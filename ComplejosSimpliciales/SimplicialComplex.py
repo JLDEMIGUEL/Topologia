@@ -1,3 +1,6 @@
+from scipy.spatial import Delaunay
+
+
 class SimplicialComplex:
     """
     Class used to represent a SimplicialComplex
@@ -81,7 +84,7 @@ class SimplicialComplex:
         subFaces
         Args:
             face: tuple of vertex
-        Adds to self.faces set all the combinations of subFaces
+        Adds to faces set all the combinations of subFaces
         """
         for vert in face:
             face2 = tuple(x for x in face if x != vert)
@@ -173,7 +176,7 @@ class SimplicialComplex:
         skeleton
 
         Args:
-            dim: dimension of the spected skeleton
+            dim: dimension of the expected skeleton
 
         Returns the skeleton with the given dimension
         """
@@ -241,3 +244,10 @@ class SimplicialComplex:
          """
         # faces.remove(())
         return sorted(faces, key=lambda a: (a, len(a)))
+
+    def AlphaComplex(self, points):
+        
+        tri = Delaunay(points)
+        print(tri.simplices)
+        sc = SimplicialComplex(tuple([tuple(e) for e in tri.simplices]))
+        print(sc.face_set())
