@@ -14,6 +14,7 @@ class SimplicialComplex:
 
     """
 
+
     def __init__(self, faces):
         """
         __init__
