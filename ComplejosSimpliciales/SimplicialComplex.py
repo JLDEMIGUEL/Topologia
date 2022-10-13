@@ -14,13 +14,17 @@ class SimplicialComplex:
 
     """
 
-
     def __init__(self, faces):
         """
         __init__
         Args:
             faces (list/set): list/set of tuples
         """
+
+        orderedFaces = set()
+        for x in faces:
+            orderedFaces.add(tuple(sorted(list(x), key=lambda a: a)))
+        faces = orderedFaces
 
         self.value = 0
         self.dic = dict()
@@ -30,9 +34,9 @@ class SimplicialComplex:
             self.faces.add(face)
             self.subFaces(face)
 
-        self.updateDict(self.faces)
+        self.updateDict(self.faces, 0)
 
-    def add(self, faces):
+    def add(self, faces, float):
         """
         add
 
@@ -40,23 +44,31 @@ class SimplicialComplex:
             faces: list/set of tuples
         Add the faces to the existing set of faces
         """
-        newSC = SimplicialComplex(faces)
-        self.faces = self.faces.union(newSC.faces)
+        orderedFaces = set()
+        for x in faces:
+            orderedFaces.add(tuple(sorted(list(x), key=lambda a: a)))
+        faces = orderedFaces
 
-        self.updateDict(newSC.faces)
+        newSC = SimplicialComplex(faces)
+        self.faces = self.faces.union(faces)
+
+        self.updateDict(newSC.faces, float)
         return
 
-    def updateDict(self, faces):
+    def updateDict(self, faces, float):
         """
         updateDict
 
         Args:
+            float:
             faces: list/set of tuples
         Updates de attribute dic with the faces given and the value
         """
         for face in faces:
             if face not in self.dic:
-                self.dic[face] = self.value
+                self.dic[face] = float
+            elif self.dic[face] > float:
+                self.dic[face] = float
         self.value += 1
 
     def orderByFloat(self):
@@ -65,7 +77,7 @@ class SimplicialComplex:
 
         Returns a list of faces ordered by their float value and its dimension
         """
-        return sorted(self.dic.keys(), key=lambda a: (self.dic[a], len(a)))
+        return sorted(self.dic.keys(), key=lambda a: (self.dic[a], len(a), a))
 
     def filterByFloat(self, value):
         """
@@ -99,6 +111,10 @@ class SimplicialComplex:
         Returns self.faces
         """
         return self.order(self.faces)
+
+
+    def thresholdvalues(self):
+            return sorted(list(set(self.dic.values())),key=lambda a: a)
 
     def dimension(self):
         """
@@ -245,10 +261,3 @@ class SimplicialComplex:
          """
         # faces.remove(())
         return sorted(faces, key=lambda a: (a, len(a)))
-
-    def AlphaComplex(self, points):
-        
-        tri = Delaunay(points)
-        print(tri.simplices)
-        sc = SimplicialComplex(tuple([tuple(e) for e in tri.simplices]))
-        print(sc.face_set())

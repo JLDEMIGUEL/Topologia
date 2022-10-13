@@ -1,6 +1,7 @@
 import numpy as np
 
 from SimplicialComplex import SimplicialComplex
+from AlphaComplex import AlphaComplex
 
 print("\n\n\n###############")
 print("EJEMPLO 1: Complejo (0,1,2,3)")
@@ -317,14 +318,20 @@ print("Connected components sc")
 print(sc.connected_components())
 print("\n")
 
-sc.add([(99, 100)])
-
-sc.add([(9, 10)])
-sc.add([(999, 1000)])
 
 print(sc.orderByFloat())
 print(sc.filterByFloat(2))
 
 points=np.array([(0.38021546727456423, 0.46419202339598786), (0.7951628297672293, 0.49263630135869474), (0.566623772375203, 0.038325621649018426), (0.3369306814864865, 0.7103735061134965), (0.08272837815822842, 0.2263273314352896), (0.5180166301873989, 0.6271769943824689), (0.33691411899985035, 0.8402045183219995), (0.33244488399729255, 0.4524636520475205), (0.11778991601260325, 0.6657734204021165), (0.9384303415747769, 0.2313873874340855)])
 
-sc.AlphaComplex(points)
+alpha = AlphaComplex(points);
+
+print("\n\n")
+print(alpha.sc.dic)
+print("\n\n")
+print(alpha.sc.dic.keys())
+print("\n\n")
+a=list()
+for x in alpha.sc.dic.keys():
+    a.insert(0,alpha.sc.dic[x])
+print(sorted(a,key=lambda a:a))
