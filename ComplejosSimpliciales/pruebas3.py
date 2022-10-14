@@ -9,14 +9,8 @@ points = np.array([(0.38021546727456423, 0.46419202339598786), (0.79516282976722
                    (0.33691411899985035, 0.8402045183219995), (0.33244488399729255, 0.4524636520475205),
                    (0.11778991601260325, 0.6657734204021165), (0.9384303415747769, 0.2313873874340855)])
 
-alpha = AlphaComplex(points)
 
-print(sorted({alpha.sc.dic[x] for x in alpha.sc.dic.keys()},key=lambda a: a))
+from Vietoris_RipsComplex import Vietoris_RipsComplex
 
-print(alpha.sc.orderByFloat())
-
-
-alpha.plotalpha(points)
-
-
+Vietoris_RipsComplex(points)
 
