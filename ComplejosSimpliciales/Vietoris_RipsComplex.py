@@ -8,20 +8,31 @@ class Vietoris_RipsComplex(SimplicialComplex):
 
     def __init__(self, points):
         self.dic = dict()
+        self.points = points
+        self.combinations = set()
         pointsTuple=tuple(x for x in points)
         self.dic[tuple(x for x in range(len(points)))] = self.calcRadio(pointsTuple)
         self.allFaces(pointsTuple)
+        self.getAllRadios()
         print(self.dic)
 
 
 
     def allFaces(self, points):
+        sizePrev = self.combinations.__len__()
         for i in range(len(points)):
             face2 = tuple(j for j in range(len(points)) if i != j)
-            face3 = tuple(x for x in points if not np.array_equal(x, points[i]))
-            self.dic[face2] = self.calcRadio(face3)
+            face3 = tuple(self.points[j] for j in face2)
+            self.combinations.add(face2)
+            if self.combinations.__len__() == sizePrev:
+                return
+            #self.dic[face2] = self.calcRadio(face3)
             #print(face2)
             self.allFaces(face3)
+
+    def getAllRadios(self):
+        for x in list(self.combinations):
+            self.dic[x] = self.calcRadio(tuple(self.points[j] for j in x))
 
     def calcRadio(self, points):
         if len(points) <= 1:
