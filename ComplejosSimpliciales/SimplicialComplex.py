@@ -1,4 +1,4 @@
-from scipy.spatial import Delaunay
+from utils import order
 
 
 class SimplicialComplex:
@@ -110,7 +110,7 @@ class SimplicialComplex:
 
         Returns self.faces
         """
-        return self.order(self.faces)
+        return order(self.faces)
 
 
     def thresholdvalues(self):
@@ -146,7 +146,7 @@ class SimplicialComplex:
 
         Returns the faces with dimension n
         """
-        return self.order(set(x for x in self.faces if len(x) - 1 == n))
+        return order(set(x for x in self.faces if len(x) - 1 == n))
 
     def star(self, face):
         """
@@ -159,7 +159,7 @@ class SimplicialComplex:
         """
         if face not in self.faces:
             return set()
-        return self.order(set(x for x in self.faces if set(face).issubset(x)))
+        return order(set(x for x in self.faces if set(face).issubset(x)))
 
     def closedStar(self, face):
         """
@@ -171,7 +171,7 @@ class SimplicialComplex:
         Returns the closed star of the given face
         """
         star = self.star(face)
-        return self.order(SimplicialComplex(star).faces)
+        return order(SimplicialComplex(star).faces)
 
     def link(self, face):
         """
@@ -186,7 +186,7 @@ class SimplicialComplex:
         for x in self.closedStar(face):
             if len(set(x).intersection(face)) == 0:
                 lk.add(x)
-        return self.order(lk)
+        return order(lk)
 
     def skeleton(self, dim):
         """
@@ -201,7 +201,7 @@ class SimplicialComplex:
         for x in self.faces:
             if len(x) <= dim + 1:
                 skeleton.add(x)
-        return self.order(skeleton)
+        return order(skeleton)
 
     def euler_characteristic(self):
         """
@@ -248,16 +248,3 @@ class SimplicialComplex:
                 edges.remove(edge)
                 reach = reach + self.reachable(vert2, edges)
         return reach
-
-    @staticmethod
-    def order(faces):
-        """
-         order
-
-         Args:
-             faces: set of faces of a Simplicial Complex
-
-         Returns the ordered list of faces
-         """
-        # faces.remove(())
-        return sorted(faces, key=lambda a: (a, len(a)))
