@@ -112,9 +112,8 @@ class SimplicialComplex:
         """
         return order(self.faces)
 
-
     def thresholdvalues(self):
-            return sorted(list(set(self.dic.values())),key=lambda a: a)
+        return sorted(list(set(self.dic.values())), key=lambda a: a)
 
     def dimension(self):
         """
@@ -221,30 +220,32 @@ class SimplicialComplex:
 
         Returns number of connected components of the SimplicialComplex
         """
-        vertex = self.skeleton(0)
-        vertex.remove(tuple())
-
+        vertex = [x[0] for x in self.n_faces(0)]
+        visitedVertex = dict()
+        for x in vertex:
+            visitedVertex[x] = False
         components = set()
         for vert in vertex:
-            edges = [x for x in self.face_set() if len(x) == 2]
-            components.add(tuple(set(self.reachable(vert[0], edges))))
+            if not visitedVertex[vert]:
+                reachableList = sorted(self.reachable(vert, visitedVertex), key=lambda a: a)
+                components.add(tuple(reachableList))
         return len(components)
 
-    def reachable(self, vert, edges):
+    def reachable(self, vert, visitedVertex):
         """
         reachable
 
         Args:
+            visitedVertex: dict with the visited vertex
             vert: entry vertex to get the list of reachable vertex
-            edges: remaining edges to explore
-
         Returns list of reachable vertex from the given vertex
         """
-        reach = list()
-        for edge in edges:
+        reach = [vert]
+        visitedVertex[vert] = True
+        for edge in self.n_faces(1):
             if vert in edge:
-                vert2 = tuple(x for x in edge if x != vert)[0]
-                reach.append(vert2)
-                edges.remove(edge)
-                reach = reach + self.reachable(vert2, edges)
+                tup = tuple(x for x in edge if x != vert)
+                endVert = tup[0]
+                if not visitedVertex[endVert]:
+                    reach = reach + self.reachable(endVert, visitedVertex)
         return reach
