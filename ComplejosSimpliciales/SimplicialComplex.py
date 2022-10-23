@@ -249,3 +249,30 @@ class SimplicialComplex:
                 if not visitedVertex[endVert]:
                     reach = reach + self.reachable(endVert, visitedVertex)
         return reach
+
+    def boundarymatrix(self, p):
+        """
+        boundarymatrix
+
+        Args:
+            p (int): dimension
+
+        Returns:
+            boundary matrix for the given dimension
+        """
+        Cp = self.n_faces(p)
+        Cp_1 = self.n_faces(p-1)
+
+        Md = [[0 for x in range(len(Cp))] for y in range(len(Cp_1))]
+
+        for i in range(len(Cp_1)):
+            for j in range(len(Cp)):
+                bool = False
+                for vert in Cp_1[i]:
+                    if vert not in Cp[j]:
+                        bool = False
+                        break
+                    bool = True
+                if not bool: continue
+                Md[i][j] = 1
+        return Md
