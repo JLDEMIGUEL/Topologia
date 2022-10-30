@@ -1,4 +1,6 @@
-from utils import order
+import numpy as np
+
+from utils import order, smith_normal_form
 
 
 class SimplicialComplex:
@@ -276,3 +278,11 @@ class SimplicialComplex:
                 if not bool: continue
                 Md[i][j] = 1
         return Md
+
+    def betti_number(self, p):
+        mp = smith_normal_form(np.matrix(self.boundarymatrix(p)))
+        mp_1 = smith_normal_form(np.matrix(self.boundarymatrix(p+1)))
+        dim_zp = len([x for x in np.transpose(mp) if 1 not in x])
+        dim_bp = len([x for x in mp_1 if 1 in x])
+        print('dimzp',dim_zp,'dimbp',dim_bp,'bp',  dim_zp - dim_bp)
+        return dim_zp - dim_bp

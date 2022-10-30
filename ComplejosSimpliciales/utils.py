@@ -83,3 +83,68 @@ def order(faces):
      """
     # faces.remove(())
     return sorted(faces, key=lambda a: (a, len(a)))
+
+
+def search_one(matrix):
+    [rows, columns] = matrix.shape
+    ret = [rows-1, columns-1]
+    for x in range(rows):
+        for y in range(columns):
+            if matrix[x, y] == 1 and x + y < ret[0] + ret[1]:
+                ret = [x, y]
+    return ret
+
+
+def swap(matrix, source, obj):
+    aux = matrix.copy()
+    if source[0] != obj[0]:
+        aux[obj[0], :] = matrix[source[0], :]
+        aux[source[0], :] = matrix[obj[0], :]
+    aux2 = aux.copy()
+    if source[1] != obj[1]:
+        aux[:, obj[1]] = aux2[:, source[1]]
+        aux[:, source[1]] = aux2[:, obj[1]]
+    return aux
+
+def simplify_columns(matrix):
+    [rows, columns] = matrix.shape
+    for i in range(columns - 1):
+        i += 1
+        if matrix[0, i] == 1:
+            matrix[:, i] = (matrix[:, i] + matrix[:, 0]) % 2
+    return matrix
+
+
+def simplify_rows(matrix):
+    [rows, columns] = matrix.shape
+    for i in range(rows - 1):
+        i += 1
+        if matrix[i, 0] == 1:
+            matrix[i, :] = (matrix[i, :] + matrix[0, :]) % 2
+    return matrix
+
+
+def smith_normal_form(matrix):
+    if matrix.shape[0] == 0 or matrix.shape[1] == 0:
+        return matrix
+    [x, y] = search_one(matrix)
+    if matrix[x, y] != 1:
+        return matrix
+    if [x, y] != [0, 0]:
+        matrix = swap(matrix, [x, y], [0, 0])
+    matrix = simplify_columns(matrix)
+    matrix = simplify_rows(matrix)
+    aux = np.delete(matrix, 0, 0)
+    aux = np.delete(aux, 0, 1)
+    aux = smith_normal_form(aux)
+    aux = reconstruct(matrix, aux)
+    return aux
+
+
+def reconstruct(matrix, aux):
+    first_row = matrix[0, :]
+    first_row = np.delete(first_row, 0)
+    first_column = matrix[:, 0]
+    aux = np.insert(aux, 0, first_row, 0)
+    aux = np.concatenate([first_column, aux], 1)
+    return aux
