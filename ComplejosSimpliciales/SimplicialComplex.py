@@ -263,7 +263,7 @@ class SimplicialComplex:
             boundary matrix for the given dimension
         """
         Cp = self.n_faces(p)
-        Cp_1 = self.n_faces(p-1)
+        Cp_1 = self.n_faces(p - 1)
 
         Md = [[0 for x in range(len(Cp))] for y in range(len(Cp_1))]
 
@@ -280,9 +280,17 @@ class SimplicialComplex:
         return Md
 
     def betti_number(self, p):
+        """
+        Gets the betti numbers of the simplicial complex for the given dimension p
+        Args:
+            p: dimension (int)
+
+        Returns the betti_number
+
+        """
         mp = smith_normal_form(np.matrix(self.boundarymatrix(p)))
-        mp_1 = smith_normal_form(np.matrix(self.boundarymatrix(p+1)))
+        mp_1 = smith_normal_form(np.matrix(self.boundarymatrix(p + 1)))
         dim_zp = len([x for x in np.transpose(mp) if 1 not in x])
         dim_bp = len([x for x in mp_1 if 1 in x])
-        print('dimzp',dim_zp,'dimbp',dim_bp,'bp',  dim_zp - dim_bp)
+        print('dimzp', dim_zp, 'dimbp', dim_bp, 'bp', dim_zp - dim_bp)
         return dim_zp - dim_bp

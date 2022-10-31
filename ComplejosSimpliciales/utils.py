@@ -1,4 +1,5 @@
 import math
+
 import matplotlib.colors
 import numpy as np
 from matplotlib import pyplot as plt
@@ -86,8 +87,16 @@ def order(faces):
 
 
 def search_one(matrix):
+    """
+    Searches a one with lower indexes in the given matrix
+    Args:
+        matrix: np.matrix
+
+    Returns the indexes of the one
+
+    """
     [rows, columns] = matrix.shape
-    ret = [rows-1, columns-1]
+    ret = [rows - 1, columns - 1]
     for x in range(rows):
         for y in range(columns):
             if matrix[x, y] == 1 and x + y < ret[0] + ret[1]:
@@ -96,6 +105,16 @@ def search_one(matrix):
 
 
 def swap(matrix, source, obj):
+    """
+    Swap the row and column given in source and the ones in obj
+    Args:
+        matrix: np.matrix
+        source: array
+        obj: array
+
+    Returns the given matrix with the applied swap
+
+    """
     aux = matrix.copy()
     if source[0] != obj[0]:
         aux[obj[0], :] = matrix[source[0], :]
@@ -106,8 +125,17 @@ def swap(matrix, source, obj):
         aux[:, source[1]] = aux2[:, obj[1]]
     return aux
 
+
 def simplify_columns(matrix):
-    [rows, columns] = matrix.shape
+    """
+    Simplifies the columns of the given matrix
+    Args:
+        matrix: np.matrix
+
+    Returns the simplified matrix
+
+    """
+    columns = matrix.shape[1]
     for i in range(columns - 1):
         i += 1
         if matrix[0, i] == 1:
@@ -116,7 +144,15 @@ def simplify_columns(matrix):
 
 
 def simplify_rows(matrix):
-    [rows, columns] = matrix.shape
+    """
+    Simplifies the rows of the given matrix
+    Args:
+        matrix: np.matrix
+
+    Returns the simplified matrix
+
+    """
+    rows = matrix.shape[0]
     for i in range(rows - 1):
         i += 1
         if matrix[i, 0] == 1:
@@ -124,7 +160,33 @@ def simplify_rows(matrix):
     return matrix
 
 
+def reconstruct(matrix, aux):
+    """
+    Mixes the sub-matrix aux with the matrix
+    Args:
+        matrix: np.matrix
+        aux: np.matrix
+
+    Returns the reconstructed matrix
+
+    """
+    first_row = matrix[0, :]
+    first_row = np.delete(first_row, 0)
+    first_column = matrix[:, 0]
+    aux = np.insert(aux, 0, first_row, 0)
+    aux = np.concatenate([first_column, aux], 1)
+    return aux
+
+
 def smith_normal_form(matrix):
+    """
+    Smith normal form of the given matrix
+    Args:
+        matrix: np.matrix
+
+    Returns the smith normal form of the given matrix
+
+    """
     if matrix.shape[0] == 0 or matrix.shape[1] == 0:
         return matrix
     [x, y] = search_one(matrix)
@@ -138,13 +200,4 @@ def smith_normal_form(matrix):
     aux = np.delete(aux, 0, 1)
     aux = smith_normal_form(aux)
     aux = reconstruct(matrix, aux)
-    return aux
-
-
-def reconstruct(matrix, aux):
-    first_row = matrix[0, :]
-    first_row = np.delete(first_row, 0)
-    first_column = matrix[:, 0]
-    aux = np.insert(aux, 0, first_row, 0)
-    aux = np.concatenate([first_column, aux], 1)
     return aux
