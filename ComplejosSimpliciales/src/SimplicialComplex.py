@@ -1,6 +1,7 @@
 import numpy as np
 
-from utils import order, smith_normal_form
+from ComplejosSimpliciales.src.utils.matrices_utils import smith_normal_form
+from ComplejosSimpliciales.src.utils.simplicial_complex_utils import order, reachable, subFaces, updateDict, order_faces
 
 
 class SimplicialComplex:
@@ -23,55 +24,30 @@ class SimplicialComplex:
             faces (list/set): list/set of tuples
         """
 
-        orderedFaces = set()
-        for x in faces:
-            orderedFaces.add(tuple(sorted(list(x), key=lambda a: a)))
-        faces = orderedFaces
+        faces = order_faces(faces)
 
-        self.value = 0
         self.dic = dict()
 
         self.faces = set()
         for face in faces:
             self.faces.add(face)
-            self.subFaces(face)
+            self.faces = self.faces.union(subFaces(face))
 
-        self.updateDict(self.faces, 0)
+        updateDict(self.dic, self.faces, 0)
 
-    def add(self, faces, float):
+    def add(self, faces, float_value):
         """
         add
 
         Args:
+            float_value: 
             faces: list/set of tuples
         Add the faces to the existing set of faces
         """
-        orderedFaces = set()
-        for x in faces:
-            orderedFaces.add(tuple(sorted(list(x), key=lambda a: a)))
-        faces = orderedFaces
-
         newSC = SimplicialComplex(faces)
-        self.faces = self.faces.union(faces)
+        self.faces = self.faces.union(newSC.face_set())
 
-        self.updateDict(newSC.faces, float)
-        return
-
-    def updateDict(self, faces, float):
-        """
-        updateDict
-
-        Args:
-            float:
-            faces: list/set of tuples
-        Updates de attribute dic with the faces given and the value
-        """
-        for face in faces:
-            if face not in self.dic:
-                self.dic[face] = float
-            elif self.dic[face] > float:
-                self.dic[face] = float
-        self.value += 1
+        updateDict(self.dic, newSC.faces, float_value)
 
     def orderByFloat(self):
         """
@@ -93,18 +69,6 @@ class SimplicialComplex:
         keys = self.dic.keys()
         res = {x for x in keys if self.dic[x] <= value}
         return res
-
-    def subFaces(self, face):
-        """
-        subFaces
-        Args:
-            face: tuple of vertex
-        Adds to faces set all the combinations of subFaces
-        """
-        for vert in face:
-            face2 = tuple(x for x in face if x != vert)
-            self.faces.add(face2)
-            self.subFaces(face2)
 
     def face_set(self):
         """
@@ -229,28 +193,9 @@ class SimplicialComplex:
         components = set()
         for vert in vertex:
             if not visitedVertex[vert]:
-                reachableList = sorted(self.reachable(vert, visitedVertex), key=lambda a: a)
+                reachableList = sorted(reachable(self.n_faces(1), vert, visitedVertex), key=lambda a: a)
                 components.add(tuple(reachableList))
         return len(components)
-
-    def reachable(self, vert, visitedVertex):
-        """
-        reachable
-
-        Args:
-            visitedVertex: dict with the visited vertex
-            vert: entry vertex to get the list of reachable vertex
-        Returns list of reachable vertex from the given vertex
-        """
-        reach = [vert]
-        visitedVertex[vert] = True
-        for edge in self.n_faces(1):
-            if vert in edge:
-                tup = tuple(x for x in edge if x != vert)
-                endVert = tup[0]
-                if not visitedVertex[endVert]:
-                    reach = reach + self.reachable(endVert, visitedVertex)
-        return reach
 
     def boundarymatrix(self, p):
         """

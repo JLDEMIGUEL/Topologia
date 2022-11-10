@@ -1,9 +1,9 @@
-from utils import radius, edges, plottriangles, plotedges
-from SimplicialComplex import SimplicialComplex
-from scipy.spatial import Delaunay, Voronoi, voronoi_plot_2d
 import matplotlib.pyplot as plt
 from IPython.core.display_functions import clear_output
-import time
+from scipy.spatial import Delaunay, Voronoi, voronoi_plot_2d
+
+from ComplejosSimpliciales.src.SimplicialComplex import SimplicialComplex
+from ComplejosSimpliciales.src.utils.alpha_complex_utils import radius, edges, plottriangles, plotedges
 
 
 class AlphaComplex(SimplicialComplex):
@@ -57,4 +57,4 @@ class AlphaComplex(SimplicialComplex):
             plottriangles(triangles, self.tri)
 
             plt.show()
-            time.sleep(.2)
+            #time.sleep(.2)
