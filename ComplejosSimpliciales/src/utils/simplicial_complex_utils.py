@@ -47,26 +47,43 @@ def subFaces(face):
     return auxSet
 
 
-def updateDict(dic, faces, float_value):
+def updateDict(dic_target, faces, float_value):
     """
     updateDict
 
     Args:
-        dic: dict
+        dic_target: dict
         float_value:
         faces: list/set of tuples
     Updates de attribute dic with the faces given and the value
     """
+    dic = dic_target.copy()
     for face in faces:
         if face not in dic:
             dic[face] = float_value
         elif dic[face] > float_value:
             dic[face] = float_value
+    return dic
 
 
 def order_faces(faces):
-    orderedFaces = set()
+    sorted_faces = set()
     for x in faces:
-        orderedFaces.add(tuple(sorted(list(x), key=lambda a: a)))
-    faces = orderedFaces
+        sorted_faces.add(tuple(sorted(list(x), key=lambda a: a)))
+    faces = sorted_faces
     return faces
+
+
+def filterByFloat(dic, value):
+    """
+    filterByFloat
+
+    Args:
+        dic: dict
+        value: Float value
+
+    Returns a set of faces which float value is less than the given value
+    """
+    keys = dic.keys()
+    res = {x for x in keys if dic[x] <= value}
+    return res

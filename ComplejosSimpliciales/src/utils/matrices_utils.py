@@ -41,15 +41,16 @@ def swap(matrix, source, obj):
     return aux
 
 
-def simplify_columns(matrix):
+def simplify_columns(matrix_target):
     """
     Simplifies the columns of the given matrix
     Args:
-        matrix: np.matrix
+        matrix_target:  np.matrix
 
     Returns the simplified matrix
 
     """
+    matrix = matrix_target.copy()
     columns = matrix.shape[1]
     for i in range(columns - 1):
         i += 1
@@ -58,15 +59,16 @@ def simplify_columns(matrix):
     return matrix
 
 
-def simplify_rows(matrix):
+def simplify_rows(matrix_target):
     """
     Simplifies the rows of the given matrix
     Args:
-        matrix: np.matrix
+        matrix_target: np.matrix
 
     Returns the simplified matrix
 
     """
+    matrix = matrix_target.copy()
     rows = matrix.shape[0]
     for i in range(rows - 1):
         i += 1

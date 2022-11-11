@@ -33,7 +33,7 @@ class SimplicialComplex:
             self.faces.add(face)
             self.faces = self.faces.union(subFaces(face))
 
-        updateDict(self.dic, self.faces, 0)
+        self.dic = updateDict(self.dic, self.faces, 0)
 
     def add(self, faces, float_value):
         """
@@ -44,31 +44,19 @@ class SimplicialComplex:
             faces: list/set of tuples
         Add the faces to the existing set of faces
         """
-        newSC = SimplicialComplex(faces)
-        self.faces = self.faces.union(newSC.face_set())
+        faces = SimplicialComplex(faces).face_set()
 
-        updateDict(self.dic, newSC.faces, float_value)
+        self.faces = self.faces.union(faces)
 
-    def orderByFloat(self):
+        self.dic = updateDict(self.dic, faces, float_value)
+
+    def filtration_order(self):
         """
-        orderByFloat
+        filtration_order
 
         Returns a list of faces ordered by their float value and its dimension
         """
         return sorted(self.dic.keys(), key=lambda a: (self.dic[a], len(a), a))
-
-    def filterByFloat(self, value):
-        """
-        filterByFloat
-
-        Args:
-            value: Float value
-
-        Returns a set of faces which float value is less than the given value
-        """
-        keys = self.dic.keys()
-        res = {x for x in keys if self.dic[x] <= value}
-        return res
 
     def face_set(self):
         """
@@ -210,7 +198,7 @@ class SimplicialComplex:
         Cp = self.n_faces(p)
         Cp_1 = self.n_faces(p - 1)
 
-        Md = [[0 for x in range(len(Cp))] for y in range(len(Cp_1))]
+        Md = [[0 for _ in range(len(Cp))] for y in range(len(Cp_1))]
 
         for i in range(len(Cp_1)):
             for j in range(len(Cp)):
