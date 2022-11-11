@@ -1,9 +1,12 @@
+import time
+
 import matplotlib.pyplot as plt
 from IPython.core.display_functions import clear_output
 from scipy.spatial import Delaunay, Voronoi, voronoi_plot_2d
 
 from ComplejosSimpliciales.src.SimplicialComplex import SimplicialComplex
 from ComplejosSimpliciales.src.utils.alpha_complex_utils import radius, edges, plottriangles, plotedges
+from ComplejosSimpliciales.src.utils.simplicial_complex_utils import filterByFloat
 
 
 class AlphaComplex(SimplicialComplex):
@@ -24,7 +27,7 @@ class AlphaComplex(SimplicialComplex):
         """
         __init__
         Args:
-            points (array): array of points
+            points (np.array): array of points
         """
 
         self.tri = Delaunay(points)
@@ -47,7 +50,7 @@ class AlphaComplex(SimplicialComplex):
         vor = Voronoi(self.tri.points)
         for x in self.thresholdvalues():
             clear_output()
-            faces = self.filterByFloat(x)
+            faces = filterByFloat(self.dic, x)
             edges = [list(edge) for edge in faces if len(edge) == 2]
             triangles = [list(triangle) for triangle in faces if len(triangle) == 3]
 
@@ -57,4 +60,4 @@ class AlphaComplex(SimplicialComplex):
             plottriangles(triangles, self.tri)
 
             plt.show()
-            #time.sleep(.2)
+            time.sleep(.2)
