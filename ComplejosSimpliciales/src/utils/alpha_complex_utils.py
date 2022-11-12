@@ -5,17 +5,13 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def radius(tri, points):
+def radius(a, b, c):
     """
     radius
     Args:
-        tri (Delaunay): Delaunay triangulation
-        points (np.array): Array of points
+
     Returns the Circumscribed circle radius of the given triangle
     """
-    a = tri.points[points[0]]
-    b = tri.points[points[1]]
-    c = tri.points[points[2]]
     lado_a = math.dist(c, b)
     lado_b = math.dist(a, c)
     lado_c = math.dist(a, b)
@@ -25,22 +21,21 @@ def radius(tri, points):
     return radio
 
 
-def edges(tri, arista):
+def edges(v1, v2, points):
     """
     edges
     Args:
-        tri (Delaunay): Delaunay triangulation
-        arista (tuple): tuple of vertex
+        v1:
+        v2:
+        points:
     Returns None or radius depending on AlphaComplex algorithm
     """
-    v1 = tri.points[arista[0]]
-    v2 = tri.points[arista[1]]
     radio = math.dist(v1, v2) * 0.5
     centro = (v1 + v2) * 0.5
-    for x in range(len(tri.points)):
-        if math.dist(centro, tri.points[x]) < radio:
-            if math.dist(tri.points[x], v1) > 0:
-                if math.dist(tri.points[x], v2) > 0:
+    for x in range(len(points)):
+        if math.dist(centro, points[x]) < radio:
+            if math.dist(points[x], v1) > 0:
+                if math.dist(points[x], v2) > 0:
                     return
     return radio
 
