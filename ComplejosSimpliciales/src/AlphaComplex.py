@@ -34,11 +34,11 @@ class AlphaComplex(SimplicialComplex):
         aux = SimplicialComplex(tuple([tuple(e) for e in self.tri.simplices]))
         super().__init__(aux.n_faces(0))
         for x in aux.n_faces(1):
-            r = edges(self.tri, x)
+            r = edges(self.tri.points[x[0]], self.tri.points[x[1]], self.tri.points)
             if r is not None:
                 self.add({x}, r)
         for x in aux.n_faces(2):
-            self.add({x}, radius(self.tri, x))
+            self.add({x}, radius(self.tri.points[x[0]], self.tri.points[x[1]], self.tri.points[x[2]]))
 
     def plotalpha(self):
         """
