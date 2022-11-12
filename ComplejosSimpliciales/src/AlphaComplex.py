@@ -1,6 +1,7 @@
 import time
 
 import matplotlib.pyplot as plt
+import numpy as np
 from IPython.core.display_functions import clear_output
 from scipy.spatial import Delaunay, Voronoi, voronoi_plot_2d
 
@@ -23,11 +24,14 @@ class AlphaComplex(SimplicialComplex):
 
     """
 
-    def __init__(self, points):
+    def __init__(self, points: np.array) -> None:
         """
         __init__
         Args:
             points (np.array): array of points
+
+        Returns:
+            None:
         """
 
         self.tri = Delaunay(points)
@@ -40,11 +44,14 @@ class AlphaComplex(SimplicialComplex):
         for x in aux.n_faces(2):
             self.add({x}, radius(self.tri.points[x[0]], self.tri.points[x[1]], self.tri.points[x[2]]))
 
-    def plotalpha(self):
+    def plotalpha(self) -> None:
         """
         plotalpha
 
         Plots the AlphaComplex iterating the dict values in order
+
+        Returns:
+            None:
         """
 
         vor = Voronoi(self.tri.points)

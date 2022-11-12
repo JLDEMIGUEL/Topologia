@@ -83,7 +83,7 @@ class TestSimplicialComplex(TestCase):
     def test_face_set_1(self):
         expected_faces = [(), (0,), (0, 1), (0, 1, 2), (0, 1, 2, 3), (0, 1, 3), (0, 2), (0, 2, 3), (0, 3), (1,), (1, 2),
                           (1, 2, 3), (1, 3), (2,), (2, 3), (3,)]
-        self.assertEquals(expected_faces, self.sc1.face_set())
+        self.assertEqual(expected_faces, self.sc1.face_set())
 
     def test_face_set_2(self):
         expected_faces = [(), (0,), (0, 1), (1,), (1, 2), (1, 2, 3), (1, 2, 3, 4), (1, 2, 4), (1, 3), (1, 3, 4), (1, 4),
@@ -205,29 +205,29 @@ class TestSimplicialComplex(TestCase):
 
     def test_boundarymatrix_1(self):
         expected_bm_0 = [[0, 0, 0, 0]]
-        self.assertEqual(expected_bm_0, self.sc1.boundarymatrix(0))
+        self.assertTrue((expected_bm_0 == self.sc1.boundarymatrix(0)).all())
         expected_bm_1 = [[1, 1, 1, 0, 0, 0],
                          [1, 0, 0, 1, 1, 0],
                          [0, 1, 0, 1, 0, 1],
                          [0, 0, 1, 0, 1, 1]]
-        self.assertEqual(expected_bm_1, self.sc1.boundarymatrix(1))
+        self.assertTrue((expected_bm_1 == self.sc1.boundarymatrix(1)).all())
         expected_bm_2 = [[1, 1, 0, 0],
                          [1, 0, 1, 0],
                          [0, 1, 1, 0],
                          [1, 0, 0, 1],
                          [0, 1, 0, 1],
                          [0, 0, 1, 1]]
-        self.assertEqual(expected_bm_2, self.sc1.boundarymatrix(2))
+        self.assertTrue((expected_bm_2 == self.sc1.boundarymatrix(2)).all())
         expected_bm_3 = [[1],
                          [1],
                          [1],
                          [1]]
-        self.assertEqual(expected_bm_3, self.sc1.boundarymatrix(3))
-        self.assertEqual([[]], self.sc1.boundarymatrix(4))
+        self.assertTrue((expected_bm_3 == self.sc1.boundarymatrix(3)).all())
+        self.assertTrue(([[]] == self.sc1.boundarymatrix(4)).all())
 
     def test_boundarymatrix_2(self):
         expected_bm_0 = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-        self.assertEqual(expected_bm_0, self.sc2.boundarymatrix(0))
+        self.assertTrue((expected_bm_0 == self.sc2.boundarymatrix(0)).all())
         expected_bm_1 = [[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                          [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                          [0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -238,7 +238,7 @@ class TestSimplicialComplex(TestCase):
                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]]
-        self.assertEqual(expected_bm_1, self.sc2.boundarymatrix(1))
+        self.assertTrue((expected_bm_1 == self.sc2.boundarymatrix(1)).all())
         expected_bm_2 = [[0, 0, 0, 0, 0],
                          [1, 1, 0, 0, 0],
                          [1, 0, 1, 0, 0],
@@ -253,14 +253,14 @@ class TestSimplicialComplex(TestCase):
                          [0, 0, 0, 0, 1],
                          [0, 0, 0, 0, 1],
                          [0, 0, 0, 0, 0]]
-        self.assertEqual(expected_bm_2, self.sc2.boundarymatrix(2))
+        self.assertTrue((expected_bm_2 == self.sc2.boundarymatrix(2)).all())
         expected_bm_3 = [[1],
                          [1],
                          [1],
                          [1],
                          [0]]
-        self.assertEqual(expected_bm_3, self.sc2.boundarymatrix(3))
-        self.assertEqual([[]], self.sc2.boundarymatrix(4))
+        self.assertTrue((expected_bm_3 == self.sc2.boundarymatrix(3)).all())
+        self.assertTrue(([[]] == self.sc2.boundarymatrix(4)).all())
 
     def test_betti_number_1(self):
         self.assertEqual(1, self.sc1.betti_number(0))

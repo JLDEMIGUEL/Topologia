@@ -17,11 +17,14 @@ class SimplicialComplex:
 
     """
 
-    def __init__(self, faces):
+    def __init__(self, faces: list | set | tuple) -> None:
         """
         __init__
         Args:
-            faces (list/set): list/set of tuples
+            faces (list | set | tuple): list/set of tuples
+
+        Returns:
+            None:
         """
 
         faces = order_faces(faces)
@@ -35,13 +38,16 @@ class SimplicialComplex:
 
         self.dic = updateDict(self.dic, self.faces, 0)
 
-    def add(self, faces, float_value):
+    def add(self, faces: list | set | tuple, float_value: float) -> None:
         """
         add
 
         Args:
-            float_value: 
-            faces: list/set of tuples
+            float_value (float):
+            faces (list | set | tuple): list/set of tuples
+
+        Returns:
+            None:
         Add the faces to the existing set of faces
         """
         faces = SimplicialComplex(faces).face_set()
@@ -50,30 +56,45 @@ class SimplicialComplex:
 
         self.dic = updateDict(self.dic, faces, float_value)
 
-    def filtration_order(self):
+    def filtration_order(self) -> list[tuple]:
         """
         filtration_order
 
         Returns a list of faces ordered by their float value and its dimension
+
+        Returns:
+             list[tuple]:
         """
         return sorted(self.dic.keys(), key=lambda a: (self.dic[a], len(a), a))
 
-    def face_set(self):
+    def face_set(self) -> list[tuple]:
         """
         face_set
 
         Returns self.faces
+
+        Returns:
+             list[tuple]:
         """
         return order(self.faces)
 
-    def thresholdvalues(self):
+    def thresholdvalues(self) -> list[int]:
+        """
+        thresholdvalues
+        Returns:
+             list[int]:
+
+        """
         return sorted(list(set(self.dic.values())), key=lambda a: a)
 
-    def dimension(self):
+    def dimension(self) -> int:
         """
         dimension
 
         Returns the dimension of the SimplicialComplex
+
+        Returns:
+            int:
         """
         dim = 1
         for face in self.faces:
@@ -81,57 +102,60 @@ class SimplicialComplex:
                 dim = len(face)
         return dim - 1
 
-    """
-    n_faces
-
-    Args:
-        n: dimension
-
-    Returns the faces with dimension n
-    """
-
-    def n_faces(self, n):
+    def n_faces(self, n: int) -> list[tuple]:
         """
         n_faces
 
         Args:
-            n: dimension
+            n (int): dimension
+
+        Returns:
+             list[tuple]:
 
         Returns the faces with dimension n
         """
         return order(set(x for x in self.faces if len(x) - 1 == n))
 
-    def star(self, face):
+    def star(self, face: tuple) -> list[tuple]:
         """
         star
 
         Args:
-            face: base face of the star
+            face (tuple): base face of the star
+
+        Returns:
+             list[tuple]:
 
         Returns the star of the given face
         """
         if face not in self.faces:
-            return set()
+            return list()
         return order(set(x for x in self.faces if set(face).issubset(x)))
 
-    def closedStar(self, face):
+    def closedStar(self, face: tuple) -> list[tuple]:
         """
         closedStar
 
         Args:
-            face: base face of the closedStar
+            face (tuple): base face of the closedStar
+
+        Returns:
+             list[tuple]:
 
         Returns the closed star of the given face
         """
         star = self.star(face)
         return order(SimplicialComplex(star).faces)
 
-    def link(self, face):
+    def link(self, face: tuple) -> list[tuple]:
         """
         link
 
         Args:
-            face: base face of the link
+            face (tuple): base face of the link
+
+        Returns:
+            list[tuple]:
 
         Returns the link of the given face
         """
@@ -141,12 +165,15 @@ class SimplicialComplex:
                 lk.add(x)
         return order(lk)
 
-    def skeleton(self, dim):
+    def skeleton(self, dim: int) -> list[tuple]:
         """
         skeleton
 
         Args:
-            dim: dimension of the expected skeleton
+            dim (int): dimension of the expected skeleton
+
+        Returns:
+            list[tuple]:
 
         Returns the skeleton with the given dimension
         """
@@ -156,11 +183,14 @@ class SimplicialComplex:
                 skeleton.add(x)
         return order(skeleton)
 
-    def euler_characteristic(self):
+    def euler_characteristic(self) -> int:
         """
         euler_characteristic
 
         Returns the euler characteristic
+
+        Returns:
+            int:
         """
         euler = 0
         for i in range(self.dimension() + 1):
@@ -168,11 +198,14 @@ class SimplicialComplex:
             euler += (-1) ** i * sk
         return euler
 
-    def connected_components(self):
+    def connected_components(self) -> int:
         """
         connected_components
 
         Returns number of connected components of the SimplicialComplex
+
+        Returns:
+            int:
         """
         vertex = [x[0] for x in self.n_faces(0)]
         visitedVertex = dict()
@@ -185,7 +218,7 @@ class SimplicialComplex:
                 components.add(tuple(reachableList))
         return len(components)
 
-    def boundarymatrix(self, p):
+    def boundarymatrix(self, p: int) -> np.matrix:
         """
         boundarymatrix
 
@@ -193,30 +226,35 @@ class SimplicialComplex:
             p (int): dimension
 
         Returns:
+            np.matrix:
             boundary matrix for the given dimension
         """
         Cp = self.n_faces(p)
         Cp_1 = self.n_faces(p - 1)
 
-        Md = [[0 for _ in range(len(Cp))] for y in range(len(Cp_1))]
+        Md = [[0 for _ in range(len(Cp))] for _ in range(len(Cp_1))]
 
         for i in range(len(Cp_1)):
             for j in range(len(Cp)):
-                bool = False
+                is_in = False
                 for vert in Cp_1[i]:
                     if vert not in Cp[j]:
-                        bool = False
+                        is_in = False
                         break
-                    bool = True
-                if not bool: continue
+                    is_in = True
+                if not is_in:
+                    continue
                 Md[i][j] = 1
-        return Md
+        return np.matrix(Md)
 
-    def betti_number(self, p):
+    def betti_number(self, p: int) -> int:
         """
         Gets the betti numbers of the simplicial complex for the given dimension p
         Args:
-            p: dimension (int)
+            p (int): dimension
+
+        Returns:
+            int:
 
         Returns the betti_number
 
@@ -225,5 +263,4 @@ class SimplicialComplex:
         mp_1 = smith_normal_form(np.matrix(self.boundarymatrix(p + 1)))
         dim_zp = len([x for x in np.transpose(mp) if 1 not in x])
         dim_bp = len([x for x in mp_1 if 1 in x])
-        print('dimzp', dim_zp, 'dimbp', dim_bp, 'bp', dim_zp - dim_bp)
         return dim_zp - dim_bp
