@@ -3,12 +3,19 @@ import math
 import matplotlib.colors
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy.spatial import Delaunay
 
 
-def radius(a, b, c):
+def radius(a: tuple, b: tuple, c: tuple) -> float:
     """
     radius
     Args:
+        a (tuple):
+        b (tuple):
+        c (tuple):
+
+    Returns:
+        float:
 
     Returns the Circumscribed circle radius of the given triangle
     """
@@ -21,13 +28,16 @@ def radius(a, b, c):
     return radio
 
 
-def edges(v1, v2, points):
+def edges(v1: tuple, v2: tuple, points: np.ndarray) -> float | None:
     """
     edges
     Args:
-        v1:
-        v2:
-        points:
+        v1 (tuple):
+        v2 (tuple):
+        points (np.ndarray):
+
+    Returns:
+        float | None:
     Returns None or radius depending on AlphaComplex algorithm
     """
     radio = math.dist(v1, v2) * 0.5
@@ -40,12 +50,15 @@ def edges(v1, v2, points):
     return radio
 
 
-def plottriangles(triangles, tri):
+def plottriangles(triangles: list, tri: Delaunay) -> None:
     """
     plottriangles
     Args:
         tri (Delaunay): Delaunay triangulation
         triangles (list): list of triangles
+
+    Returns:
+        None:
     Plots the given triangles
     """
     if len(triangles) > 0:
@@ -54,12 +67,15 @@ def plottriangles(triangles, tri):
         plt.tripcolor(tri.points[:, 0], tri.points[:, 1], triangles, c, edgecolor="k", lw=2, cmap=cmap)
 
 
-def plotedges(edges, tri):
+def plotedges(edges: list, tri: Delaunay) -> None:
     """
     plotedges
     Args:
         tri (Delaunay): Delaunay triangulation
         edges (list): list of edges
+
+    Returns:
+        None:
     Plots the given edges
     """
     for edge in edges:

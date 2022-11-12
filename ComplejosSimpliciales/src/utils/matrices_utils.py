@@ -1,11 +1,14 @@
 import numpy as np
 
 
-def search_one(matrix):
+def search_one(matrix: np.matrix) -> list:
     """
     Searches a one with lower indexes in the given matrix
     Args:
-        matrix: np.matrix
+        matrix (np.matrix):
+
+    Returns:
+        list:
 
     Returns the indexes of the one
 
@@ -19,13 +22,16 @@ def search_one(matrix):
     return ret
 
 
-def swap(matrix, source, obj):
+def swap(matrix: np.matrix, source: list, obj: list) -> np.matrix:
     """
     Swap the row and column given in source and the ones in obj
     Args:
-        matrix: np.matrix
-        source: array
-        obj: array
+        matrix (np.matrix):
+        source (list):
+        obj (list):
+
+    Returns:
+        np.matrix:
 
     Returns the given matrix with the applied swap
 
@@ -41,11 +47,14 @@ def swap(matrix, source, obj):
     return aux
 
 
-def simplify_columns(matrix_target):
+def simplify_columns(matrix_target: np.matrix) -> np.matrix:
     """
     Simplifies the columns of the given matrix
     Args:
-        matrix_target:  np.matrix
+        matrix_target (np.matrix):
+
+    Returns:
+        np.matrix:
 
     Returns the simplified matrix
 
@@ -59,11 +68,14 @@ def simplify_columns(matrix_target):
     return matrix
 
 
-def simplify_rows(matrix_target):
+def simplify_rows(matrix_target: np.matrix) -> np.matrix:
     """
     Simplifies the rows of the given matrix
     Args:
-        matrix_target: np.matrix
+        matrix_target (np.matrix):
+
+    Returns:
+        np.matrix:
 
     Returns the simplified matrix
 
@@ -77,12 +89,15 @@ def simplify_rows(matrix_target):
     return matrix
 
 
-def reconstruct(matrix, aux):
+def reconstruct(matrix: np.matrix, aux: np.matrix) -> np.matrix:
     """
     Mixes the sub-matrix aux with the matrix
     Args:
-        matrix: np.matrix
-        aux: np.matrix
+        matrix (np.matrix):
+        aux (np.matrix):
+
+    Returns:
+        np.matrix:
 
     Returns the reconstructed matrix
 
@@ -95,11 +110,14 @@ def reconstruct(matrix, aux):
     return aux
 
 
-def smith_normal_form(matrix):
+def smith_normal_form(matrix: np.matrix) -> np.matrix:
     """
     Smith normal form of the given matrix
     Args:
-        matrix: np.matrix
+        matrix (np.matrix):
+
+    Returns:
+        np.matrix:
 
     Returns the smith normal form of the given matrix
 

@@ -3,7 +3,16 @@ import math
 import numpy as np
 
 
-def calcRadio(points):
+def calcRadio(points: np.ndarray) -> float:
+    """
+
+    Args:
+        points (np.ndarray):
+
+    Returns:
+        float:
+
+    """
     if len(points) <= 1:
         return 0
     maximum = 0
