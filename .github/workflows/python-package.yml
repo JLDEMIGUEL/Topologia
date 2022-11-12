@@ -22,6 +22,6 @@ jobs:
           pip install -r requirements.txt
       - name: Test with pytest
         run: |
-          run: python -m unittest test
+          run: python -m unittest ComplejosSimpliciales/tests
 
 
