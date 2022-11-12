@@ -20,6 +20,9 @@ jobs:
       - name: Test with pytest
         run: |
           cd ComplejosSimpliciales
-          run:  python -m unittest discover -s tests -p 'test_*.py'
+          run: |
+            pip install pytest
+            pip install pytest-cov
+            pytest tests --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
 
 
