@@ -5,30 +5,39 @@ from ComplejosSimpliciales.src.utils.vietoris_complex_utils import calcRadio
 
 
 class Vietoris_RipsComplex(SimplicialComplex):
+    """
+    Class used to represent a Vietoris_RipsComplex
+    Extends from SimplicialComplex
 
+    Attributes:
+
+    points (np.array): stores the complex points
+    combinations (set): all faces combinations
+
+    attributes inherited from Vietoris_RipsComplex
+
+    """
     def __init__(self, points: np.array) -> None:
         """
-
         Args:
-            points (np.array): 
+            points (np.array): array of points
 
         Returns:
-            None: 
+            None: instantiates new Vietoris_RipsComplex
         """
         self.dic = dict()
         self.points = points
-        self.pointPositions = tuple(i for i in range(len(points)))
+        pointPositions = tuple(i for i in range(len(points)))
         self.combinations = set()
         pointsTuple = tuple(x for x in points)
         self.dic[tuple(x for x in range(len(points)))] = calcRadio(pointsTuple)
-        self.allFaces(self.pointPositions)
+        self.allFaces(pointPositions)
         self.getAllRadios()
 
     def allFaces(self, points: tuple) -> None:
         """
-
         Args:
-            points (tuple): 
+            points (tuple): tuple of every face
 
         Returns:
             None: 

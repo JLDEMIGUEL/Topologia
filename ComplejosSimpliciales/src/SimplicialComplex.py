@@ -10,21 +10,20 @@ class SimplicialComplex:
 
     Attributes:
     
-    faces: set
-        stores a set of tuples with the vertex of the SimplicialComplex
-    dic: dict
-        stores a dictionary with faces as keys and float as value
+    faces (set): stores a set of tuples with the vertex of the SimplicialComplex
+    dic (dict): stores a dictionary with faces as keys and float as value
 
     """
 
     def __init__(self, faces: list | set | tuple) -> None:
         """
-        __init__
+        Instantiates new SimplicialComplex
+
         Args:
-            faces (list | set | tuple): list/set of tuples
+            faces (list | set | tuple): list/set/tuple of tuples with vertex
 
         Returns:
-            None:
+            None: instantiates new SimplicialComplex
         """
 
         faces = order_faces(faces)
@@ -40,15 +39,13 @@ class SimplicialComplex:
 
     def add(self, faces: list | set | tuple, float_value: float) -> None:
         """
-        add
+        Add the faces to the existing set of faces
 
         Args:
-            float_value (float):
+            float_value (float): value stored in self.dic
             faces (list | set | tuple): list/set of tuples
-
         Returns:
             None:
-        Add the faces to the existing set of faces
         """
         faces = SimplicialComplex(faces).face_set()
 
@@ -58,43 +55,38 @@ class SimplicialComplex:
 
     def filtration_order(self) -> list[tuple]:
         """
-        filtration_order
-
         Returns a list of faces ordered by their float value and its dimension
 
         Returns:
-             list[tuple]:
+             list[tuple]: list of faces ordered by their float value
         """
         return sorted(self.dic.keys(), key=lambda a: (self.dic[a], len(a), a))
 
     def face_set(self) -> list[tuple]:
         """
-        face_set
-
         Returns self.faces
 
         Returns:
-             list[tuple]:
+             list[tuple]: ordered list of self.faces
         """
         return order(self.faces)
 
     def thresholdvalues(self) -> list[int]:
         """
-        thresholdvalues
+        Returns list of threshold values
+
         Returns:
-             list[int]:
+             list[int]: ordered list of threshold values
 
         """
         return sorted(list(set(self.dic.values())), key=lambda a: a)
 
     def dimension(self) -> int:
         """
-        dimension
-
         Returns the dimension of the SimplicialComplex
 
         Returns:
-            int:
+            int: dimension
         """
         dim = 1
         for face in self.faces:
@@ -104,29 +96,21 @@ class SimplicialComplex:
 
     def n_faces(self, n: int) -> list[tuple]:
         """
-        n_faces
-
         Args:
             n (int): dimension
 
         Returns:
-             list[tuple]:
-
-        Returns the faces with dimension n
+             list[tuple]: faces with dimension n
         """
         return order(set(x for x in self.faces if len(x) - 1 == n))
 
     def star(self, face: tuple) -> list[tuple]:
         """
-        star
-
         Args:
             face (tuple): base face of the star
 
         Returns:
-             list[tuple]:
-
-        Returns the star of the given face
+             list[tuple]: star of the given face
         """
         if face not in self.faces:
             return list()
@@ -134,30 +118,22 @@ class SimplicialComplex:
 
     def closedStar(self, face: tuple) -> list[tuple]:
         """
-        closedStar
-
         Args:
             face (tuple): base face of the closedStar
 
         Returns:
-             list[tuple]:
-
-        Returns the closed star of the given face
+             list[tuple]: closed star of the given face
         """
         star = self.star(face)
         return order(SimplicialComplex(star).faces)
 
     def link(self, face: tuple) -> list[tuple]:
         """
-        link
-
         Args:
             face (tuple): base face of the link
 
         Returns:
-            list[tuple]:
-
-        Returns the link of the given face
+            list[tuple]: link of the given face
         """
         lk = set()
         for x in self.closedStar(face):
@@ -167,15 +143,11 @@ class SimplicialComplex:
 
     def skeleton(self, dim: int) -> list[tuple]:
         """
-        skeleton
-
         Args:
             dim (int): dimension of the expected skeleton
 
         Returns:
-            list[tuple]:
-
-        Returns the skeleton with the given dimension
+            list[tuple]: skeleton with the given dimension
         """
         skeleton = set()
         for x in self.faces:
@@ -185,12 +157,10 @@ class SimplicialComplex:
 
     def euler_characteristic(self) -> int:
         """
-        euler_characteristic
-
         Returns the euler characteristic
 
         Returns:
-            int:
+            int: euler characteristic
         """
         euler = 0
         for i in range(self.dimension() + 1):
@@ -200,12 +170,10 @@ class SimplicialComplex:
 
     def connected_components(self) -> int:
         """
-        connected_components
-
         Returns number of connected components of the SimplicialComplex
 
         Returns:
-            int:
+            int: number of connected components
         """
         vertex = [x[0] for x in self.n_faces(0)]
         visitedVertex = dict()
@@ -220,14 +188,11 @@ class SimplicialComplex:
 
     def boundarymatrix(self, p: int) -> np.matrix:
         """
-        boundarymatrix
-
         Args:
             p (int): dimension
 
         Returns:
-            np.matrix:
-            boundary matrix for the given dimension
+            np.matrix: boundary matrix for the given dimension
         """
         Cp = self.n_faces(p)
         Cp_1 = self.n_faces(p - 1)
@@ -250,13 +215,12 @@ class SimplicialComplex:
     def betti_number(self, p: int) -> int:
         """
         Gets the betti numbers of the simplicial complex for the given dimension p
+
         Args:
             p (int): dimension
 
         Returns:
-            int:
-
-        Returns the betti_number
+            int: betti_number
 
         """
         mp = smith_normal_form(np.matrix(self.boundarymatrix(p)))

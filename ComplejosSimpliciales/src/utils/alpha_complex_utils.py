@@ -8,16 +8,13 @@ from scipy.spatial import Delaunay
 
 def radius(a: tuple, b: tuple, c: tuple) -> float:
     """
-    radius
     Args:
-        a (tuple):
-        b (tuple):
-        c (tuple):
+        a (tuple): first point
+        b (tuple): second point
+        c (tuple): third point
 
     Returns:
-        float:
-
-    Returns the Circumscribed circle radius of the given triangle
+        float: circumscribed circle radius of the given triangle
     """
     lado_a = math.dist(c, b)
     lado_b = math.dist(a, c)
@@ -30,15 +27,13 @@ def radius(a: tuple, b: tuple, c: tuple) -> float:
 
 def edges(v1: tuple, v2: tuple, points: np.ndarray) -> float | None:
     """
-    edges
     Args:
-        v1 (tuple):
-        v2 (tuple):
-        points (np.ndarray):
+        v1 (tuple): first point
+        v2 (tuple): second point
+        points (np.ndarray): array of other points
 
     Returns:
-        float | None:
-    Returns None or radius depending on AlphaComplex algorithm
+        float | None: None or radius depending on AlphaComplex algorithm
     """
     radio = math.dist(v1, v2) * 0.5
     centro = (v1 + v2) * 0.5
@@ -52,14 +47,13 @@ def edges(v1: tuple, v2: tuple, points: np.ndarray) -> float | None:
 
 def plottriangles(triangles: list, tri: Delaunay) -> None:
     """
-    plottriangles
+    Plots the given triangles
+
     Args:
         tri (Delaunay): Delaunay triangulation
         triangles (list): list of triangles
-
     Returns:
         None:
-    Plots the given triangles
     """
     if len(triangles) > 0:
         c = np.ones(len(triangles))
@@ -69,14 +63,13 @@ def plottriangles(triangles: list, tri: Delaunay) -> None:
 
 def plotedges(edges: list, tri: Delaunay) -> None:
     """
-    plotedges
+    Plots the given edges
+
     Args:
         tri (Delaunay): Delaunay triangulation
         edges (list): list of edges
-
     Returns:
         None:
-    Plots the given edges
     """
     for edge in edges:
         x = [tri.points[edge[0], 0], tri.points[edge[1], 0]]

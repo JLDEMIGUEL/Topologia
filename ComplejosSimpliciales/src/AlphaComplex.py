@@ -17,21 +17,20 @@ class AlphaComplex(SimplicialComplex):
 
     Attributes:
 
-    SimplicialComplex attributes
-
-    tri: Delaunay
-        stores Delaunay triangulation for the given points
+    tri (Delaunay): stores Delaunay triangulation for the given points
+    attributes inherited from SimplicialComplex
 
     """
 
     def __init__(self, points: np.array) -> None:
         """
-        __init__
+        Instantiates a new AlphaComplex
+
         Args:
             points (np.array): array of points
 
         Returns:
-            None:
+            None: Instantiates a new AlphaComplex
         """
 
         self.tri = Delaunay(points)
@@ -46,8 +45,6 @@ class AlphaComplex(SimplicialComplex):
 
     def plotalpha(self) -> None:
         """
-        plotalpha
-
         Plots the AlphaComplex iterating the dict values in order
 
         Returns:

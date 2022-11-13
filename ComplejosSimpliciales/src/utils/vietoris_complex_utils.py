@@ -5,13 +5,12 @@ import numpy as np
 
 def calcRadio(points: np.ndarray) -> float:
     """
+    Calculates vietoris rips value
 
     Args:
-        points (np.ndarray):
-
+        points (np.ndarray): array of points
     Returns:
-        float:
-
+        float: value
     """
     if len(points) <= 1:
         return 0
