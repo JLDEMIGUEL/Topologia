@@ -4,13 +4,12 @@ import numpy as np
 def search_one(matrix: np.matrix) -> list:
     """
     Searches a one with lower indexes in the given matrix
+
     Args:
-        matrix (np.matrix):
+        matrix (np.matrix): target matrix
 
     Returns:
-        list:
-
-    Returns the indexes of the one
+        list: indexes of the one
 
     """
     [rows, columns] = matrix.shape
@@ -25,15 +24,13 @@ def search_one(matrix: np.matrix) -> list:
 def swap(matrix: np.matrix, source: list, obj: list) -> np.matrix:
     """
     Swap the row and column given in source and the ones in obj
+
     Args:
-        matrix (np.matrix):
-        source (list):
-        obj (list):
-
+        matrix (np.matrix): target matrix
+        source (list): source indexes
+        obj (list): objective indexes
     Returns:
-        np.matrix:
-
-    Returns the given matrix with the applied swap
+        np.matrix: matrix with the applied swap
 
     """
     aux = matrix.copy()
@@ -50,13 +47,11 @@ def swap(matrix: np.matrix, source: list, obj: list) -> np.matrix:
 def simplify_columns(matrix_target: np.matrix) -> np.matrix:
     """
     Simplifies the columns of the given matrix
+
     Args:
-        matrix_target (np.matrix):
-
+        matrix_target (np.matrix): target matrix
     Returns:
-        np.matrix:
-
-    Returns the simplified matrix
+        np.matrix: simplified matrix
 
     """
     matrix = matrix_target.copy()
@@ -71,14 +66,11 @@ def simplify_columns(matrix_target: np.matrix) -> np.matrix:
 def simplify_rows(matrix_target: np.matrix) -> np.matrix:
     """
     Simplifies the rows of the given matrix
+
     Args:
-        matrix_target (np.matrix):
-
+        matrix_target (np.matrix): target matrix
     Returns:
-        np.matrix:
-
-    Returns the simplified matrix
-
+        np.matrix: simplified matrix
     """
     matrix = matrix_target.copy()
     rows = matrix.shape[0]
@@ -92,14 +84,12 @@ def simplify_rows(matrix_target: np.matrix) -> np.matrix:
 def reconstruct(matrix: np.matrix, aux: np.matrix) -> np.matrix:
     """
     Mixes the sub-matrix aux with the matrix
+
     Args:
-        matrix (np.matrix):
-        aux (np.matrix):
-
+        matrix (np.matrix): target matrix
+        aux (np.matrix): reconstruction matrix
     Returns:
-        np.matrix:
-
-    Returns the reconstructed matrix
+        np.matrix: reconstructed matrix
 
     """
     first_row = matrix[0, :]
@@ -113,14 +103,11 @@ def reconstruct(matrix: np.matrix, aux: np.matrix) -> np.matrix:
 def smith_normal_form(matrix: np.matrix) -> np.matrix:
     """
     Smith normal form of the given matrix
+
     Args:
-        matrix (np.matrix):
-
+        matrix (np.matrix): target matrix
     Returns:
-        np.matrix:
-
-    Returns the smith normal form of the given matrix
-
+        np.matrix: smith normal form of the given matrix
     """
     if matrix.shape[0] == 0 or matrix.shape[1] == 0:
         return matrix

@@ -1,31 +1,22 @@
 def order(faces: list | set | tuple) -> list:
     """
-     order
-
-     Args:
-         faces (list | set | tuple): set of faces of a Simplicial Complex
-
-     Returns:
-         list:
-
-     Returns the ordered list of faces
-     """
+    Args:
+        faces (list | set | tuple): set of faces of a Simplicial Complex
+    Returns:
+        list: ordered list of faces
+    """
     # faces.remove(())
     return sorted(faces, key=lambda a: (a, len(a)))
 
 
 def reachable(edges: list | set | tuple, vert: int, visitedVertex: dict) -> list:
     """
-        reachable
-
-        Args:
-            edges (list | set | tuple): list of edges
-            visitedVertex (dict): dict with the visited vertex
-            vert (int): entry vertex to get the list of reachable vertex
-
-        Returns:
-            list:
-        Returns list of reachable vertex from the given vertex
+    Args:
+        edges (list | set | tuple): list of edges
+        visitedVertex (dict): dict with the visited vertex
+        vert (int): entry vertex to get the list of reachable vertex
+    Returns:
+        list: list of reachable vertex from the given vertex
     """
     reach = [vert]
     visitedVertex[vert] = True
@@ -40,14 +31,11 @@ def reachable(edges: list | set | tuple, vert: int, visitedVertex: dict) -> list
 
 def subFaces(face: list | set | tuple) -> set:
     """
-        subFaces
-        Args:
-            face (list | set | tuple): tuple of vertex
-
-        Returns:
-            set:
-        Adds to faces set all the combinations of subFaces
-        """
+    Args:
+        face (list | set | tuple): tuple of vertex
+    Returns:
+        set: set with all sub faces
+    """
     auxSet = set()
     for vert in face:
         face2 = tuple(x for x in face if x != vert)
@@ -58,16 +46,13 @@ def subFaces(face: list | set | tuple) -> set:
 
 def updateDict(dic_target: dict, faces: list | set | tuple, float_value: float) -> dict:
     """
-    updateDict
-
     Args:
         dic_target (dict): dict
         float_value (float):
         faces (list | set | tuple): list/set of tuples
 
     Returns:
-        dict:
-    Updates de attribute dic with the faces given and the value
+        dict: dic with the faces given and the value
     """
     dic = dic_target.copy()
     for face in faces:
@@ -80,12 +65,10 @@ def updateDict(dic_target: dict, faces: list | set | tuple, float_value: float) 
 
 def order_faces(faces: list | set | tuple) -> set:
     """
-
     Args:
         faces (list | set | tuple):
-
     Returns:
-        set:
+        set: sorted faces set
     """
     sorted_faces = set()
     for x in faces:
@@ -96,16 +79,11 @@ def order_faces(faces: list | set | tuple) -> set:
 
 def filterByFloat(dic: dict, value: float) -> set:
     """
-    filterByFloat
-
     Args:
         dic (dict): dict
         value (float): Float value
-
     Returns:
-        set:
-
-    Returns a set of faces which float value is less than the given value
+        set: faces which float value is less than the given value
     """
     keys = dic.keys()
     res = {x for x in keys if dic[x] <= value}
