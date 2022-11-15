@@ -1,4 +1,4 @@
-from SimplicialComplex import SimplicialComplex
+from ComplejosSimpliciales.src.SimplicialComplex import SimplicialComplex
 
 tetraedro = SimplicialComplex({(0, 1, 2, 3)})
 tetraedro_borde = tetraedro.skeleton(2)
