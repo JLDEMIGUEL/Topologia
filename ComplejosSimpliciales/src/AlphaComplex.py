@@ -64,4 +64,4 @@ class AlphaComplex(SimplicialComplex):
             plottriangles(triangles, self.tri)
 
             plt.show()
-            time.sleep(.2)
+            time.sleep(.1)
