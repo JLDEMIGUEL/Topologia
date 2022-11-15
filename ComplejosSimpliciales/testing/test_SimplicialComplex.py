@@ -4,7 +4,7 @@ import numpy as np
 
 from ComplejosSimpliciales.src.AlphaComplex import AlphaComplex
 from ComplejosSimpliciales.src.SimplicialComplex import SimplicialComplex
-from utils.constants import tetraedro, toro, plano_proyectivo, botella_klein
+from ComplejosSimpliciales.src.utils.constants import tetraedro, toro, plano_proyectivo, botella_klein
 
 
 class TestSimplicialComplex(TestCase):
