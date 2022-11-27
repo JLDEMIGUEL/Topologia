@@ -7,17 +7,17 @@ import numpy as np
 
 from ComplejosSimpliciales.src.AlphaComplex import AlphaComplex
 
-ROOT_DIR = os.path.abspath(Path(__file__).parent.parent.parent)
+CLOUD_PATH = os.path.join(os.path.abspath(Path(__file__).parent.parent.parent),"docs","clouds.json")
 
 
 class TestAlphaComplex(TestCase):
-    ac1 = AlphaComplex(np.array(json.load(open(ROOT_DIR+'\\docs\\clouds.json'))['alpha1']))
+    ac1 = AlphaComplex(np.array(json.load(open(CLOUD_PATH))['alpha1']))
 
-    ac2 = AlphaComplex(np.array(json.load(open(ROOT_DIR + '\\docs\\clouds.json'))['alpha2']))
+    ac2 = AlphaComplex(np.array(json.load(open(CLOUD_PATH))['alpha2']))
 
-    ac3 = AlphaComplex(np.array(json.load(open(ROOT_DIR + '\\docs\\clouds.json'))['alpha3']))
+    ac3 = AlphaComplex(np.array(json.load(open(CLOUD_PATH))['alpha3']))
 
-    ac4 = AlphaComplex(np.array(json.load(open(ROOT_DIR + '\\docs\\clouds.json'))['alpha4']))
+    ac4 = AlphaComplex(np.array(json.load(open(CLOUD_PATH))['alpha4']))
 
     def test_filtration_order_1(self):
         expected_order = [(), (0,), (1,), (2,), (3,), (4,), (5,), (6,), (7,), (8,), (9,), (0, 7), (3, 6), (3, 5),
