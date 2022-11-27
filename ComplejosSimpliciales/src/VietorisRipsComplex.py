@@ -1,7 +1,7 @@
 import numpy as np
 
 from ComplejosSimpliciales.src.SimplicialComplex import SimplicialComplex
-from utils.vietoris_complex_utils import all_faces, get_all_radios
+from ComplejosSimpliciales.src.utils.vietoris_complex_utils import all_faces, get_all_radios
 
 
 class Vietoris_RipsComplex(SimplicialComplex):
