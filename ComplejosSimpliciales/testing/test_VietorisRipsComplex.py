@@ -4,7 +4,7 @@ from unittest import TestCase
 
 import numpy as np
 
-from VietorisRipsComplex import Vietoris_RipsComplex
+from ComplejosSimpliciales.src.VietorisRipsComplex import Vietoris_RipsComplex
 
 ROOT_DIR = os.path.abspath(Path(__file__).parent.parent.parent)
 
