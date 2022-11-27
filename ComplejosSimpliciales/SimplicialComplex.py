@@ -294,3 +294,45 @@ class SimplicialComplex:
         dim_bp = len([x for x in mp_1 if 1 in x])
         print('dimzp', dim_zp, 'dimbp', dim_bp, 'bp', dim_zp - dim_bp)
         return dim_zp - dim_bp
+
+    def matriz_borde_generalizado(self):
+        faces = sorted(self.faces, key=lambda face: (self.dic[face], len(face), face))
+        faces.remove(faces[0])
+        faces = [(0,), (1,), (2,), (3,), (4,), (5,), (0, 3), (2, 4), (3, 5), (4, 5), (1, 2), (0, 1), (1, 3), (1, 4), (3, 4), (0, 1, 3), (1, 2, 4), (3, 4, 5), (1, 3, 4)]
+
+        M = [[0 for _ in range(len(faces))] for _ in range(len(faces))]
+        for i in range(len(faces)):
+            for j in range(len(faces)):
+                if len(faces[i]) is not len(faces[j]) - 1:
+                    continue
+                bool = False
+                for vert in faces[i]:
+                    if vert not in faces[j]:
+                        bool = False
+                        break
+                    bool = True
+                if not bool: continue
+                M[i][j] = 1
+        return M
+
+    def algoritmo_matriz(self, M):
+        M = np.matrix(M)
+        rows, cols = M.shape
+        lows_list = [-1 for _ in range(cols)]
+        for j in range(cols):
+            columna = M[:, j]
+            lista = [x for x in range(rows) if columna[x] == 1]
+            if len(lista) == 0: continue
+            low = max(lista)
+            lows_list[j] = low
+            prev_cols = [x for x in range(cols) if lows_list[x] == low and x != j]
+            while len(prev_cols) > 0:
+                prev_col = prev_cols[0]
+                M[:, j] = (M[:, j] + M[:, prev_col]) % 2
+                lista = [x for x in range(rows) if M[:, j][x] == 1]
+                if len(lista) == 0: break
+                low = max(lista)
+                lows_list[j] = low
+                prev_cols = [x for x in range(cols) if lows_list[x] == low and x != j]
+        return M
+
