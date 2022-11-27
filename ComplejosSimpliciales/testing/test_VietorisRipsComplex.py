@@ -6,8 +6,6 @@ import numpy as np
 
 from ComplejosSimpliciales.src.VietorisRipsComplex import Vietoris_RipsComplex
 
-ROOT_DIR = os.path.abspath(Path(__file__).parent.parent.parent)
-
 
 class TestVietoris_RipsComplex(TestCase):
     ac1 = Vietoris_RipsComplex(np.array([[0, 3], [-1, 2], [1, 0], [0, -3]]))
