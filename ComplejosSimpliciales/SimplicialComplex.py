@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 
 from utils import order, smith_normal_form
@@ -298,7 +299,6 @@ class SimplicialComplex:
     def matriz_borde_generalizado(self):
         faces = sorted(self.faces, key=lambda face: (self.dic[face], len(face), face))
         faces.remove(faces[0])
-        faces = [(0,), (1,), (2,), (3,), (4,), (5,), (0, 3), (2, 4), (3, 5), (4, 5), (1, 2), (0, 1), (1, 3), (1, 4), (3, 4), (0, 1, 3), (1, 2, 4), (3, 4, 5), (1, 3, 4)]
 
         M = [[0 for _ in range(len(faces))] for _ in range(len(faces))]
         for i in range(len(faces)):
@@ -334,5 +334,22 @@ class SimplicialComplex:
                 low = max(lista)
                 lows_list[j] = low
                 prev_cols = [x for x in range(cols) if lows_list[x] == low and x != j]
-        return M
+        return M, lows_list
 
+    def persistence_diagram(self):
+        M, lows_list = self.algoritmo_matriz(self.matriz_borde_generalizado())
+        faces = sorted(self.faces, key=lambda face: (self.dic[face], len(face), face))
+        faces.remove(faces[0])
+        infinite = 1.5 * max(self.thresholdvalues())
+        points = []
+        for j in range(len(faces)):
+            if lows_list[j] == -1:
+                if j not in lows_list:
+                    points.append((self.dic[faces[j]], infinite))
+            else:
+                i = lows_list[j]
+                points.append((self.dic[faces[i]], self.dic[faces[j]]))
+        points = np.array([np.array(point) for point in points])
+        plt.plot(points[:, 0], points[:, 1], 'ko')
+        plt.axis([-0.1 * infinite, infinite * 1.1, -0.1 * infinite, infinite * 1.1])
+        plt.show()
