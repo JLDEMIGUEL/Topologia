@@ -1,6 +1,8 @@
 import numpy as np
+from matplotlib import pyplot as plt
 
-from ComplejosSimpliciales.src.utils.matrices_utils import smith_normal_form
+from ComplejosSimpliciales.src.utils.matrices_utils import smith_normal_form, algoritmo_matriz, \
+    matriz_borde_generalizado
 from ComplejosSimpliciales.src.utils.simplicial_complex_utils import order, reachable, subFaces, updateDict, order_faces
 
 
@@ -228,3 +230,32 @@ class SimplicialComplex:
         dim_zp = len([x for x in np.transpose(mp) if 1 not in x])
         dim_bp = len([x for x in mp_1 if 1 in x])
         return dim_zp - dim_bp
+
+    def persistence_diagram(self, p=None):
+        if p is None:
+            p = list(np.array(range(self.dimension())) + 1)
+        else:
+            p = [p]
+        M, lows_list = algoritmo_matriz(matriz_borde_generalizado(self.dic))
+        faces = sorted(self.faces, key=lambda face: (self.dic[face], len(face), face))
+        faces.remove(faces[0])
+        infinite = 1.5 * max(self.thresholdvalues())
+
+        for dim in p:
+            points = []
+            for j in range(len(faces)):
+                if lows_list[j] == -1:
+                    if j not in lows_list and len(faces[j]) == dim:
+                        points.append((self.dic[faces[j]], infinite))
+                elif len(faces[j]) - 1 == dim:
+                    i = lows_list[j]
+                    points.append((self.dic[faces[i]], self.dic[faces[j]]))
+            self.plot_points(points, dim)
+        plt.axis([-0.1 * infinite, infinite * 1.1, -0.1 * infinite, infinite * 1.1])
+        plt.plot([-0.1 * infinite, infinite * 1.1], [-0.1 * infinite, infinite * 1.1], "--")
+        plt.show()
+
+    def plot_points(self, points, dim):
+        colors = ["b", "g", "r", "m", "y"]
+        points = np.array([np.array(point) for point in points])
+        plt.plot(points[:, 0], points[:, 1], colors[dim] + "o")
