@@ -123,3 +123,45 @@ def smith_normal_form(matrix: np.matrix) -> np.matrix:
     aux = smith_normal_form(aux)
     aux = reconstruct(matrix, aux)
     return aux
+
+
+def algoritmo_matriz(M):
+    M = np.matrix(M)
+    rows, cols = M.shape
+    lows_list = [-1 for _ in range(cols)]
+    for j in range(cols):
+        columna = M[:, j]
+        lista = [x for x in range(rows) if columna[x] == 1]
+        if len(lista) == 0: continue
+        low = max(lista)
+        lows_list[j] = low
+        prev_cols = [x for x in range(cols) if lows_list[x] == low and x != j]
+        while len(prev_cols) > 0:
+            prev_col = prev_cols[0]
+            M[:, j] = (M[:, j] + M[:, prev_col]) % 2
+            lista = [x for x in range(rows) if M[:, j][x] == 1]
+            if len(lista) == 0: break
+            low = max(lista)
+            lows_list[j] = low
+            prev_cols = [x for x in range(cols) if lows_list[x] == low and x != j]
+    return M, lows_list
+
+
+def matriz_borde_generalizado(dic):
+    faces = sorted(dic.keys(), key=lambda face: (dic[face], len(face), face))
+    faces.remove(faces[0])
+
+    M = [[0 for _ in range(len(faces))] for _ in range(len(faces))]
+    for i in range(len(faces)):
+        for j in range(len(faces)):
+            if len(faces[i]) is not len(faces[j]) - 1:
+                continue
+            bool = False
+            for vert in faces[i]:
+                if vert not in faces[j]:
+                    bool = False
+                    break
+                bool = True
+            if not bool: continue
+            M[i][j] = 1
+    return M
