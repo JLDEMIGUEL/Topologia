@@ -1,3 +1,9 @@
+import math
+from random import random
+
+import numpy as np
+
+
 def order(faces: list | set | tuple) -> list:
     """
     Args:
@@ -88,3 +94,8 @@ def filterByFloat(dic: dict, value: float) -> set:
     keys = dic.keys()
     res = {x for x in keys if dic[x] <= value}
     return res
+
+
+def noise(points: np.array):
+    mean = sum([math.sqrt(p[0] ** 2 + p[1] ** 2) for p in points]) / len(points)
+    return np.array([np.array(p) + np.random.normal(mean, 0.1, size=2) for p in points])
