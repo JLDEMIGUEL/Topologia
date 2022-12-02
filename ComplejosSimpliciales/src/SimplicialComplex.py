@@ -252,7 +252,8 @@ class SimplicialComplex:
                     points.append((self.dic[faces[i]], self.dic[faces[j]]))
             self.plot_points(points, dim)
         plt.axis([-0.1 * infinite, infinite * 1.1, -0.1 * infinite, infinite * 1.1])
-        plt.plot([-0.1 * infinite, infinite * 1.1], [-0.1 * infinite, infinite * 1.1], "--")
+        plt.plot([-0.1 * infinite, infinite * 1.1], [-0.1 * infinite, infinite * 1.1], "b--")
+        plt.plot([-0.1 * infinite, infinite * 1.1], [infinite, infinite], "b--")
         plt.show()
 
     def plot_points(self, points, dim):

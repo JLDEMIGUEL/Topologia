@@ -1,5 +1,5 @@
 import time
-
+import statistics
 import matplotlib.pyplot as plt
 import numpy as np
 from IPython.core.display_functions import clear_output
@@ -8,6 +8,18 @@ from scipy.spatial import Delaunay, Voronoi, voronoi_plot_2d
 from ComplejosSimpliciales.src.SimplicialComplex import SimplicialComplex
 from ComplejosSimpliciales.src.utils.alpha_complex_utils import radius, edges, plottriangles, plotedges
 from ComplejosSimpliciales.src.utils.simplicial_complex_utils import filterByFloat
+
+
+def filter_faces(faces: set, dic: dict):
+    ordered_faces = sorted(faces, key=lambda face: dic[face])
+    while statistics.mean(dic.values()) > 1.25 * statistics.median(dic.values()):
+        last = ordered_faces[-1]
+        ordered_faces.remove(last)
+        dic.pop(last)
+    return set(ordered_faces), dic
+
+
+
 
 
 class AlphaComplex(SimplicialComplex):
@@ -42,6 +54,9 @@ class AlphaComplex(SimplicialComplex):
                 self.add({x}, r)
         for x in aux.n_faces(2):
             self.add({x}, radius(self.tri.points[x[0]], self.tri.points[x[1]], self.tri.points[x[2]]))
+
+        if len(self.faces) > 30:
+            self.faces, self.dic = filter_faces(self.faces, self.dic)
 
     def plotalpha(self) -> None:
         """
