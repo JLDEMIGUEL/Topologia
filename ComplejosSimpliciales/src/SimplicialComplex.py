@@ -259,4 +259,4 @@ class SimplicialComplex:
     def plot_points(self, points, dim):
         colors = ["b", "g", "r", "m", "y"]
         points = np.array([np.array(point) for point in points])
-        plt.plot(points[:, 0], points[:, 1], colors[dim] + "o")
+        plt.plot(points[:, 0], points[:, 1], colors[dim % len(colors)] + "o")

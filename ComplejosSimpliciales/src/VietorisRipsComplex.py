@@ -28,5 +28,5 @@ class Vietoris_RipsComplex(SimplicialComplex):
         """
         self.points = points
         pointPositions = tuple(i for i in range(len(points)))
-        self.combinations = all_faces({tuple(x for x in range(len(points)))}, pointPositions)
-        self.dic = get_all_radios(self.combinations, self.points)
+        self.faces = all_faces({tuple(x for x in range(len(points)))}, pointPositions)
+        self.dic = get_all_radios(self.faces, self.points)
