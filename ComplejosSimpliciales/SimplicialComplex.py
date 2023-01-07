@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+import utils
 from utils import order, smith_normal_form
 
 
@@ -296,6 +297,36 @@ class SimplicialComplex:
         print('dimzp', dim_zp, 'dimbp', dim_bp, 'bp', dim_zp - dim_bp)
         return dim_zp - dim_bp
 
+    def algoritmo_incremental(self):
+        faces = self.orderByFloat()
+        faces.remove(tuple())
+        complex = set()
+        betti_nums = [0, 0]
+        components, loops, triangles = 0, 0, 0
+        for face in faces:
+            dim = len(face) - 1
+            complex.add(face)
+            c_aux, l_aux, t_aux = self.calc_homology(complex)
+            if c_aux > components or l_aux > loops:
+                betti_nums[dim] = betti_nums[dim] + 1
+            elif c_aux < components or l_aux < loops:
+                betti_nums[dim - 1] = betti_nums[dim - 1] - 1
+            if t_aux > triangles:
+                betti_nums[dim - 1] = betti_nums[dim - 1] - 1
+            components, loops, triangles = c_aux, l_aux, t_aux
+        return betti_nums
+    def calc_homology(self, complex):
+        return self.calc_comps(complex), self.calc_loops(complex), self.calc_triang(complex)
+
+    def calc_comps(self, complex):
+        return utils.connected_components(complex)
+
+    def calc_loops(self, complex):
+        return utils.num_loops(complex)
+
+    def calc_triang(self, complex):
+        return utils.num_triang(complex)
+
     def matriz_borde_generalizado(self):
         faces = sorted(self.faces, key=lambda face: (self.dic[face], len(face), face))
         faces.remove(faces[0])
@@ -341,15 +372,47 @@ class SimplicialComplex:
         faces = sorted(self.faces, key=lambda face: (self.dic[face], len(face), face))
         faces.remove(faces[0])
         infinite = 1.5 * max(self.thresholdvalues())
-        points = []
-        for j in range(len(faces)):
-            if lows_list[j] == -1:
-                if j not in lows_list:
-                    points.append((self.dic[faces[j]], infinite))
-            else:
-                i = lows_list[j]
-                points.append((self.dic[faces[i]], self.dic[faces[j]]))
-        points = np.array([np.array(point) for point in points])
-        plt.plot(points[:, 0], points[:, 1], 'ko')
+        p = list(np.array(range(self.dimension())) + 1)
+        colors = ["b", "g", "r", "m", "y"]
+        for dim in p:
+            points = []
+            for j in range(len(faces)):
+                if lows_list[j] == -1:
+                    if j not in lows_list and len(faces[j]) == dim:
+                        points.append((self.dic[faces[j]], infinite))
+                elif len(faces[j]) - 1 == dim:
+                    i = lows_list[j]
+                    points.append((self.dic[faces[i]], self.dic[faces[j]]))
+            points = np.array([np.array(point) for point in points])
+            plt.plot(points[:, 0], points[:, 1], colors[dim] + "o")
         plt.axis([-0.1 * infinite, infinite * 1.1, -0.1 * infinite, infinite * 1.1])
+        plt.plot([-0.1 * infinite, infinite * 1.1], [-0.1 * infinite, infinite * 1.1], "b--")
+        plt.plot([-0.1 * infinite, infinite * 1.1], [infinite, infinite], "b--")
         plt.show()
+
+    def barcode_diagram(self):
+        M, lows_list = self.algoritmo_matriz(self.matriz_borde_generalizado())
+        faces = sorted(self.faces, key=lambda face: (self.dic[face], len(face), face))
+        faces.remove(faces[0])
+        infinite = 1.5 * max(self.thresholdvalues())
+        p = list(np.array(range(self.dimension())) + 1)
+        h = 0
+        colors = ["b", "g", "r", "m", "y"]
+        for dim in p:
+            points = set()
+            for j in range(len(faces)):
+                if lows_list[j] == -1:
+                    if j not in lows_list and len(faces[j]) == dim:
+                        points.add((self.dic[faces[j]], infinite))
+                elif len(faces[j]) - 1 == dim:
+                    i = lows_list[j]
+                    points.add((self.dic[faces[i]], self.dic[faces[j]]))
+            points = sorted(points, key=lambda point: point[1] - point[0])
+            points = np.array([np.array(point) for point in points])
+            for i in range(len(points)):
+                plt.plot([points[i][0], points[i][1]], [h, h], colors[dim])
+                h += 1
+        plt.show()
+
+
+
