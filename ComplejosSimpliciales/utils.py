@@ -244,17 +244,16 @@ def reachable(edges: list | set | tuple, vert: int, visitedVertex: dict) -> list
 
 def num_loops(complex):
     edges = set(face for face in complex if len(face) == 2)
-
-    loop_count = 0
+    loops = set()
 
     for edge1 in edges:
         for edge2 in edges.difference({edge1}):
             for edge3 in edges.difference({edge1, edge2}):
                 if len({edge1[0], edge1[1], edge2[0], edge2[1], edge3[0], edge3[1]}) == 3:
-                    loop_count += 1
-                    edges = edges.difference({edge1, edge2, edge3})
+                    loop = sorted({edge1[0], edge1[1], edge2[0], edge2[1], edge3[0], edge3[1]}, key=lambda a: a)
+                    loops.add(tuple(loop))
 
-    return loop_count
+    return len(loops)
 
 
 def num_triang(complex: set):
