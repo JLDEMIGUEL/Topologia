@@ -4,6 +4,51 @@ import numpy as np
 import utils
 from utils import order, smith_normal_form
 
+def subFaces(face: list | set | tuple) -> set:
+    """
+    Args:
+        face (list | set | tuple): tuple of vertex
+    Returns:
+        set: set with all sub faces
+    """
+    auxSet = set()
+    for vert in face:
+        face2 = tuple(x for x in face if x != vert)
+        auxSet.add(face2)
+        auxSet = auxSet.union(subFaces(face2))
+    return auxSet
+
+
+def updateDict(dic_target: dict, faces: list | set | tuple, float_value: float) -> dict:
+    """
+    Args:
+        dic_target (dict): dict
+        float_value (float):
+        faces (list | set | tuple): list/set of tuples
+    Returns:
+        dict: dic with the faces given and the value
+    """
+    dic = dic_target.copy()
+    for face in faces:
+        if face not in dic:
+            dic[face] = float_value
+        elif dic[face] > float_value:
+            dic[face] = float_value
+    return dic
+
+
+def order_faces(faces: list | set | tuple) -> set:
+    """
+    Args:
+        faces (list | set | tuple):
+    Returns:
+        set: sorted faces set
+    """
+    sorted_faces = set()
+    for x in faces:
+        sorted_faces.add(tuple(sorted(list(x), key=lambda a: a)))
+    faces = sorted_faces
+    return faces
 
 class SimplicialComplex:
     """
@@ -25,55 +70,32 @@ class SimplicialComplex:
             faces (list/set): list/set of tuples
         """
 
-        orderedFaces = set()
-        for x in faces:
-            orderedFaces.add(tuple(sorted(list(x), key=lambda a: a)))
-        faces = orderedFaces
+        faces = order_faces(faces)
 
-        self.value = 0
         self.dic = dict()
 
         self.faces = set()
         for face in faces:
             self.faces.add(face)
-            self.subFaces(face)
+            self.faces = self.faces.union(subFaces(face))
 
-        self.updateDict(self.faces, 0)
+        self.dic = updateDict(self.dic, self.faces, 0)
 
-    def add(self, faces, float):
+    def add(self, faces: list | set | tuple, float_value: float) -> None:
         """
-        add
-
-        Args:
-            faces: list/set of tuples
         Add the faces to the existing set of faces
+        Args:
+            float_value (float): value stored in self.dic
+            faces (list | set | tuple): list/set of tuples
+        Returns:
+            None:
         """
-        orderedFaces = set()
-        for x in faces:
-            orderedFaces.add(tuple(sorted(list(x), key=lambda a: a)))
-        faces = orderedFaces
+        faces = SimplicialComplex(faces).face_set()
 
-        newSC = SimplicialComplex(faces)
         self.faces = self.faces.union(faces)
 
-        self.updateDict(newSC.faces, float)
-        return
+        self.dic = updateDict(self.dic, faces, float_value)
 
-    def updateDict(self, faces, float):
-        """
-        updateDict
-
-        Args:
-            float:
-            faces: list/set of tuples
-        Updates de attribute dic with the faces given and the value
-        """
-        for face in faces:
-            if face not in self.dic:
-                self.dic[face] = float
-            elif self.dic[face] > float:
-                self.dic[face] = float
-        self.value += 1
 
     def orderByFloat(self):
         """
@@ -308,7 +330,10 @@ class SimplicialComplex:
             complex.add(face)
             c_aux, l_aux, t_aux = self.calc_homology(complex)
             if c_aux > components or l_aux > loops:
-                betti_nums[dim] = betti_nums[dim] + 1
+                if l_aux > loops:
+                    betti_nums[dim] = betti_nums[dim] + (l_aux - loops)
+                else:
+                    betti_nums[dim] = betti_nums[dim] + 1
             elif c_aux < components or l_aux < loops:
                 betti_nums[dim - 1] = betti_nums[dim - 1] - 1
             if t_aux > triangles:
