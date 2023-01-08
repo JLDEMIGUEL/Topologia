@@ -249,8 +249,6 @@ class SimplicialComplex:
             if t_aux > triangles:
                 betti_nums[dim - 1] = betti_nums[dim - 1] - 1
             components, loops, triangles = c_aux, l_aux, t_aux
-        betti_nums[0] = components
-        betti_nums[1] = loops - triangles
         return betti_nums
     def calc_homology(self, complex):
         return self.calc_comps(complex), self.calc_loops(complex), self.calc_triang(complex)
@@ -301,7 +299,7 @@ class SimplicialComplex:
         infinite = 1.5 * max(self.thresholdvalues())
         p = list(np.array(range(self.dimension())) + 1)
         h = 0
-        colors = ["b", "g", "r", "m", "y"]
+        colors = ["b", "g", "r", "m", "y", "b", "g", "r", "m", "y"]
         for dim in p:
             points = set()
             for j in range(len(faces)):

@@ -55,14 +55,15 @@ class AlphaComplex(SimplicialComplex):
         if len(self.faces) > 30:
             self.faces, self.dic = filter_faces(self.faces, self.dic)
 
-    def plotalpha(self) -> None:
+    def plotalpha(self, sleep_time=None) -> None:
         """
         Plots the AlphaComplex iterating the dict values in order
 
         Returns:
             None:
         """
-
+        if not sleep_time:
+            sleep_time = .1
         vor = Voronoi(self.tri.points)
         for x in self.thresholdvalues():
             clear_output()
@@ -76,4 +77,4 @@ class AlphaComplex(SimplicialComplex):
             plottriangles(triangles, self.tri)
 
             plt.show()
-            time.sleep(.1)
+            time.sleep(sleep_time)
