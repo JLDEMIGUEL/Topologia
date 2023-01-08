@@ -99,3 +99,60 @@ def filterByFloat(dic: dict, value: float) -> set:
 def noise(points: np.array):
     mean = sum([math.sqrt(p[0] ** 2 + p[1] ** 2) for p in points]) / len(points)
     return np.array([np.array(p) + np.random.normal(mean, 0.1, size=2) for p in points])
+
+
+def connected_components(complex: set):
+    """
+    Returns number of connected components of the SimplicialComplex
+    Returns:
+        int: number of connected components
+    """
+    vertex = [x[0] for x in complex if len(x) == 1]
+    edges = [x for x in complex if len(x) == 2]
+    visitedVertex = dict()
+    for x in vertex:
+        visitedVertex[x] = False
+    components = set()
+    for vert in vertex:
+        if not visitedVertex[vert]:
+            reachableList = sorted(reachable_alg(edges, vert, visitedVertex), key=lambda a: a)
+            components.add(tuple(reachableList))
+    return len(components)
+
+
+def reachable_alg(edges: list | set | tuple, vert: int, visitedVertex: dict) -> list:
+    """
+    Args:
+        edges (list | set | tuple): list of edges
+        visitedVertex (dict): dict with the visited vertex
+        vert (int): entry vertex to get the list of reachable vertex
+    Returns:
+        list: list of reachable vertex from the given vertex
+    """
+    reach = [vert]
+    visitedVertex[vert] = True
+    for edge in edges:
+        if vert in edge:
+            tup = tuple(x for x in edge if x != vert)
+            endVert = tup[0]
+            if not visitedVertex[endVert]:
+                reach = reach + reachable(edges, endVert, visitedVertex)
+    return reach
+
+
+def num_loops(complex):
+    edges = set(face for face in complex if len(face) == 2)
+    loops = set()
+
+    for edge1 in edges:
+        for edge2 in edges.difference({edge1}):
+            for edge3 in edges.difference({edge1, edge2}):
+                if len({edge1[0], edge1[1], edge2[0], edge2[1], edge3[0], edge3[1]}) == 3:
+                    loop = sorted({edge1[0], edge1[1], edge2[0], edge2[1], edge3[0], edge3[1]}, key=lambda a: a)
+                    loops.add(tuple(loop))
+
+    return len(loops)
+
+
+def num_triang(complex: set):
+    return len([x for x in complex if len(x) == 3])

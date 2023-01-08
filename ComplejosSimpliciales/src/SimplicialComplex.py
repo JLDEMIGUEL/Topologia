@@ -3,7 +3,8 @@ from matplotlib import pyplot as plt
 
 from ComplejosSimpliciales.src.utils.matrices_utils import smith_normal_form, algoritmo_matriz, \
     matriz_borde_generalizado
-from ComplejosSimpliciales.src.utils.simplicial_complex_utils import order, reachable, subFaces, updateDict, order_faces
+from ComplejosSimpliciales.src.utils.simplicial_complex_utils import order, reachable, subFaces, updateDict, \
+    order_faces, connected_components, num_loops, num_triang
 
 
 class SimplicialComplex:
@@ -231,6 +232,36 @@ class SimplicialComplex:
         dim_bp = len([x for x in mp_1 if 1 in x])
         return dim_zp - dim_bp
 
+    def algoritmo_incremental(self):
+        faces = self.filtration_order()
+        faces.remove(tuple())
+        complex = set()
+        betti_nums = [0, 0]
+        components, loops, triangles = 0, 0, 0
+        for face in faces:
+            dim = len(face) - 1
+            complex.add(face)
+            c_aux, l_aux, t_aux = self.calc_homology(complex)
+            if c_aux > components or l_aux > loops:
+                betti_nums[dim] = betti_nums[dim] + 1
+            elif c_aux < components or l_aux < loops:
+                betti_nums[dim - 1] = betti_nums[dim - 1] - 1
+            if t_aux > triangles:
+                betti_nums[dim - 1] = betti_nums[dim - 1] - 1
+            components, loops, triangles = c_aux, l_aux, t_aux
+        return betti_nums
+    def calc_homology(self, complex):
+        return self.calc_comps(complex), self.calc_loops(complex), self.calc_triang(complex)
+
+    def calc_comps(self, complex):
+        return connected_components(complex)
+
+    def calc_loops(self, complex):
+        return num_loops(complex)
+
+    def calc_triang(self, complex):
+        return num_triang(complex)
+
     def persistence_diagram(self, p=None):
         if p is None:
             p = list(np.array(range(self.dimension())) + 1)
@@ -262,7 +293,7 @@ class SimplicialComplex:
         plt.plot(points[:, 0], points[:, 1], colors[dim % len(colors)] + "o")
 
     def barcode_diagram(self):
-        M, lows_list = algoritmo_matriz(matriz_borde_generalizado())
+        M, lows_list = algoritmo_matriz(matriz_borde_generalizado(self.dic))
         faces = sorted(self.faces, key=lambda face: (self.dic[face], len(face), face))
         faces.remove(faces[0])
         infinite = 1.5 * max(self.thresholdvalues())
