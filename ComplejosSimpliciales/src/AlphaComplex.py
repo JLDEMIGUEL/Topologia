@@ -19,9 +19,6 @@ def filter_faces(faces: set, dic: dict):
     return set(ordered_faces), dic
 
 
-
-
-
 class AlphaComplex(SimplicialComplex):
     """
     Class used to represent a AlphaComplex

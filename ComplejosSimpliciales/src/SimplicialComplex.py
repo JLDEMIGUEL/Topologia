@@ -260,3 +260,27 @@ class SimplicialComplex:
         colors = ["b", "g", "r", "m", "y"]
         points = np.array([np.array(point) for point in points])
         plt.plot(points[:, 0], points[:, 1], colors[dim % len(colors)] + "o")
+
+    def barcode_diagram(self):
+        M, lows_list = algoritmo_matriz(matriz_borde_generalizado())
+        faces = sorted(self.faces, key=lambda face: (self.dic[face], len(face), face))
+        faces.remove(faces[0])
+        infinite = 1.5 * max(self.thresholdvalues())
+        p = list(np.array(range(self.dimension())) + 1)
+        h = 0
+        colors = ["b", "g", "r", "m", "y"]
+        for dim in p:
+            points = set()
+            for j in range(len(faces)):
+                if lows_list[j] == -1:
+                    if j not in lows_list and len(faces[j]) == dim:
+                        points.add((self.dic[faces[j]], infinite))
+                elif len(faces[j]) - 1 == dim:
+                    i = lows_list[j]
+                    points.add((self.dic[faces[i]], self.dic[faces[j]]))
+            points = sorted(points, key=lambda point: point[1] - point[0])
+            points = np.array([np.array(point) for point in points])
+            for i in range(len(points)):
+                plt.plot([points[i][0], points[i][1]], [h, h], colors[dim])
+                h += 1
+        plt.show()
