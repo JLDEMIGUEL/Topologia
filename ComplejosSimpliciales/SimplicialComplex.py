@@ -340,6 +340,7 @@ class SimplicialComplex:
                 betti_nums[dim - 1] = betti_nums[dim - 1] - 1
             components, loops, triangles = c_aux, l_aux, t_aux
         return betti_nums
+
     def calc_homology(self, complex):
         return self.calc_comps(complex), self.calc_loops(complex), self.calc_triang(complex)
 

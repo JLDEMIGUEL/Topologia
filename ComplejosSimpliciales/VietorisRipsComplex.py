@@ -35,10 +35,8 @@ class Vietoris_RipsComplex(SimplicialComplex):
         if len(points) <= 1:
             return 0
         maximum = 0
-        #print(points)
         for x in points:
             for y in [z for z in points if not np.array_equal(x, z)]:
-                #print("hola",x,y)
                 dist = math.dist(x, y)
                 if maximum < dist:
                     maximum = dist
