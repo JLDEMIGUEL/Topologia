@@ -19,3 +19,17 @@ class TestVietoris_RipsComplex(TestCase):
                          (2, 3): 3.1622776601683795, (3,): 0}
         self.assertEqual(expected_combinations, self.ac1.faces)
         self.assertEqual(expected_dict, self.ac1.dic)
+
+    def test_dimension(self):
+        self.assertEqual(3, self.ac1.dimension())
+
+    def test_connected_components(self):
+        self.assertEqual(1, self.ac1.connected_components())
+
+    def test_euler_characteristic(self):
+        self.assertEqual(1, self.ac1.euler_characteristic())
+
+    def test_betti_numbers(self):
+        self.assertEqual((1, 0, 0, 0, 0), (
+            self.ac1.betti_number(0), self.ac1.betti_number(1), self.ac1.betti_number(2), self.ac1.betti_number(3),
+            self.ac1.betti_number(4)))
