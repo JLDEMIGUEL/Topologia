@@ -125,12 +125,38 @@ def smith_normal_form(matrix: np.matrix) -> np.matrix:
     return aux
 
 
-def gcd_euclides(a, b):
-    pass
+def gcd_euclides(a: int, b: int) -> int:
+    """
+    Compute the greatest common divisor (gcd) of two integers using the Euclidean algorithm.
+
+    Parameters:
+        a (int): the first integer
+        b (int): the second integer
+
+    Returns:
+        int: the gcd of a and b
+    """
+    a, b = abs(a), abs(b)
+    while b:
+        a, b = b, a % b
+    return a
 
 
-def matrix_gcd(matrix):
-    pass
+def matrix_gcd(matrix:  np.matrix) -> int:
+    """
+    Compute the greatest common divisor (gcd) of all elements in a matrix using the Euclidean algorithm.
+
+    Parameters:
+        matrix (np.matrix): a 2D list of integers
+
+    Returns:
+        int: the gcd of all elements in matrix
+    """
+    gcd_result = matrix[0][0]
+    for row in matrix:
+        for element in row:
+            gcd_result = gcd_euclides(gcd_result % element, element)
+    return gcd_result
 
 
 def smith_normal_form_z(matrix: np.matrix) -> np.matrix:
