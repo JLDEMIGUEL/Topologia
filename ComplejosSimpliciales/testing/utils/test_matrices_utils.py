@@ -3,7 +3,7 @@ from unittest import TestCase
 import numpy as np
 
 from ComplejosSimpliciales.src.utils.matrices_utils import search_one, swap, simplify_rows, simplify_columns, \
-    reconstruct, smith_normal_form
+    reconstruct, smith_normal_form, gcd_euclides, matrix_gcd
 
 
 class Test(TestCase):
@@ -125,3 +125,25 @@ class Test(TestCase):
         expected_matrix = np.matrix([[1, 0, 0, 0]])
         smf = smith_normal_form(self.m4)
         self.assertTrue((expected_matrix == smf).all())
+
+    def test_gcd_euclides_1(self):
+        expected = 2
+        returned = gcd_euclides(2, 4)
+        self.assertEqual(expected, returned)
+
+    def test_gcd_euclides_2(self):
+        expected = 36
+        returned = gcd_euclides(180, 324)
+        self.assertEqual(expected, returned)
+
+    def test_matrix_gcd_1(self):
+        matrix = [[2, 4, 6], [8, 10, 12], [14, 16, 18]]
+        expected = 2
+        returned = matrix_gcd(matrix)
+        self.assertEqual(expected, returned)
+
+    def test_matrix_gcd_2(self):
+        matrix = [[45, 30, 15], [150, 120, 75]]
+        expected = 15
+        returned = matrix_gcd(matrix)
+        self.assertEqual(expected, returned)

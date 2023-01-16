@@ -125,6 +125,27 @@ def smith_normal_form(matrix: np.matrix) -> np.matrix:
     return aux
 
 
+def gcd_euclides(a, b):
+    pass
+
+
+def matrix_gcd(matrix):
+    pass
+
+
+def smith_normal_form_z(matrix: np.matrix) -> np.matrix:
+    """
+    Smith normal form of the given matrix
+
+    Args:
+        matrix (np.matrix): target matrix
+    Returns:
+        np.matrix: smith normal form of the given matrix
+    """
+
+    pass
+
+
 def algoritmo_matriz(M):
     M = np.matrix(M)
     rows, cols = M.shape
