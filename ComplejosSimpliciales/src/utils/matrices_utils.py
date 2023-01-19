@@ -3,14 +3,11 @@ import numpy as np
 
 def search_one(matrix: np.matrix) -> list:
     """
-    Searches a one with lower indexes in the given matrix
-
+    Searches a one with lower indexes in the given matrix.
     Args:
         matrix (np.matrix): target matrix
-
     Returns:
         list: indexes of the one
-
     """
     [rows, columns] = matrix.shape
     ret = [rows - 1, columns - 1]
@@ -23,15 +20,13 @@ def search_one(matrix: np.matrix) -> list:
 
 def swap(matrix: np.matrix, source: list, obj: list) -> np.matrix:
     """
-    Swap the row and column given in source and the ones in obj
-
+    Swap the row and column given in source and the ones in obj.
     Args:
         matrix (np.matrix): target matrix
         source (list): source indexes
         obj (list): objective indexes
     Returns:
         np.matrix: matrix with the applied swap
-
     """
     aux = matrix.copy()
     if source[0] != obj[0]:
@@ -46,13 +41,11 @@ def swap(matrix: np.matrix, source: list, obj: list) -> np.matrix:
 
 def simplify_columns(matrix_target: np.matrix) -> np.matrix:
     """
-    Simplifies the columns of the given matrix
-
+    Simplifies the columns of the given matrix.
     Args:
         matrix_target (np.matrix): target matrix
     Returns:
         np.matrix: simplified matrix
-
     """
     matrix = matrix_target.copy()
     columns = matrix.shape[1]
@@ -65,8 +58,7 @@ def simplify_columns(matrix_target: np.matrix) -> np.matrix:
 
 def simplify_rows(matrix_target: np.matrix) -> np.matrix:
     """
-    Simplifies the rows of the given matrix
-
+    Simplifies the rows of the given matrix.
     Args:
         matrix_target (np.matrix): target matrix
     Returns:
@@ -83,14 +75,12 @@ def simplify_rows(matrix_target: np.matrix) -> np.matrix:
 
 def reconstruct(matrix: np.matrix, aux: np.matrix) -> np.matrix:
     """
-    Mixes the sub-matrix aux with the matrix
-
+    Mixes the sub-matrix aux with the matrix.
     Args:
         matrix (np.matrix): target matrix
         aux (np.matrix): reconstruction matrix
     Returns:
         np.matrix: reconstructed matrix
-
     """
     first_row = matrix[0, :]
     first_row = np.delete(first_row, 0)
@@ -102,8 +92,7 @@ def reconstruct(matrix: np.matrix, aux: np.matrix) -> np.matrix:
 
 def smith_normal_form(matrix: np.matrix) -> np.matrix:
     """
-    Smith normal form of the given matrix
-
+    Smith normal form of the given matrix.
     Args:
         matrix (np.matrix): target matrix
     Returns:
@@ -125,7 +114,14 @@ def smith_normal_form(matrix: np.matrix) -> np.matrix:
     return aux
 
 
-def algoritmo_matriz(M):
+def generalized_border_matrix_algorithm(M: list[list[int]]) -> tuple[list[list[int]], list]:
+    """
+    Reduce the generalized border matrix and computes the lows list.
+    Args:
+        M (list[list[int]]): dictionary with faces
+    Returns:
+        tuple[list[list[int]], list]: the reduced generalized border matrix and the lows list
+    """
     M = np.matrix(M)
     rows, cols = M.shape
     lows_list = [-1 for _ in range(cols)]
@@ -147,7 +143,14 @@ def algoritmo_matriz(M):
     return M, lows_list
 
 
-def matriz_borde_generalizado(dic):
+def generalized_border_matrix(dic: dict) -> list[list[int]]:
+    """
+    Computes the generalized border matrix of the complex.
+    Args:
+        dic (dict): dictionary with faces
+    Returns:
+        np.matrix: the generalized border matrix
+    """
     faces = sorted(dic.keys(), key=lambda face: (dic[face], len(face), face))
     faces.remove(faces[0])
 
@@ -156,12 +159,13 @@ def matriz_borde_generalizado(dic):
         for j in range(len(faces)):
             if len(faces[i]) is not len(faces[j]) - 1:
                 continue
-            bool = False
+            condition = False
             for vert in faces[i]:
                 if vert not in faces[j]:
-                    bool = False
+                    condition = False
                     break
-                bool = True
-            if not bool: continue
+                condition = True
+            if not condition:
+                continue
             M[i][j] = 1
     return M

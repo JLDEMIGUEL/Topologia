@@ -1,15 +1,14 @@
 import numpy as np
-from matplotlib import pyplot as plt
 
-from ComplejosSimpliciales.src.utils.matrices_utils import smith_normal_form, algoritmo_matriz, \
-    matriz_borde_generalizado
+from ComplejosSimpliciales.src.utils.matrices_utils import smith_normal_form, generalized_border_matrix_algorithm, \
+    generalized_border_matrix
 from ComplejosSimpliciales.src.utils.simplicial_complex_utils import order, reachable, subFaces, updateDict, \
-    order_faces, connected_components, num_loops, num_triang
+    order_faces, calc_homology, plot_persistence_diagram, plot_barcode_diagram
 
 
 class SimplicialComplex:
     """
-    Class used to represent a SimplicialComplex
+    Class used to represent a SimplicialComplex.
 
     Attributes:
     
@@ -20,11 +19,9 @@ class SimplicialComplex:
 
     def __init__(self, faces: list | set | tuple) -> None:
         """
-        Instantiates new SimplicialComplex
-
+        Instantiates new SimplicialComplex.
         Args:
             faces (list | set | tuple): list/set/tuple of tuples with vertex
-
         Returns:
             None: instantiates new SimplicialComplex
         """
@@ -42,8 +39,7 @@ class SimplicialComplex:
 
     def add(self, faces: list | set | tuple, float_value: float) -> None:
         """
-        Add the faces to the existing set of faces
-
+        Add the faces to the existing set of faces.
         Args:
             float_value (float): value stored in self.dic
             faces (list | set | tuple): list/set of tuples
@@ -58,8 +54,7 @@ class SimplicialComplex:
 
     def filtration_order(self) -> list[tuple]:
         """
-        Returns a list of faces ordered by their float value and its dimension
-
+        Returns a list of faces ordered by their float value and its dimension.
         Returns:
              list[tuple]: list of faces ordered by their float value
         """
@@ -67,8 +62,7 @@ class SimplicialComplex:
 
     def face_set(self) -> list[tuple]:
         """
-        Returns self.faces
-
+        Returns self.faces.
         Returns:
              list[tuple]: ordered list of self.faces
         """
@@ -76,8 +70,7 @@ class SimplicialComplex:
 
     def thresholdvalues(self) -> list[int]:
         """
-        Returns list of threshold values
-
+        Returns list of threshold values.
         Returns:
              list[int]: ordered list of threshold values
 
@@ -86,8 +79,7 @@ class SimplicialComplex:
 
     def dimension(self) -> int:
         """
-        Returns the dimension of the SimplicialComplex
-
+        Returns the dimension of the SimplicialComplex.
         Returns:
             int: dimension
         """
@@ -99,9 +91,9 @@ class SimplicialComplex:
 
     def n_faces(self, n: int) -> list[tuple]:
         """
+        Returns the faces with dimension n.
         Args:
             n (int): dimension
-
         Returns:
              list[tuple]: faces with dimension n
         """
@@ -109,9 +101,9 @@ class SimplicialComplex:
 
     def star(self, face: tuple) -> list[tuple]:
         """
+        Computes the star of the given face.
         Args:
             face (tuple): base face of the star
-
         Returns:
              list[tuple]: star of the given face
         """
@@ -121,9 +113,9 @@ class SimplicialComplex:
 
     def closedStar(self, face: tuple) -> list[tuple]:
         """
+        Computes the closed star of the given face.
         Args:
             face (tuple): base face of the closedStar
-
         Returns:
              list[tuple]: closed star of the given face
         """
@@ -132,9 +124,9 @@ class SimplicialComplex:
 
     def link(self, face: tuple) -> list[tuple]:
         """
+        Computes the link of the given face.
         Args:
             face (tuple): base face of the link
-
         Returns:
             list[tuple]: link of the given face
         """
@@ -146,9 +138,9 @@ class SimplicialComplex:
 
     def skeleton(self, dim: int) -> list[tuple]:
         """
+        Computes the skeleton of the given dimension.
         Args:
             dim (int): dimension of the expected skeleton
-
         Returns:
             list[tuple]: skeleton with the given dimension
         """
@@ -160,8 +152,7 @@ class SimplicialComplex:
 
     def euler_characteristic(self) -> int:
         """
-        Returns the euler characteristic
-
+        Returns the euler characteristic of the complex.
         Returns:
             int: euler characteristic
         """
@@ -173,8 +164,7 @@ class SimplicialComplex:
 
     def connected_components(self) -> int:
         """
-        Returns number of connected components of the SimplicialComplex
-
+        Returns number of connected components of the SimplicialComplex.
         Returns:
             int: number of connected components
         """
@@ -191,9 +181,9 @@ class SimplicialComplex:
 
     def boundarymatrix(self, p: int) -> np.matrix:
         """
+        Returns the boundary matrix of the complex.
         Args:
             p (int): dimension
-
         Returns:
             np.matrix: boundary matrix for the given dimension
         """
@@ -217,14 +207,11 @@ class SimplicialComplex:
 
     def betti_number(self, p: int) -> int:
         """
-        Gets the betti numbers of the simplicial complex for the given dimension p
-
+        Gets the betti numbers of the simplicial complex for the given dimension p.
         Args:
             p (int): dimension
-
         Returns:
             int: betti_number
-
         """
         mp = smith_normal_form(np.matrix(self.boundarymatrix(p)))
         mp_1 = smith_normal_form(np.matrix(self.boundarymatrix(p + 1)))
@@ -232,16 +219,22 @@ class SimplicialComplex:
         dim_bp = len([x for x in mp_1 if 1 in x])
         return dim_zp - dim_bp
 
-    def algoritmo_incremental(self):
+    def incremental_algth(self) -> list[int]:
+        """
+        Gets the betti numbers 0 and 1 of a plain and orientable simplicial complex
+        using the incremental algorithm.
+        Returns:
+            list[int]: betti_number
+        """
         faces = self.filtration_order()
         faces.remove(tuple())
-        complex = set()
+        complex_faces = set()
         betti_nums = [0, 0]
         components, loops, triangles = 0, 0, 0
         for face in faces:
             dim = len(face) - 1
-            complex.add(face)
-            c_aux, l_aux, t_aux = self.calc_homology(complex)
+            complex_faces.add(face)
+            c_aux, l_aux, t_aux = calc_homology(complex_faces)
             if c_aux > components or l_aux > loops:
                 betti_nums[dim] = betti_nums[dim] + 1
             elif c_aux < components or l_aux < loops:
@@ -250,68 +243,54 @@ class SimplicialComplex:
                 betti_nums[dim - 1] = betti_nums[dim - 1] - 1
             components, loops, triangles = c_aux, l_aux, t_aux
         return betti_nums
-    def calc_homology(self, complex):
-        return self.calc_comps(complex), self.calc_loops(complex), self.calc_triang(complex)
 
-    def calc_comps(self, complex):
-        return connected_components(complex)
+    def persistence_diagram(self, p: list[int] = None) -> None:
+        """
+        Computes and plots the persistence diagram of the simplicial complex.
+        Args:
+             p (list[int]): list of dimensions to plot. If the argument is missing, all the dimensions are used
+        Returns:
+        """
+        infinite, points = self._process_diagram(p)
+        plot_persistence_diagram(points, infinite)
 
-    def calc_loops(self, complex):
-        return num_loops(complex)
+    def barcode_diagram(self,  p: list[int] = None) -> None:
+        """
+        Computes and plots the barcode diagram of the simplicial complex.
+        Args:
+             p (list[int]): list of dimensions to plot. If the argument is missing, all the dimensions are used
+        Returns:
+        """
+        infinite, points = self._process_diagram(p)
+        plot_barcode_diagram(points)
 
-    def calc_triang(self, complex):
-        return num_triang(complex)
-
-    def persistence_diagram(self, p=None):
+    def _process_diagram(self, p: list[int] = None) -> tuple[int, dict]:
+        """
+        Computes and plots the barcode diagram of the simplicial complex.
+        Args:
+            p (list[int]): list of dimensions to plot. If the argument is missing, all the dimensions are used
+        Returns:
+            tuple[int, dict]: the infinite for the complex and a dictionary mapping dimensions and points to plot
+        """
         if p is None:
             p = list(np.array(range(self.dimension())) + 1)
         else:
             p = [p]
-        M, lows_list = algoritmo_matriz(matriz_borde_generalizado(self.dic))
+        M, lows_list = generalized_border_matrix_algorithm(generalized_border_matrix(self.dic))
         faces = sorted(self.faces, key=lambda face: (self.dic[face], len(face), face))
         faces.remove(faces[0])
         infinite = 1.5 * max(self.thresholdvalues())
-
+        points = {}
         for dim in p:
-            points = []
+            points_list = set()
             for j in range(len(faces)):
                 if lows_list[j] == -1:
                     if j not in lows_list and len(faces[j]) == dim:
-                        points.append((self.dic[faces[j]], infinite))
+                        points_list.add((self.dic[faces[j]], infinite))
                 elif len(faces[j]) - 1 == dim:
                     i = lows_list[j]
-                    points.append((self.dic[faces[i]], self.dic[faces[j]]))
-            self.plot_points(points, dim)
-        plt.axis([-0.1 * infinite, infinite * 1.1, -0.1 * infinite, infinite * 1.1])
-        plt.plot([-0.1 * infinite, infinite * 1.1], [-0.1 * infinite, infinite * 1.1], "b--")
-        plt.plot([-0.1 * infinite, infinite * 1.1], [infinite, infinite], "b--")
-        plt.show()
-
-    def plot_points(self, points, dim):
-        colors = ["b", "g", "r", "m", "y"]
-        points = np.array([np.array(point) for point in points])
-        plt.plot(points[:, 0], points[:, 1], colors[dim % len(colors)] + "o")
-
-    def barcode_diagram(self):
-        M, lows_list = algoritmo_matriz(matriz_borde_generalizado(self.dic))
-        faces = sorted(self.faces, key=lambda face: (self.dic[face], len(face), face))
-        faces.remove(faces[0])
-        infinite = 1.5 * max(self.thresholdvalues())
-        p = list(np.array(range(self.dimension())) + 1)
-        h = 0
-        colors = ["b", "g", "r", "m", "y", "b", "g", "r", "m", "y"]
-        for dim in p:
-            points = set()
-            for j in range(len(faces)):
-                if lows_list[j] == -1:
-                    if j not in lows_list and len(faces[j]) == dim:
-                        points.add((self.dic[faces[j]], infinite))
-                elif len(faces[j]) - 1 == dim:
-                    i = lows_list[j]
-                    points.add((self.dic[faces[i]], self.dic[faces[j]]))
-            points = sorted(points, key=lambda point: point[1] - point[0])
-            points = np.array([np.array(point) for point in points])
-            for i in range(len(points)):
-                plt.plot([points[i][0], points[i][1]], [h, h], colors[dim])
-                h += 1
-        plt.show()
+                    points_list.add((self.dic[faces[i]], self.dic[faces[j]]))
+            points_list = sorted(points_list, key=lambda point: point[1] - point[0])
+            points_list = np.array([np.array(point) for point in points_list])
+            points[dim] = points_list
+        return infinite, points
