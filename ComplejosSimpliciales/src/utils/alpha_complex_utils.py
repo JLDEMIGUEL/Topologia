@@ -8,11 +8,11 @@ from scipy.spatial import Delaunay
 
 def radius(a: tuple, b: tuple, c: tuple) -> float:
     """
+    Computes the radius of the circumference which contains the three points.
     Args:
         a (tuple): first point
         b (tuple): second point
         c (tuple): third point
-
     Returns:
         float: circumscribed circle radius of the given triangle
     """
@@ -27,11 +27,11 @@ def radius(a: tuple, b: tuple, c: tuple) -> float:
 
 def edges(v1: tuple, v2: tuple, points: np.ndarray) -> float | None:
     """
+    Computes the length of the edge if exists.
     Args:
         v1 (tuple): first point
         v2 (tuple): second point
         points (np.ndarray): array of other points
-
     Returns:
         float | None: None or radius depending on AlphaComplex algorithm
     """
@@ -47,8 +47,7 @@ def edges(v1: tuple, v2: tuple, points: np.ndarray) -> float | None:
 
 def plottriangles(triangles: list, tri: Delaunay) -> None:
     """
-    Plots the given triangles
-
+    Plots the given triangles.
     Args:
         tri (Delaunay): Delaunay triangulation
         triangles (list): list of triangles
@@ -61,17 +60,16 @@ def plottriangles(triangles: list, tri: Delaunay) -> None:
         plt.tripcolor(tri.points[:, 0], tri.points[:, 1], triangles, c, edgecolor="k", lw=2, cmap=cmap)
 
 
-def plotedges(edges: list, tri: Delaunay) -> None:
+def plotedges(edges_list: list, tri: Delaunay) -> None:
     """
-    Plots the given edges
-
+    Plots the given edges.
     Args:
         tri (Delaunay): Delaunay triangulation
-        edges (list): list of edges
+        edges_list (list): list of edges
     Returns:
         None:
     """
-    for edge in edges:
+    for edge in edges_list:
         x = [tri.points[edge[0], 0], tri.points[edge[1], 0]]
         y = [tri.points[edge[0], 1], tri.points[edge[1], 1]]
         plt.plot(x, y, 'k')

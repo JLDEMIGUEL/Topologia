@@ -21,8 +21,8 @@ def filter_faces(faces: set, dic: dict):
 
 class AlphaComplex(SimplicialComplex):
     """
-    Class used to represent a AlphaComplex
-    Extends from SimplicialComplex
+    Class used to represent a AlphaComplex.
+    Extends from SimplicialComplex.
 
     Attributes:
 
@@ -33,11 +33,9 @@ class AlphaComplex(SimplicialComplex):
 
     def __init__(self, points: np.array) -> None:
         """
-        Instantiates a new AlphaComplex
-
+        Instantiates a new AlphaComplex.
         Args:
             points (np.array): array of points
-
         Returns:
             None: Instantiates a new AlphaComplex
         """
@@ -57,8 +55,7 @@ class AlphaComplex(SimplicialComplex):
 
     def plotalpha(self, sleep_time=None) -> None:
         """
-        Plots the AlphaComplex iterating the dict values in order
-
+        Plots the AlphaComplex iterating the dict values in order.
         Returns:
             None:
         """
@@ -68,12 +65,12 @@ class AlphaComplex(SimplicialComplex):
         for x in self.thresholdvalues():
             clear_output()
             faces = filterByFloat(self.dic, x)
-            edges = [list(edge) for edge in faces if len(edge) == 2]
+            edges_list = [list(edge) for edge in faces if len(edge) == 2]
             triangles = [list(triangle) for triangle in faces if len(triangle) == 3]
 
             voronoi_plot_2d(vor, show_vertices=False, line_width=2, line_colors='blue')
             plt.plot(self.tri.points[:, 0], self.tri.points[:, 1], 'ko')
-            plotedges(edges, self.tri)
+            plotedges(edges_list, self.tri)
             plottriangles(triangles, self.tri)
 
             plt.show()
