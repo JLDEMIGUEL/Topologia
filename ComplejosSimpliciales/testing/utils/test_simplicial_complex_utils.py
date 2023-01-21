@@ -165,7 +165,7 @@ class Test(TestCase):
         with patch('matplotlib.pyplot.show') as mocked_show, \
                 patch('matplotlib.pyplot.plot') as mocked_plot:
             simple_alpha.persistence_diagram()
-            self.assertEquals([
+            self.assertEqual([
                 mock.call([0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                           [1.110180165558726, 1.3901438774457844, 1.5811388300841898, 1.63783393541592, 1.7,
                            2.874107142857142], 'go'),
@@ -184,7 +184,7 @@ class Test(TestCase):
                 patch('matplotlib.pyplot.plot') as mocked_plot:
             simple_alpha.barcode_diagram()
 
-            self.assertEquals([
+            self.assertEqual([
                 mock.call([0.0, 1.110180165558726], [0, 0], 'g'),
                 mock.call([0.0, 1.3901438774457844], [1, 1], 'g'),
                 mock.call([0.0, 1.5811388300841898], [2, 2], 'g'),
