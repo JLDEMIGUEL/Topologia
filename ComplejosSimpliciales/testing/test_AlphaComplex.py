@@ -1,13 +1,14 @@
 import json
 import os
 from pathlib import Path
-from unittest import TestCase
+from unittest import TestCase, mock
+from unittest.mock import patch
 
 import numpy as np
 
 from ComplejosSimpliciales.src.AlphaComplex import AlphaComplex
 
-CLOUD_PATH = os.path.join(os.path.abspath(Path(__file__).parent.parent.parent),"docs","clouds.json")
+CLOUD_PATH = os.path.join(os.path.abspath(Path(__file__).parent.parent.parent), "docs", "clouds.json")
 
 
 class TestAlphaComplex(TestCase):
@@ -116,3 +117,32 @@ class TestAlphaComplex(TestCase):
                            3.3474070826562006, 3.81894308488309, 3.8192688178009524, 3.8800339027875133,
                            3.9262271123430863, 3.9903330121627274, 5.611766756773166]
         self.assertEqual(expected_values, self.ac4.thresholdvalues())
+
+    def test_plotalpha(self):
+        alpha = AlphaComplex([[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]])
+        with patch('matplotlib.pyplot.show') as mocked_show,\
+                patch('matplotlib.pyplot.plot') as mocked_plot,\
+                patch('matplotlib.pyplot.tripcolor') as mocked_tripcolor:
+            alpha.plotalpha()
+            calls_list = mocked_plot.mock_calls
+            calls_list.reverse()
+
+            self.assertEqual([
+                 mock.call([0.0, 1.7], [1.0, -1.8], 'k'),
+                 mock.call([-3.0, -1.7], [0.0, -1.8], 'k'),
+                 mock.call([-1.7, 0.0], [-1.8, -4.0], 'k'),
+                 mock.call([0.0, 3.0], [1.0, 0.0], 'k'),
+                 mock.call([3.0, 1.7], [0.0, -1.8], 'k'),
+                 mock.call([-3.0, 0.0], [0.0, 1.0], 'k'),
+                 mock.call([1.7, 0.0], [-1.8, -4.0], 'k'),
+                 mock.call([0.0, -1.7], [1.0, -1.8], 'k'),
+                 mock.call([-1.7, 1.7], [-1.8, -1.8], 'k')
+            ], calls_list[0:9])
+            self.assertEqual(65, mocked_plot.call_count)
+
+            self.assertEqual(3, mocked_tripcolor.call_count)
+
+            mocked_show.assert_called()
+            self.assertEqual(9, mocked_show.call_count)
+
+

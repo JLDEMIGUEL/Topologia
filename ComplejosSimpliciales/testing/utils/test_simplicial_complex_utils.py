@@ -1,7 +1,13 @@
-from unittest import TestCase
+import math
+import unittest
+from unittest import TestCase, mock
+from unittest.mock import patch
 
+import numpy as np
+
+from ComplejosSimpliciales.src.AlphaComplex import AlphaComplex
 from ComplejosSimpliciales.src.utils.simplicial_complex_utils import order, reachable, subFaces, updateDict, \
-    order_faces, filterByFloat
+    order_faces, filterByFloat, noise, connected_components, reachable_alg, num_loops, calc_homology, num_triangles
 
 
 class Test(TestCase):
@@ -103,3 +109,91 @@ class Test(TestCase):
         expected_faces = {(2,), (5,), (11,), (8,), (14,), (17,), (1, 9), (1, 15), (13, 17), (7, 16), (4,), (1,), (7,),
                           (10,), (16,), (13,), (19,), (6, 10), (0,), (3,), (9,), (6,), (12,), (18,), (15,), (9, 15), ()}
         self.assertEqual(expected_faces, filterByFloat(dic, value))
+
+    def test_noise(self):
+        points = np.array([[1, 2], [3, 4], [5, 6]])
+        perturbed_points = noise(points)
+        self.assertTrue(np.any(points != perturbed_points))
+        self.assertEqual(points.shape, perturbed_points.shape)
+
+        mean = sum([math.sqrt(p[0] ** 2 + p[1] ** 2) for p in points]) / len(points)
+        mean_noise = sum([math.sqrt((p[0] - point[0]) ** 2 + (p[1] - point[1]) ** 2) for p, point in
+                          zip(points, perturbed_points)]) / len(points)
+        self.assertAlmostEqual(mean, mean_noise, delta=3)
+
+        std_dev = 0.1
+        std_dev_noise = np.std(
+            [math.sqrt((p[0] - point[0]) ** 2 + (p[1] - point[1]) ** 2) for p, point in zip(points, perturbed_points)])
+        self.assertAlmostEqual(std_dev, std_dev_noise, delta=3)
+
+    def test_connected_components(self):
+        faces = [(0,), (1,), (2,), (3,), (4,), (0, 1), (0, 2), (1, 2), (2, 3), (3, 4)]
+        self.assertEqual(1, connected_components(faces))
+        faces = [(0,), (1,), (2,), (3,), (4,), (1, 2), (2, 3), (3, 4)]
+        self.assertEqual(2, connected_components(faces))
+        faces = [(0,), (1,), (2,), (3,), (4,), (5,), (6,), (0, 1), (2, 3), (3, 6), (2, 4), (2, 5), (4, 5)]
+        self.assertEqual(2, connected_components(faces))
+
+    def test_reachable_alg(self):
+        edges = [(0, 1), (2, 3), (3, 6), (2, 4), (2, 5), (4, 5)]
+        self.assertEqual([0, 1], reachable_alg(edges, 0,
+                                               {0: False, 1: False, 2: False, 3: False, 4: False, 5: False, 6: False}))
+        self.assertEqual({2, 3, 4, 5, 6}, set(reachable_alg(edges, 2,
+                                                            {0: False, 1: False, 2: False, 3: False, 4: False, 5: False,
+                                                             6: False})))
+
+    def test_num_loops(self):
+        faces = [(0, 1), (2, 3), (3, 6), (2, 4), (2, 5), (2, 6), (4, 7)]
+        self.assertEqual(1, num_loops(faces))
+        faces = [(0, 1), (2, 3), (3, 6), (2, 4), (2, 5), (2, 6), (4, 5)]
+        self.assertEqual(2, num_loops(faces))
+
+    def test_num_triangles(self):
+        faces = [(0, 1, 2), (0, 1, 3), (0, 1, 4)]
+        self.assertEqual(3, num_triangles(faces))
+
+    def test_calc_homology(self):
+        faces = [(0,), (1,), (2,), (3,), (4,), (0, 1), (0, 2), (1, 2), (2, 3), (3, 4)]
+        self.assertEqual((1, 1, 0), calc_homology(faces))
+        faces = [(0,), (1,), (2,), (3,), (4,), (1, 2), (2, 3), (3, 4)]
+        self.assertEqual((2, 0, 0), calc_homology(faces))
+        faces = [(0,), (1,), (2,), (3,), (4,), (5,), (6,), (0, 1), (2, 3), (3, 6), (2, 4), (2, 5), (4, 5)]
+        self.assertEqual((2, 1, 0), calc_homology(faces))
+
+    def test_plot_persistence_diagram(self):
+        simple_alpha = AlphaComplex([[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]])
+        with patch('matplotlib.pyplot.show') as mocked_show, \
+                patch('matplotlib.pyplot.plot') as mocked_plot:
+            simple_alpha.persistence_diagram()
+            self.assertEqual([
+                mock.call([0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                          [1.110180165558726, 1.3901438774457844, 1.5811388300841898, 1.63783393541592, 1.7,
+                           2.874107142857142], 'go'),
+                mock.call([1.7, 1.63783393541592, 1.5811388300841898],
+                          [1.7568181818181818, 1.7164000648001554, 1.916071428571428], 'ro'),
+                mock.call([-0.28741071428571424, 3.1615178571428566], [-0.28741071428571424, 3.1615178571428566],
+                          'b--'),
+                mock.call([-0.28741071428571424, 3.1615178571428566], [2.874107142857142, 2.874107142857142], 'b--')
+            ], mocked_plot.mock_calls)
+
+            mocked_show.assert_called_once()
+
+    def test_plot_barcode_diagram(self):
+        simple_alpha = AlphaComplex([[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]])
+        with patch('matplotlib.pyplot.show') as mocked_show, \
+                patch('matplotlib.pyplot.plot') as mocked_plot:
+            simple_alpha.barcode_diagram()
+
+            self.assertEqual([
+                mock.call([0.0, 1.110180165558726], [0, 0], 'g'),
+                mock.call([0.0, 1.3901438774457844], [1, 1], 'g'),
+                mock.call([0.0, 1.5811388300841898], [2, 2], 'g'),
+                mock.call([0.0, 1.63783393541592], [3, 3], 'g'),
+                mock.call([0.0, 1.7], [4, 4], 'g'),
+                mock.call([0.0, 2.874107142857142], [5, 5], 'g'),
+                mock.call([1.7, 1.7568181818181818], [6, 6], 'r'),
+                mock.call([1.63783393541592, 1.7164000648001554], [7, 7], 'r'),
+                mock.call([1.5811388300841898, 1.916071428571428], [8, 8], 'r')
+            ], mocked_plot.mock_calls)
+
+            mocked_show.assert_called_once()
