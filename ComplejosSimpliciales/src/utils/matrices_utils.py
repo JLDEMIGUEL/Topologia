@@ -1,11 +1,11 @@
 import numpy as np
 
 
-def search_one(matrix: np.matrix) -> list:
+def search_one(matrix: np.array) -> list:
     """
     Searches a one with lower indexes in the given matrix.
     Args:
-        matrix (np.matrix): target matrix
+        matrix (np.array): target matrix
     Returns:
         list: indexes of the one
     """
@@ -18,15 +18,15 @@ def search_one(matrix: np.matrix) -> list:
     return ret
 
 
-def swap(matrix: np.matrix, source: list, obj: list) -> np.matrix:
+def swap(matrix: np.array, source: list, obj: list) -> np.array:
     """
     Swap the row and column given in source and the ones in obj.
     Args:
-        matrix (np.matrix): target matrix
+        matrix (np.array): target matrix
         source (list): source indexes
         obj (list): objective indexes
     Returns:
-        np.matrix: matrix with the applied swap
+        np.array: matrix with the applied swap
     """
     aux = matrix.copy()
     if source[0] != obj[0]:
@@ -39,13 +39,13 @@ def swap(matrix: np.matrix, source: list, obj: list) -> np.matrix:
     return aux
 
 
-def simplify_columns(matrix_target: np.matrix) -> np.matrix:
+def simplify_columns(matrix_target: np.array) -> np.array:
     """
     Simplifies the columns of the given matrix.
     Args:
-        matrix_target (np.matrix): target matrix
+        matrix_target (np.array): target matrix
     Returns:
-        np.matrix: simplified matrix
+        np.array: simplified matrix
     """
     matrix = matrix_target.copy()
     columns = matrix.shape[1]
@@ -56,13 +56,13 @@ def simplify_columns(matrix_target: np.matrix) -> np.matrix:
     return matrix
 
 
-def simplify_rows(matrix_target: np.matrix) -> np.matrix:
+def simplify_rows(matrix_target: np.array) -> np.array:
     """
     Simplifies the rows of the given matrix.
     Args:
-        matrix_target (np.matrix): target matrix
+        matrix_target (np.array): target matrix
     Returns:
-        np.matrix: simplified matrix
+        np.array: simplified matrix
     """
     matrix = matrix_target.copy()
     rows = matrix.shape[0]
@@ -82,12 +82,13 @@ def reconstruct(matrix: np.array, aux: np.array) -> np.array:
     Returns:
         np.array: reconstructed matrix
     """
-    first_row = matrix[0, :]
-    first_row = np.delete(first_row, 0)
-    first_column = matrix[:, 0]
-    aux = np.insert(aux, 0, first_row, 0)
-    aux = np.concatenate([first_column, aux], 1)
-    return aux
+    if len(aux) == 0:
+        return matrix
+    first_row = matrix[0, 1:]
+    first_col = matrix[:, 0]
+    matrix_res = np.r_[[first_row], aux]
+    matrix_res = np.c_[first_col, matrix_res]
+    return matrix_res
 
 
 def smith_normal_form(matrix: np.array) -> np.array:
