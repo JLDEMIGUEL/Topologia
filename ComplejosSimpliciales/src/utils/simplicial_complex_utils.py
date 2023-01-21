@@ -217,7 +217,7 @@ def plot_persistence_diagram(points: dict, infinite: int) -> None:
     """
     for dim, points_list in points.items():
         points_list = np.array([np.array(point) for point in points_list])
-        plt.plot(points_list[:, 0], points_list[:, 1], colors[dim % len(colors)] + "o")
+        plt.plot(points_list[:, 0].tolist(), points_list[:, 1].tolist(), colors[dim % len(colors)] + "o")
     plt.axis([-0.1 * infinite, infinite * 1.1, -0.1 * infinite, infinite * 1.1])
     plt.plot([-0.1 * infinite, infinite * 1.1], [-0.1 * infinite, infinite * 1.1], "b--")
     plt.plot([-0.1 * infinite, infinite * 1.1], [infinite, infinite], "b--")

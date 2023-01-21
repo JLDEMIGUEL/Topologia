@@ -179,13 +179,13 @@ class SimplicialComplex:
                 components.add(tuple(reachableList))
         return len(components)
 
-    def boundarymatrix(self, p: int) -> np.matrix:
+    def boundarymatrix(self, p: int) -> np.array:
         """
         Returns the boundary matrix of the complex.
         Args:
             p (int): dimension
         Returns:
-            np.matrix: boundary matrix for the given dimension
+            np.array: boundary matrix for the given dimension
         """
         Cp = self.n_faces(p)
         Cp_1 = self.n_faces(p - 1)
@@ -203,7 +203,7 @@ class SimplicialComplex:
                 if not is_in:
                     continue
                 Md[i][j] = 1
-        return np.matrix(Md)
+        return np.array(Md)
 
     def betti_number(self, p: int) -> int:
         """

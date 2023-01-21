@@ -73,14 +73,14 @@ def simplify_rows(matrix_target: np.matrix) -> np.matrix:
     return matrix
 
 
-def reconstruct(matrix: np.matrix, aux: np.matrix) -> np.matrix:
+def reconstruct(matrix: np.array, aux: np.array) -> np.array:
     """
     Mixes the sub-matrix aux with the matrix.
     Args:
-        matrix (np.matrix): target matrix
-        aux (np.matrix): reconstruction matrix
+        matrix (np.array): target matrix
+        aux (np.array): reconstruction matrix
     Returns:
-        np.matrix: reconstructed matrix
+        np.array: reconstructed matrix
     """
     first_row = matrix[0, :]
     first_row = np.delete(first_row, 0)
@@ -90,13 +90,13 @@ def reconstruct(matrix: np.matrix, aux: np.matrix) -> np.matrix:
     return aux
 
 
-def smith_normal_form(matrix: np.matrix) -> np.matrix:
+def smith_normal_form(matrix: np.array) -> np.array:
     """
     Smith normal form of the given matrix.
     Args:
-        matrix (np.matrix): target matrix
+        matrix (np.array): target matrix
     Returns:
-        np.matrix: smith normal form of the given matrix
+        np.array: smith normal form of the given matrix
     """
     if matrix.shape[0] == 0 or matrix.shape[1] == 0:
         return matrix
@@ -114,21 +114,22 @@ def smith_normal_form(matrix: np.matrix) -> np.matrix:
     return aux
 
 
-def generalized_border_matrix_algorithm(M: list[list[int]]) -> tuple[list[list[int]], list]:
+def generalized_border_matrix_algorithm(M: list[list[int]]) -> tuple[np.array, list]:
     """
     Reduce the generalized border matrix and computes the lows list.
     Args:
         M (list[list[int]]): dictionary with faces
     Returns:
-        tuple[list[list[int]], list]: the reduced generalized border matrix and the lows list
+        tuple[np.array, list]: the reduced generalized border matrix and the lows list
     """
-    M = np.matrix(M)
+    M = np.array(M)
     rows, cols = M.shape
     lows_list = [-1 for _ in range(cols)]
     for j in range(cols):
         columna = M[:, j]
         lista = [x for x in range(rows) if columna[x] == 1]
-        if len(lista) == 0: continue
+        if len(lista) == 0:
+            continue
         low = max(lista)
         lows_list[j] = low
         prev_cols = [x for x in range(cols) if lows_list[x] == low and x != j]
@@ -136,7 +137,8 @@ def generalized_border_matrix_algorithm(M: list[list[int]]) -> tuple[list[list[i
             prev_col = prev_cols[0]
             M[:, j] = (M[:, j] + M[:, prev_col]) % 2
             lista = [x for x in range(rows) if M[:, j][x] == 1]
-            if len(lista) == 0: break
+            if len(lista) == 0:
+                break
             low = max(lista)
             lows_list[j] = low
             prev_cols = [x for x in range(cols) if lows_list[x] == low and x != j]
@@ -149,7 +151,7 @@ def generalized_border_matrix(dic: dict) -> list[list[int]]:
     Args:
         dic (dict): dictionary with faces
     Returns:
-        np.matrix: the generalized border matrix
+        list[list[int]]: the generalized border matrix
     """
     faces = sorted(dic.keys(), key=lambda face: (dic[face], len(face), face))
     faces.remove(faces[0])
