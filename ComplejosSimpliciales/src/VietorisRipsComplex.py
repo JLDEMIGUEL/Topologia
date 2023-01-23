@@ -9,9 +9,7 @@ from ComplejosSimpliciales.src.SimplicialComplex import SimplicialComplex
 
 class Vietoris_RipsComplex(SimplicialComplex):
     """
-    Class used to represent a Vietoris_RipsComplex
-
-    Attributes
+    Class used to represent a Vietoris_RipsComplex.
 
     Attributes:
 
@@ -21,9 +19,9 @@ class Vietoris_RipsComplex(SimplicialComplex):
 
     def __init__(self, points: np.array, max_size: int = None) -> None:
         """
+        Instantiates a new Vietoris Rips Complex.
         Args:
             points (np.array): array of points
-
         Returns:
             None: instantiates new Vietoris_RipsComplex
         """
@@ -32,18 +30,32 @@ class Vietoris_RipsComplex(SimplicialComplex):
         self.max_size = max_size
 
         # Compute the Vietoris-Rips complex
-        self.faces, self.dic = self.compute()
+        self.faces, self.dic = self._compute()
 
-    def compute_rips_complex_for_subset(self, subset):
+    def _compute_rips_complex_for_subset(self, subset: list) -> tuple[int, int]:
+        """
+        Compute the Vietoris Rips Complex for a given subset of points.
+        Args:
+            subset (list): A list of points for which to compute the Rips complex
+        Returns:
+            tuple[int, int]: A tuple containing the radius of the Rips complex, and the subset of points
+        """
         if len(subset) <= 1:
             # Return 0 if the subset contains only one point
             return 0, subset
         else:
             # Compute the maximum distance between any pair of points in the subset
-            radius = self.compute_max_distance(subset)
+            radius = self._compute_max_distance(subset)
             return radius, subset
 
-    def compute_max_distance(self, subset):
+    def _compute_max_distance(self, subset: list) -> float:
+        """
+        Compute the maximum distance between any pair of points in a given subset.
+        Args:
+            subset (list): A list of points for which to compute the maximum distance
+        Returns:
+            float: The maximum distance between any pair of points in the subset
+        """
         if not subset:
             # Return 0 if the subset is empty
             return 0
@@ -60,7 +72,13 @@ class Vietoris_RipsComplex(SimplicialComplex):
 
         return max(left_max, right_max)
 
-    def compute(self):
+    def _compute(self) -> tuple[set, dict]:
+        """
+        Compute the Vietoris Rips Complex for the set of points passed to the class.
+        Returns:
+            tuple[set, dict]: A tuple containing the set of faces of the Rips complex and a dictionary where the keys
+            are the faces and the values are the corresponding radii
+        """
         with Pool() as pool:
             if self.max_size is None:
                 # Generate all subsets of the points
@@ -71,7 +89,7 @@ class Vietoris_RipsComplex(SimplicialComplex):
                 subsets = [subset for k in range(1, self.max_size + 1) for subset in
                            combinations(range(len(self.points)), k + 1)]
             # Compute the maximum distance between any pair of points in each subset
-            simplices = pool.map(self.compute_rips_complex_for_subset, subsets)
+            simplices = pool.map(self._compute_rips_complex_for_subset, subsets)
         # Store the simplices in the faces attribute as tuples instead of arrays
         faces = {tuple(simplex) for radius, simplex in simplices}
         faces.add(tuple())

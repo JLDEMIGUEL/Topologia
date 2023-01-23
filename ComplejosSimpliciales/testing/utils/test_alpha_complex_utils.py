@@ -1,8 +1,10 @@
-from unittest import TestCase
+from unittest import TestCase, mock
+from unittest.mock import patch, ANY
 
 import numpy as np
+from scipy.spatial import Delaunay
 
-from ComplejosSimpliciales.src.utils.alpha_complex_utils import radius, edges
+from ComplejosSimpliciales.src.utils.alpha_complex_utils import radius, edges, plotedges, plottriangles
 
 
 class Test(TestCase):
@@ -33,3 +35,33 @@ class Test(TestCase):
         points = [a, b, np.array([1.0, 1.0])]
         expected_radius = None
         self.assertEqual(expected_radius, edges(a, b, points), 6)
+
+    def test_plotedges(self):
+        with patch('matplotlib.pyplot.plot') as mocked_plot:
+            points = [[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]]
+            edges_list = [[0, 1], [1, 3], [2, 4], [1, 2], [0, 3], [1, 4], [4, 5], [3, 5]]
+            plotedges(edges_list, Delaunay(points))
+
+            self.assertEqual(8, mocked_plot.call_count)
+
+            self.assertEqual([
+                 mock.call([-3.0, 0.0], [0.0, 1.0], 'k'),
+                 mock.call([0.0, -1.7], [1.0, -1.8], 'k'),
+                 mock.call([3.0, 1.7], [0.0, -1.8], 'k'),
+                 mock.call([0.0, 3.0], [1.0, 0.0], 'k'),
+                 mock.call([-3.0, -1.7], [0.0, -1.8], 'k'),
+                 mock.call([0.0, 1.7], [1.0, -1.8], 'k'),
+                 mock.call([1.7, 0.0], [-1.8, -4.0], 'k'),
+                 mock.call([-1.7, 0.0], [-1.8, -4.0], 'k')
+            ], mocked_plot.mock_calls)
+
+    def test_plottriangles(self):
+        with patch('matplotlib.pyplot.tripcolor') as mocked_tripcolor:
+            points = [[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]]
+            triangles = [[[0, 1, 3], [1, 2, 4], [1, 3, 4], [3, 4, 5]]]
+            plottriangles(triangles, Delaunay(points))
+
+            self.assertEqual(1, mocked_tripcolor.call_count)
+
+            mocked_tripcolor.assert_called_with(ANY, ANY, [[[0, 1, 3], [1, 2, 4], [1, 3, 4], [3, 4, 5]]], ANY,
+                                                edgecolor='k', lw=2, cmap=ANY)

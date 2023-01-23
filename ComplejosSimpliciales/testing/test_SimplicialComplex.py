@@ -1,16 +1,19 @@
 import json
 import os
 from pathlib import Path
-from unittest import TestCase
+from unittest import TestCase, mock
+from unittest.mock import patch
+
 import numpy as np
+
 from ComplejosSimpliciales.src.AlphaComplex import AlphaComplex
 from ComplejosSimpliciales.src.SimplicialComplex import SimplicialComplex
 from ComplejosSimpliciales.src.utils.constants import tetraedro, toro, plano_proyectivo, botella_klein
-CLOUD_PATH = os.path.join(os.path.abspath(Path(__file__).parent.parent.parent),"docs","clouds.json")
+
+CLOUD_PATH = os.path.join(os.path.abspath(Path(__file__).parent.parent.parent), "docs", "clouds.json")
 
 
 class TestSimplicialComplex(TestCase):
-
     # Figura
     sc2 = SimplicialComplex([(0, 1), (1, 2, 3, 4), (4, 5), (5, 6), (4, 6), (6, 7, 8), (8, 9)])
 
@@ -25,6 +28,9 @@ class TestSimplicialComplex(TestCase):
 
     # Botella Klein
     botella_klein = botella_klein
+
+    # Simple AlphaComplex
+    simple_alpha = AlphaComplex([[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]])
 
     def test_basic_1(self):
         aux = SimplicialComplex(tetraedro.face_set())
@@ -92,13 +98,13 @@ class TestSimplicialComplex(TestCase):
         expected_faces = [(), (0,), (0, 1), (1,), (1, 2), (1, 2, 3), (1, 2, 3, 4), (1, 2, 4), (1, 3), (1, 3, 4), (1, 4),
                           (2,), (2, 3), (2, 3, 4), (2, 4), (3,), (3, 4), (4,), (4, 5), (4, 6), (5,), (5, 6), (6,),
                           (6, 7), (6, 7, 8), (6, 8), (7,), (7, 8), (8,), (8, 9), (9,)]
-        self.assertEquals(expected_faces, self.sc2.face_set())
+        self.assertEqual(expected_faces, self.sc2.face_set())
 
     def test_face_set_3(self):
         expected_faces = [(), (0,), (1,), (2,), (2, 3), (3,), (4,), (4, 5), (4, 6), (5,), (5, 6), (6,), (6, 7),
                           (6, 7, 8), (6, 7, 8, 9), (6, 7, 9), (6, 8), (6, 8, 9), (6, 9), (7,), (7, 8), (7, 8, 9),
                           (7, 9), (8,), (8, 9), (9,)]
-        self.assertEquals(expected_faces, self.sc3.face_set())
+        self.assertEqual(expected_faces, self.sc3.face_set())
 
     def test_dimension_1(self):
         dimension = tetraedro.dimension()
@@ -318,3 +324,61 @@ class TestSimplicialComplex(TestCase):
         for i in range(botella_klein.dimension() + 1):
             euler += (-1) ** i * botella_klein.betti_number(i)
         self.assertEqual(botella_klein.euler_characteristic(), euler)
+
+    def test_incremental_algth(self):
+        sc = SimplicialComplex([(0, 1, 2), (2, 3), (3, 4)])
+        self.assertEqual([1, 0], sc.incremental_algth())
+        sc = SimplicialComplex([(0, 1), (1, 2), (0, 2), (2, 3), (3, 4)])
+        self.assertEqual([1, 1], sc.incremental_algth())
+        sc = SimplicialComplex([(0, 1), (1, 2), (0, 2), (2, 3), (3, 4), (2, 4)])
+        self.assertEqual([1, 2], sc.incremental_algth())
+
+    def test_persistence_diagram(self):
+        with patch('matplotlib.pyplot.show') as mocked_show, \
+                patch('matplotlib.pyplot.plot') as mocked_plot:
+            self.simple_alpha.persistence_diagram()
+            self.assertEqual([
+                mock.call([0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                          [1.110180165558726, 1.3901438774457844, 1.5811388300841898, 1.63783393541592, 1.7,
+                           2.874107142857142], 'go'),
+                mock.call([1.7, 1.63783393541592, 1.5811388300841898],
+                          [1.7568181818181818, 1.7164000648001554, 1.916071428571428], 'ro'),
+                mock.call([-0.28741071428571424, 3.1615178571428566], [-0.28741071428571424, 3.1615178571428566],
+                          'b--'),
+                mock.call([-0.28741071428571424, 3.1615178571428566], [2.874107142857142, 2.874107142857142], 'b--')
+            ], mocked_plot.mock_calls)
+
+            mocked_show.assert_called_once()
+
+    def test_barcode_diagram(self):
+        with patch('matplotlib.pyplot.show') as mocked_show, \
+                patch('matplotlib.pyplot.plot') as mocked_plot:
+            self.simple_alpha.barcode_diagram()
+
+            self.assertEqual([
+                mock.call([0.0, 1.110180165558726], [0, 0], 'g'),
+                mock.call([0.0, 1.3901438774457844], [1, 1], 'g'),
+                mock.call([0.0, 1.5811388300841898], [2, 2], 'g'),
+                mock.call([0.0, 1.63783393541592], [3, 3], 'g'),
+                mock.call([0.0, 1.7], [4, 4], 'g'),
+                mock.call([0.0, 2.874107142857142], [5, 5], 'g'),
+                mock.call([1.7, 1.7568181818181818], [6, 6], 'r'),
+                mock.call([1.63783393541592, 1.7164000648001554], [7, 7], 'r'),
+                mock.call([1.5811388300841898, 1.916071428571428], [8, 8], 'r')
+            ], mocked_plot.mock_calls)
+
+            mocked_show.assert_called_once()
+
+    def test_process_diagram(self):
+        infinite, points = self.simple_alpha._process_diagram()
+
+        self.assertEqual(2.874107142857142, infinite)
+        self.assertEqual([[0.0, 1.110180165558726],
+                          [0.0, 1.3901438774457844],
+                          [0.0, 1.5811388300841898],
+                          [0.0, 1.63783393541592],
+                          [0.0, 1.7],
+                          [0.0, 2.874107142857142]], points[1].tolist())
+        self.assertEqual([[1.7, 1.7568181818181818],
+                          [1.63783393541592, 1.7164000648001554],
+                          [1.5811388300841898, 1.916071428571428]], points[2].tolist())
