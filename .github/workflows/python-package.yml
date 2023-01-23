@@ -23,6 +23,6 @@ jobs:
           cd ComplejosSimpliciales
           run: |
             pip install pytest
-            pytest testing/ --doctest-modules --junitxml=junit/test-results.xml
+            pytest testing/ --doctest-modules
 
 
