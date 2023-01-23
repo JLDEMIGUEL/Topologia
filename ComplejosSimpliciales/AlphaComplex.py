@@ -5,9 +5,9 @@ import numpy as np
 from IPython.core.display_functions import clear_output
 from scipy.spatial import Delaunay, Voronoi, voronoi_plot_2d
 
-from ComplejosSimpliciales.src.SimplicialComplex import SimplicialComplex
-from ComplejosSimpliciales.src.utils.alpha_complex_utils import radius, edges, plottriangles, plotedges
-from ComplejosSimpliciales.src.utils.simplicial_complex_utils import filterByFloat
+from ComplejosSimpliciales.SimplicialComplex import SimplicialComplex
+from ComplejosSimpliciales.utils.alpha_complex_utils import radius, edges, plottriangles, plotedges
+from ComplejosSimpliciales.utils.simplicial_complex_utils import filterByFloat
 
 
 def filter_faces(faces: set, dic: dict):

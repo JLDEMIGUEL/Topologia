@@ -1,10 +1,8 @@
-import os
-from pathlib import Path
 from unittest import TestCase
 
 import numpy as np
 
-from ComplejosSimpliciales.src.VietorisRipsComplex import Vietoris_RipsComplex
+from ComplejosSimpliciales.VietorisRipsComplex import Vietoris_RipsComplex
 
 
 class TestVietoris_RipsComplex(TestCase):
