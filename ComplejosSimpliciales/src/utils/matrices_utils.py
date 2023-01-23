@@ -115,6 +115,188 @@ def smith_normal_form(matrix: np.array) -> np.array:
     return aux
 
 
+def gcd_euclides(a: int, b: int) -> int:
+    """
+    Compute the greatest common divisor (gcd) of two integers using the Euclidean algorithm.
+
+    Parameters:
+        a (int): the first integer
+        b (int): the second integer
+
+    Returns:
+        int: the gcd of a and b
+    """
+    a, b = abs(a), abs(b)
+    while b:
+        a, b = b, a % b
+    return a
+
+
+def matrix_gcd(matrix: np.array) -> int:
+    """
+    Compute the greatest common divisor (gcd) of all elements in a matrix using the Euclidean algorithm.
+
+    Parameters:
+        matrix (np.array): a 2D list of integers
+
+    Returns:
+        int: the gcd of all elements in matrix
+    """
+    if len(matrix) == 0 or len(matrix[0]) == 0:
+        return 0
+    gcd_result = matrix[0][0]
+    for row in matrix:
+        for element in row:
+            if element == 0:
+                continue
+            gcd_result = gcd_euclides(gcd_result % element, element)
+    return gcd_result
+
+
+def min_abs_position(matrix: np.array) -> list[int, int]:
+    """
+    Find the position of the minimum absolute value in a matrix.
+
+    Parameters:
+        matrix (np.array): A 2D list of integers
+
+    Returns:
+        list[int, int]: A tuple of integers representing the row and column indices
+                         of the minimum absolute value in the matrix.
+    """
+    min_val = float('inf')
+    min_val_pos = [0, 0]
+    for i, row in enumerate(matrix):
+        for j, element in enumerate(row):
+            if element != 0 and abs(element) < min_val:
+                min_val = abs(element)
+                min_val_pos = [i, j]
+    return min_val_pos
+
+
+def swap_and_sign(matrix: np.array, source: list, obj: list) -> np.array:
+    """
+    Swap the row and column given in source and the ones in obj
+    and change row sign if necessary
+
+    Args:
+        matrix (np.array): target matrix
+        source (list): source indexes
+        obj (list): objective indexes
+    Returns:
+        np.array: matrix with the applied swap
+
+    """
+    matrix = swap(matrix, source, obj)
+    if matrix[obj[0], obj[1]] < 0:
+        matrix[obj[0], :] *= -1
+    return matrix
+
+
+def reduce_rows_columns(matrix: np.array) -> np.array:
+    """
+    Reduces the first column and first row assuming that the element [0, 0] divides
+    every element in both, the first column and first row.
+    Args:
+        matrix (np.array): target matrix to reduce
+    Returns:
+        np.array: matrix with the applied reduction
+    """
+    first_row = matrix[0, :]
+    first_col = matrix[:, 0]
+    first_elem = matrix[0, 0]
+    for i in range(1, len(first_row)):
+        mult = first_row[i] / first_elem
+        matrix[:, i] = matrix[:, i] - mult * matrix[:, 0]
+
+    for j in range(1, len(first_col)):
+        mult = first_col[j] / first_elem
+        matrix[j, :] = matrix[j, :] - mult * matrix[0, :]
+
+    return matrix
+
+
+def _find_element_with_property(matrix: np.array) -> tuple[int, int]:
+    """
+    Finds the first element which can not be divided by the first one.
+    Args:
+        matrix (np.array): matrix to find elements
+    Returns:
+        tuple[int, int]: coordinates of the element
+    """
+    rows, cols = matrix.shape
+    first = matrix[0, 0]
+
+    for i in range(1, rows):
+        if gcd_euclides(first, matrix[i][0]) < first:
+            return i, 0
+    for j in range(1, cols):
+        if gcd_euclides(first, matrix[0][j]) < first:
+            return 0, j
+
+    for i in range(1, rows):
+        for j in range(1, cols):
+            if gcd_euclides(first, matrix[i][j]) < first:
+                return i, j
+
+
+def _process_reduction(matrix: np.array, coord: tuple[int, int]) -> np.array:
+    """
+    Returns the matrix with the reduction applied.
+    Args:
+        matrix (np.array): matrix to find elements
+        coord (tuple[int, int]): coordinates where the element is in the matrix
+    Returns:
+        np.array: reduced matrix
+    """
+    first = matrix[0, 0]
+    elem = matrix[coord[0], coord[1]]
+    if coord[0] == 0:
+        if matrix[coord[0], coord[1]] < 0:
+            matrix[:, coord[1]] *= -1
+            elem *= -1
+        matrix[:, coord[1]] -= int(elem / first) * matrix[:, 0]
+    if coord[1] == 0:
+        if matrix[coord[0], coord[1]] < 0:
+            matrix[coord[0], :] *= -1
+            elem *= -1
+        matrix[coord[0], :] -= int(elem / first) * matrix[0, :]
+    if coord[0] > 0 and coord[1] > 0:
+        matrix[0, :] += matrix[coord[0], :]
+        matrix = _process_reduction(matrix, [0, coord[1]])
+    return matrix
+
+
+def smith_normal_form_z(matrix: np.array) -> np.array:
+    """
+    Smith normal form of the given matrix
+
+    Args:
+        matrix (np.array): target matrix
+    Returns:
+        np.array: smith normal form of the given matrix
+    """
+    gcd = matrix_gcd(matrix)
+    if gcd == 0:
+        return matrix
+
+    while gcd != matrix[0][0]:
+        if gcd == 0:
+            return matrix
+        min_pos = min_abs_position(matrix)
+        matrix = swap_and_sign(matrix, min_pos, [0, 0])
+        if matrix[0, 0] > gcd:
+            coords = _find_element_with_property(matrix)
+            if coords is not None:
+                matrix = _process_reduction(matrix, coords)
+        gcd = matrix_gcd(matrix)
+
+    matrix = reduce_rows_columns(matrix)
+    sub_matrix = matrix[1:, 1:]
+    matrix = reconstruct(matrix, smith_normal_form_z(sub_matrix))
+    return matrix
+
+
 def generalized_border_matrix_algorithm(M: list[list[int]]) -> tuple[np.array, list]:
     """
     Reduce the generalized border matrix and computes the lows list.
@@ -127,20 +309,20 @@ def generalized_border_matrix_algorithm(M: list[list[int]]) -> tuple[np.array, l
     rows, cols = M.shape
     lows_list = [-1 for _ in range(cols)]
     for j in range(cols):
-        columna = M[:, j]
-        lista = [x for x in range(rows) if columna[x] == 1]
-        if len(lista) == 0:
+        column = M[:, j]
+        ones_list = [x for x in range(rows) if column[x] == 1]
+        if len(ones_list) == 0:
             continue
-        low = max(lista)
+        low = max(ones_list)
         lows_list[j] = low
         prev_cols = [x for x in range(cols) if lows_list[x] == low and x != j]
         while len(prev_cols) > 0:
             prev_col = prev_cols[0]
             M[:, j] = (M[:, j] + M[:, prev_col]) % 2
-            lista = [x for x in range(rows) if M[:, j][x] == 1]
-            if len(lista) == 0:
+            ones_list = [x for x in range(rows) if M[:, j][x] == 1]
+            if len(ones_list) == 0:
                 break
-            low = max(lista)
+            low = max(ones_list)
             lows_list[j] = low
             prev_cols = [x for x in range(cols) if lows_list[x] == low and x != j]
     return M, lows_list
