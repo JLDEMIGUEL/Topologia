@@ -216,16 +216,6 @@ def reduce_rows_columns(matrix: np.array) -> np.array:
     return matrix
 
 
-def reconstruct_z(matrix_a, matrix_b):
-    if len(matrix_b) == 0:
-        return matrix_a
-    first_row = matrix_a[0, 1:]
-    first_col = matrix_a[:, 0]
-    matrix_res = np.r_[[first_row], matrix_b]
-    matrix_res = np.c_[first_col, matrix_res]
-    return matrix_res
-
-
 def _find_element_with_property(matrix: np.array) -> tuple[int, int]:
     """
     Finds the first element which can not be divided by the first one.
@@ -303,7 +293,7 @@ def smith_normal_form_z(matrix: np.array) -> np.array:
 
     matrix = reduce_rows_columns(matrix)
     sub_matrix = matrix[1:, 1:]
-    matrix = reconstruct_z(matrix, smith_normal_form_z(sub_matrix))
+    matrix = reconstruct(matrix, smith_normal_form_z(sub_matrix))
     return matrix
 
 
@@ -319,20 +309,20 @@ def generalized_border_matrix_algorithm(M: list[list[int]]) -> tuple[np.array, l
     rows, cols = M.shape
     lows_list = [-1 for _ in range(cols)]
     for j in range(cols):
-        columna = M[:, j]
-        lista = [x for x in range(rows) if columna[x] == 1]
-        if len(lista) == 0:
+        column = M[:, j]
+        ones_list = [x for x in range(rows) if column[x] == 1]
+        if len(ones_list) == 0:
             continue
-        low = max(lista)
+        low = max(ones_list)
         lows_list[j] = low
         prev_cols = [x for x in range(cols) if lows_list[x] == low and x != j]
         while len(prev_cols) > 0:
             prev_col = prev_cols[0]
             M[:, j] = (M[:, j] + M[:, prev_col]) % 2
-            lista = [x for x in range(rows) if M[:, j][x] == 1]
-            if len(lista) == 0:
+            ones_list = [x for x in range(rows) if M[:, j][x] == 1]
+            if len(ones_list) == 0:
                 break
-            low = max(lista)
+            low = max(ones_list)
             lows_list[j] = low
             prev_cols = [x for x in range(cols) if lows_list[x] == low and x != j]
     return M, lows_list

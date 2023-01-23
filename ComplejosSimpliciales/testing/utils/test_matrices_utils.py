@@ -5,7 +5,7 @@ import numpy as np
 from ComplejosSimpliciales.src.AlphaComplex import AlphaComplex
 from ComplejosSimpliciales.src.utils.matrices_utils import search_one, swap, simplify_rows, simplify_columns, \
     reconstruct, smith_normal_form, gcd_euclides, matrix_gcd, min_abs_position, swap_and_sign, reduce_rows_columns, \
-    smith_normal_form_z
+    smith_normal_form_z, generalized_border_matrix, generalized_border_matrix_algorithm
 
 
 class Test(TestCase):
