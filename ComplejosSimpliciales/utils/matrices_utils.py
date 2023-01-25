@@ -281,15 +281,12 @@ def smith_normal_form_z(matrix: np.array) -> np.array:
         return matrix
 
     while gcd != matrix[0][0]:
-        if gcd == 0:
-            return matrix
         min_pos = min_abs_position(matrix)
         matrix = swap_and_sign(matrix, min_pos, [0, 0])
         if matrix[0, 0] > gcd:
             coords = _find_element_with_property(matrix)
             if coords is not None:
                 matrix = _process_reduction(matrix, coords)
-        gcd = matrix_gcd(matrix)
 
     matrix = reduce_rows_columns(matrix)
     sub_matrix = matrix[1:, 1:]
