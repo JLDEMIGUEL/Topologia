@@ -3,9 +3,9 @@ from unittest import TestCase
 import numpy as np
 
 from ComplejosSimpliciales.AlphaComplex import AlphaComplex
-from ComplejosSimpliciales.utils.matrices_utils import search_one, swap, simplify_rows, simplify_columns, \
+from ComplejosSimpliciales.utils.matrices_utils import search_non_zero_elem, swap, simplify_rows, simplify_columns, \
     reconstruct, smith_normal_form, gcd_euclides, matrix_gcd, min_abs_position, swap_and_sign, reduce_rows_columns, \
-    smith_normal_form_z, generalized_border_matrix, generalized_border_matrix_algorithm
+    smith_normal_form_z, generalized_border_matrix, generalized_border_matrix_algorithm, extended_gcd
 
 
 class Test(TestCase):
@@ -28,19 +28,19 @@ class Test(TestCase):
 
     def test_search_one_1(self):
         ret = [0, 0]
-        self.assertEqual(ret, search_one(self.m1))
+        self.assertEqual(ret, search_non_zero_elem(self.m1))
 
     def test_search_one_2(self):
         ret = [2, 1]
-        self.assertEqual(ret, search_one(self.m2))
+        self.assertEqual(ret, search_non_zero_elem(self.m2))
 
     def test_search_one_3(self):
         ret = [2, 0]
-        self.assertEqual(ret, search_one(self.m3))
+        self.assertEqual(ret, search_non_zero_elem(self.m3))
 
     def test_search_one_4(self):
         ret = [0, 1]
-        self.assertEqual(ret, search_one(self.m4))
+        self.assertEqual(ret, search_non_zero_elem(self.m4))
 
     def test_swap_1(self):
         source = [1, 0]
@@ -77,6 +77,27 @@ class Test(TestCase):
                                     [0, 0, 1, 0, 1, 1]])
         simplified_matrix = simplify_rows(self.m1)
         self.assertListEqual(expected_matrix.tolist(), simplified_matrix.tolist())
+
+    def test_extended_gcd_1(self):
+        a = 60
+        b = 48
+        gcd, x, y = extended_gcd(a, b)
+        self.assertEqual(12, gcd)
+        self.assertEqual(12, (a * x) + (b * y))
+
+    def test_extended_gcd_2(self):
+        a = 35
+        b = 14
+        gcd, x, y = extended_gcd(a, b)
+        self.assertEqual(7, gcd)
+        self.assertEqual(7, (a * x) + (b * y))
+
+    def test_extended_gcd_3(self):
+        a = 24
+        b = 60
+        gcd, x, y = extended_gcd(a, b)
+        self.assertEqual(12, gcd)
+        self.assertEqual(12, (a * x) + (b * y))
 
     def test_reconstruct_1(self):
         matrix = np.array([[1, 0, 0, 0],

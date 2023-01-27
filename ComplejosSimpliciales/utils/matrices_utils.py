@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def search_one(matrix: np.array) -> list:
+def search_non_zero_elem(matrix: np.array) -> list:
     """
     Searches a one with lower indexes in the given matrix.
     Args:
@@ -13,7 +13,7 @@ def search_one(matrix: np.array) -> list:
     ret = [rows - 1, columns - 1]
     for x in range(rows):
         for y in range(columns):
-            if matrix[x, y] == 1 and x + y < ret[0] + ret[1]:
+            if matrix[x, y] != 0 and x + y < ret[0] + ret[1]:
                 ret = [x, y]
     return ret
 
@@ -49,8 +49,7 @@ def simplify_columns(matrix_target: np.array) -> np.array:
     """
     matrix = matrix_target.copy()
     columns = matrix.shape[1]
-    for i in range(columns - 1):
-        i += 1
+    for i in range(1, columns):
         if matrix[0, i] == 1:
             matrix[:, i] = (matrix[:, i] + matrix[:, 0]) % 2
     return matrix
@@ -66,11 +65,18 @@ def simplify_rows(matrix_target: np.array) -> np.array:
     """
     matrix = matrix_target.copy()
     rows = matrix.shape[0]
-    for i in range(rows - 1):
-        i += 1
+    for i in range(1, rows):
         if matrix[i, 0] == 1:
             matrix[i, :] = (matrix[i, :] + matrix[0, :]) % 2
     return matrix
+
+
+def extended_gcd(a, b):
+    if a == 0:
+        return (b, 0, 1)
+    else:
+        gcd, x, y = extended_gcd(b % a, a)
+        return (gcd, y - (b // a) * x, x)
 
 
 def reconstruct(matrix: np.array, aux: np.array) -> np.array:
@@ -101,8 +107,8 @@ def smith_normal_form(matrix: np.array) -> np.array:
     """
     if matrix.shape[0] == 0 or matrix.shape[1] == 0:
         return matrix
-    [x, y] = search_one(matrix)
-    if matrix[x, y] != 1:
+    [x, y] = search_non_zero_elem(matrix)
+    if matrix[x, y] == 0:
         return matrix
     if [x, y] != [0, 0]:
         matrix = swap(matrix, [x, y], [0, 0])
