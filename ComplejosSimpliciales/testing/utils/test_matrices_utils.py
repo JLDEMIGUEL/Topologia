@@ -1,3 +1,4 @@
+import unittest
 from unittest import TestCase
 
 import numpy as np
@@ -189,49 +190,71 @@ class Test(TestCase):
         returned = min_abs_position(matrix)
         self.assertEqual(expected, returned)
 
-    def test_swap_and_sign_1(self):
-        source = [1, 0]
-        obj = [0, 0]
-        matrix = np.array([[1, 1, 1, 0, 0, 0],
-                           [-1, 0, 0, 1, 1, 0],
-                           [0, 1, 0, 1, 0, 1],
-                           [0, 0, 1, 0, 1, 1]])
-        expected_matrix = np.array([[1, 0, 0, -1, -1, 0],
-                                    [1, 1, 1, 0, 0, 0],
-                                    [0, 1, 0, 1, 0, 1],
-                                    [0, 0, 1, 0, 1, 1]])
-        swapped_matrix = swap_and_sign(matrix, source, obj)
-        self.assertListEqual(expected_matrix.tolist(), swapped_matrix.tolist())
+    def test_smith_normal_form_z_0(self):
+        matrix = np.array([[3, 2, 3],
+                           [0, 2, 0],
+                           [2, 2, 2]])
+        expected_matrix = np.array([[1, 0, 0],
+                                    [0, 2, 0],
+                                    [0, 0, 0]])
+        expected_rows_matrix = np.array([[1, 0, 0],
+                                         [0, 0, 1],
+                                         [2, 1, -3]])
+        expected_columns_matrix = np.array([[1, -2, -1],
+                                            [-1, 3, 0],
+                                            [0, 0, 1]])
 
-    def test_swap_and_sign_2(self):
-        source = [1, 0]
-        obj = [0, 0]
-        matrix = np.array([[1, 1, 1, 0, 0, 0],
-                           [1, 0, 0, 1, 1, 0],
-                           [0, 1, 0, 1, 0, 1],
-                           [0, 0, 1, 0, 1, 1]])
-        expected_matrix = np.array([[1, 0, 0, 1, 1, 0],
-                                    [1, 1, 1, 0, 0, 0],
-                                    [0, 1, 0, 1, 0, 1],
-                                    [0, 0, 1, 0, 1, 1]])
-        swapped_matrix = swap_and_sign(matrix, source, obj)
-        self.assertListEqual(expected_matrix.tolist(), swapped_matrix.tolist())
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
 
-    def test_reduce_rows_columns(self):
-        matrix = np.array([[-2, 4, -6], [-8, 0, 12], [0, -16, 18]])
-        expected_matrix = np.array([[-2, 0, 0], [0, -16, 36], [0, -16, 18]])
+        self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
-        reduced_matrix = reduce_rows_columns(matrix)
-        self.assertListEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+    def test_smith_normal_form_z_00(self):
+        matrix = np.array([[1, 1],
+                           [1, -1],
+                           [-1, 1]])
+        expected_matrix = np.array([[1, 0],
+                                    [0, 2],
+                                    [0, 0]])
+        expected_rows_matrix = np.array([[1, 0, 0],
+                                         [1, -1, 0],
+                                         [0, 1, 1]])
+        expected_columns_matrix = np.array([[1, -1],
+                                            [0, 1]])
+
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
+        self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_1(self):
         matrix = np.array([[1, 2, 3],
                            [4, 5, 6]])
         expected_matrix = np.array([[1, 0, 0],
                                     [0, 3, 0]])
+        expected_rows_matrix = np.array([[1, 0],
+                                         [4, -1]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        expected_columns_matrix = np.array([[1, -2, 1],
+                                            [0, 1, -2],
+                                            [0, 0, 1]])
+
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_2(self):
         matrix = np.array([[2, 4, 4],
@@ -240,9 +263,21 @@ class Test(TestCase):
         expected_matrix = np.array([[2, 0, 0],
                                     [0, 6, 0],
                                     [0, 0, 12]])
+        expected_rows_matrix = np.array([[1, 0, 0],
+                                         [2, -1, -1],
+                                         [3, -4, -3]])
+        expected_columns_matrix = np.array([[1, -2, 2],
+                                            [0, 1, -2],
+                                            [0, 0, 1]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_3(self):
         matrix = np.array([[2, 4, 4],
@@ -251,9 +286,21 @@ class Test(TestCase):
         expected_matrix = np.array([[2, 0, 0],
                                     [0, 2, 0],
                                     [0, 0, 156]])
+        expected_rows_matrix = np.array([[1, 0, 0],
+                                         [8, 1, -1],
+                                         [219, 28, -27]])
+        expected_columns_matrix = np.array([[1, 2, -6],
+                                            [0, 5, -14],
+                                            [0, -6, 17]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_4(self):
         matrix = np.array([[-6, 111, -36, 6],
@@ -264,9 +311,23 @@ class Test(TestCase):
                                     [0, 3, 0, 0],
                                     [0, 0, 21, 0],
                                     [0, 0, 0, 0]])
+        expected_rows_matrix = np.array([[-1, -1, 0, 0],
+                                         [-5, -6, 20, 0],
+                                         [-85, -130, 419, -20],
+                                         [-98, 21, 1, 99]])
+        expected_columns_matrix = np.array([[1, -21039, 7026, 2],
+                                            [0, -1, 0, 2],
+                                            [0, 0, -1, 6],
+                                            [0, -270, 90, 1]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_5(self):
         matrix = np.array([[6, -6],
@@ -275,9 +336,20 @@ class Test(TestCase):
         expected_matrix = np.array([[2, 0],
                                     [0, 6],
                                     [0, 0]])
+        expected_rows_matrix = np.array([[0, -1, -1],
+                                         [-3, -1, 3],
+                                         [8, 2, -9]])
+        expected_columns_matrix = np.array([[1, -10],
+                                            [0, 1]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_6(self):
         matrix = np.array([[1, 2, 1, 1],
@@ -286,9 +358,22 @@ class Test(TestCase):
         expected_matrix = np.array([[1, 0, 0, 0],
                                     [0, 1, 0, 0],
                                     [0, 0, 0, 0]])
+        expected_rows_matrix = np.array([[1, 0, 0],
+                                         [2, -1, 0],
+                                         [-1, -1, 1]])
+        expected_columns_matrix = np.array([[1, -1, 2, -1],
+                                            [0, 0, 1, 0],
+                                            [0, 1, -4, 0],
+                                            [0, 0, 0, 1]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_7(self):
         matrix = np.array([[1, 2, 3],
@@ -297,9 +382,21 @@ class Test(TestCase):
         expected_matrix = np.array([[1, 0, 0],
                                     [0, 8, 0],
                                     [0, 0, 0]])
+        expected_rows_matrix = np.array([[1, 0, 0],
+                                         [3, -1, 0],
+                                         [-1, 0, 1]])
+        expected_columns_matrix = np.array([[1, -2, -1],
+                                            [0, 1, -1],
+                                            [0, 0, 1]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_8(self):
         matrix = np.array([[1, 0, -1],
@@ -310,27 +407,62 @@ class Test(TestCase):
                                     [0, 3, 0],
                                     [0, 0, 6],
                                     [0, 0, 0]])
+        expected_rows_matrix = np.array([[1, 0, 0, 0],
+                                         [-4, 1, 0, 0],
+                                         [-12, 3, -1, 0],
+                                         [1, -1, -1, 1]])
+        expected_columns_matrix = np.array([[1, 0, 1],
+                                            [0, 1, -1],
+                                            [0, 0, 1]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_9(self):
         matrix = np.array([[8, 4, 8],
                            [4, 8, 4]])
         expected_matrix = np.array([[4, 0, 0],
                                     [0, 12, 0]])
+        expected_rows_matrix = np.array([[1, 0],
+                                         [2, -1]])
+        expected_columns_matrix = np.array([[0, 1, -1],
+                                            [1, -2, 0],
+                                            [0, 0, 1]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_10(self):
         matrix = np.array([[2, 1, -3],
                            [1, -1, 2]])
         expected_matrix = np.array([[1, 0, 0],
                                     [0, 1, 0]])
+        expected_rows_matrix = np.array([[1, 0],
+                                         [-1, -1]])
+        expected_columns_matrix = np.array([[0, 0, 1],
+                                            [1, 3, 7],
+                                            [0, 1, 3]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_11(self):
         matrix = np.array([[2, 10, 6],
@@ -339,9 +471,21 @@ class Test(TestCase):
         expected_matrix = np.array([[2, 0, 0],
                                     [0, 14, 0],
                                     [0, 0, 0]])
+        expected_rows_matrix = np.array([[1, 0, 0],
+                                         [2, 1, 0],
+                                         [-1, -1, 1]])
+        expected_columns_matrix = np.array([[1, -5, -3],
+                                            [0, 1, 0],
+                                            [0, 0, 1]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_12(self):
         matrix = np.array([[2, 6, -8],
@@ -350,27 +494,61 @@ class Test(TestCase):
         expected_matrix = np.array([[2, 0, 0],
                                     [0, 2, 0],
                                     [0, 0, 168]])
+        expected_rows_matrix = np.array([[1, 0, 0],
+                                         [10, -3, 4],
+                                         [-26, 8, -11]])
+        expected_columns_matrix = np.array([[1, -3, -95],
+                                            [0, 1, 33],
+                                            [0, 0, 1]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_13(self):
         matrix = np.array([[1, -1, 1],
                            [1, 0, 2]])
         expected_matrix = np.array([[1, 0, 0],
                                     [0, 1, 0]])
+        expected_rows_matrix = np.array([[1, 0],
+                                         [-1, 1]])
+        expected_columns_matrix = np.array([[1, 1, -2],
+                                            [0, 1, -1],
+                                            [0, 0, 1]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_14(self):
         matrix = np.array([[1, 0, -3],
                            [1, 2, 5]])
         expected_matrix = np.array([[1, 0, 0],
                                     [0, 2, 0]])
+        expected_rows_matrix = np.array([[1, 0],
+                                         [-1, 1]])
+        expected_columns_matrix = np.array([[1, 0, 3],
+                                            [0, 1, -4],
+                                            [0, 0, 1]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_15(self):
         matrix = np.array([[2, -1, 0],
@@ -379,9 +557,21 @@ class Test(TestCase):
         expected_matrix = np.array([[1, 0, 0],
                                     [0, 1, 0],
                                     [0, 0, 5]])
+        expected_rows_matrix = np.array([[-1, 0, 0],
+                                         [1, 0, 1],
+                                         [3, -1, 0]])
+        expected_columns_matrix = np.array([[0, 0, 1],
+                                            [1, 0, 2],
+                                            [0, 1, -3]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_smith_normal_form_z_16(self):
         matrix = np.array([[1, 0, 0, 0, 0, 0, 0],
@@ -402,9 +592,31 @@ class Test(TestCase):
                                     [0, 0, 0, 0, 0, 0, 0],
                                     [0, 0, 0, 0, 0, 0, 0],
                                     [0, 0, 0, 0, 0, 0, 0]])
+        expected_rows_matrix = np.array([[1, 0, 0, 0, 0, 0, 0, 0, 0],
+                                         [0, 1, 0, 0, 0, 0, 0, 0, 0],
+                                         [0, 0, 1, 0, 0, 0, 0, 0, 0],
+                                         [0, 0, 0, 1, 0, 0, 0, 0, 0],
+                                         [0, 0, 0, 0, 1, 0, 0, 0, 0],
+                                         [0, 0, 0, 0, 0, 1, 0, 0, 0],
+                                         [0, 0, 0, 0, 0, 0, 1, 0, 0],
+                                         [0, 0, 0, 0, 0, 0, 0, 1, 0],
+                                         [0, 0, 0, 0, 0, 0, 0, 0, 1]])
+        expected_columns_matrix = np.array([[1, 0, 0, 0, 0, 0, 0],
+                                            [0, 1, 0, 0, 0, 0, 0],
+                                            [0, 0, 1, 0, 0, 0, 0],
+                                            [0, 0, 0, 1, 0, 0, 0],
+                                            [0, 0, 0, 0, 1, 0, 0],
+                                            [0, 0, 0, 0, 0, 1, 0],
+                                            [0, 0, 0, 0, 0, 0, 1]])
 
-        reduced_matrix = smith_normal_form_z(matrix)
-        self.assertListEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        reduced_matrix, rows_opp_matrix, columns_opp_matrix = smith_normal_form_z(matrix)
+
+        self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
+        self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         (np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                         np.matrix(expected_columns_matrix)).tolist())
 
     def test_generalized_border_matrix_algorithm(self):
         simple_alpha = AlphaComplex([[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]])
