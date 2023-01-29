@@ -133,7 +133,7 @@ def inverse(number: int, group: int) -> int:
 
 
 def smith_normal_form(matrix: np.array, rows_opp_matrix: np.array = None, columns_opp_matrix: np.array = None,
-                      group: int = 2) -> np.array:
+                      group: int = 2) -> tuple[np.array, np.array, np.array]:
     """
     Smith normal form of the given matrix.
     Args:
@@ -142,7 +142,7 @@ def smith_normal_form(matrix: np.array, rows_opp_matrix: np.array = None, column
         columns_opp_matrix (np.array): columns matrix
         group (int): group
     Returns:
-        np.array: smith normal form of the given matrix
+        tuple[np.array, np.array, np.array]: smith normal form of the given matrix
     """
     matrix = matrix.copy()
     if rows_opp_matrix is None or columns_opp_matrix is None:
