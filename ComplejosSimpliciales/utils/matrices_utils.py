@@ -1,4 +1,5 @@
 import numpy as np
+from fractions import Fraction
 
 
 def search_non_zero_elem(matrix: np.array) -> list:
@@ -37,6 +38,25 @@ def swap(matrix: np.array, source: list, obj: list) -> np.array:
         aux[:, obj[1]] = aux2[:, source[1]]
         aux[:, source[1]] = aux2[:, obj[1]]
     return aux
+
+
+def swap_opp_matrix(rows_opp_matrix: np.array, columns_opp_matrix: np.array, source: list, obj: list) -> \
+        tuple[np.array, np.array]:
+    """
+    Swap the row and column given in source and the ones in obj
+    Args:
+        rows_opp_matrix (np.array): rows matrix
+        columns_opp_matrix (np.array): columns matrix
+        source (list): source indexes
+        obj (list): objective indexes
+    Returns:
+        tuple[np.array, np.array]: swapped matrix's
+    """
+    if source[0] != obj[0]:
+        rows_opp_matrix = swap(rows_opp_matrix, [source[0], 0], [obj[0], 0])
+    if source[1] != obj[1]:
+        columns_opp_matrix = swap(columns_opp_matrix, [0, source[1]], [0, obj[1]])
+    return rows_opp_matrix, columns_opp_matrix
 
 
 def simplify_columns(matrix_target: np.array, columns_opp_matrix: np.array, group: object) -> tuple[np.array, np.array]:
@@ -79,6 +99,47 @@ def simplify_rows(matrix_target: np.array, rows_opp_matrix: np.array, group: obj
     return matrix, rows_opp_matrix
 
 
+def simplify_columns_Q(matrix_target: np.array, columns_opp_matrix: np.array, group: object) -> tuple[
+    np.array, np.array]:
+    """
+    Simplifies the columns of the given matrix.
+    Args:
+        matrix_target (np.array): target matrix
+        columns_opp_matrix (np.array): columns opp matrix
+        group (object): group
+    Returns:
+        tuple[np.array, np.array]: simplified matrix
+    """
+    matrix = matrix_target.copy()
+    columns = matrix.shape[1]
+    for i in range(1, columns):
+        if matrix[0, i] != 0:
+            inv = inverse(matrix[0, i], group)
+            matrix[:, i] = (inv * matrix[:, i] - matrix[:, 0])
+            columns_opp_matrix[:, i] = (inv * columns_opp_matrix[:, i] - columns_opp_matrix[:, 0])
+    return matrix, columns_opp_matrix
+
+
+def simplify_rows_Q(matrix_target: np.array, rows_opp_matrix: np.array, group: object) -> tuple[np.array, np.array]:
+    """
+    Simplifies the rows of the given matrix.
+    Args:
+        matrix_target (np.array): target matrix
+        rows_opp_matrix (np.array): rows opp matrix
+        group (object): group
+    Returns:
+        tuple[np.array, np.array]: simplified matrix
+    """
+    matrix = matrix_target.copy()
+    rows = matrix.shape[0]
+    for i in range(1, rows):
+        if matrix[i, 0] != 0:
+            inv = inverse(matrix[i, 0], group)
+            matrix[i, :] = (inv * matrix[i, :] - matrix[0, :])
+            rows_opp_matrix[i, :] = (inv * rows_opp_matrix[i, :] - rows_opp_matrix[0, :])
+    return matrix, rows_opp_matrix
+
+
 def extended_gcd(a: int, b: int) -> tuple[int, int, int]:
     """
     Computes the extended Euclidean algorithm for integers a and b.
@@ -115,7 +176,7 @@ def reconstruct(matrix: np.array, aux: np.array) -> np.array:
     return matrix_res
 
 
-def inverse(number: int, group: int) -> int:
+def inverse(number: int | Fraction, group: int) -> int:
     """
     Computes the modular inverse of a number in a given group.
     The modular inverse of a is the number x such that a*x = 1 (mod group)
@@ -128,6 +189,8 @@ def inverse(number: int, group: int) -> int:
     Returns:
         int: The modular inverse of number in group, or None if no inverse exists
     """
+    if group == 'Q':
+        return Fraction(number.denominator, number.numerator)
     _, x, _ = extended_gcd(number, group)
     return x if x > 0 else x + group
 
@@ -145,12 +208,13 @@ def smith_normal_form(matrix: np.array, rows_opp_matrix: np.array = None, column
         tuple[np.array, np.array, np.array]: smith normal form of the given matrix
     """
     matrix = matrix.copy()
+    if matrix.shape[0] == 0 or matrix.shape[1] == 0:
+        return matrix, rows_opp_matrix, columns_opp_matrix
+
     if rows_opp_matrix is None or columns_opp_matrix is None:
         rows_opp_matrix = np.eye(matrix.shape[0], dtype=int)
         columns_opp_matrix = np.eye(matrix.shape[1], dtype=int)
 
-    if matrix.shape[0] == 0 or matrix.shape[1] == 0:
-        return matrix, rows_opp_matrix, columns_opp_matrix
     [x, y] = search_non_zero_elem(matrix)
     if matrix[x, y] == 0:
         return matrix, rows_opp_matrix, columns_opp_matrix
@@ -164,12 +228,56 @@ def smith_normal_form(matrix: np.array, rows_opp_matrix: np.array = None, column
     matrix, columns_opp_matrix = simplify_columns(matrix, columns_opp_matrix, group)
     matrix, rows_opp_matrix = simplify_rows(matrix, rows_opp_matrix, group)
 
+    sub_matrix = matrix[1:, 1:]
+    rows_sub_matrix = rows_opp_matrix[1:, :]
+    columns_sub_matrix = columns_opp_matrix[:, 1:]
+
+    sub_matrix, aux_rows, aux_columns = smith_normal_form(sub_matrix, rows_sub_matrix, columns_sub_matrix, group=group)
+    matrix, rows_opp_matrix, columns_opp_matrix = reconstruct_all(matrix, sub_matrix, rows_opp_matrix, aux_rows,
+                                                                  columns_opp_matrix, aux_columns)
+    return matrix, rows_opp_matrix, columns_opp_matrix
+
+
+def smith_normal_form_Q(matrix: np.array, rows_opp_matrix: np.array = None, columns_opp_matrix: np.array = None,
+                        group: int = 2) -> tuple[np.array, np.array, np.array]:
+    """
+    Smith normal form of the given matrix.
+    Args:
+        matrix (np.array): target matrix
+        rows_opp_matrix (np.array): rows matrix
+        columns_opp_matrix (np.array): columns matrix
+        group (int): group
+    Returns:
+        tuple[np.array, np.array, np.array]: smith normal form of the given matrix
+    """
+    matrix = matrix.copy()
+    if rows_opp_matrix is None or columns_opp_matrix is None:
+        rows_opp_matrix = np.array(
+            [[Fraction(1) if i == j else Fraction(0) for j in range(matrix.shape[0])] for i in range(matrix.shape[0])])
+        columns_opp_matrix = np.array(
+            [[Fraction(1) if i == j else Fraction(0) for j in range(matrix.shape[1])] for i in range(matrix.shape[1])])
+
+    if matrix.shape[0] == 0 or matrix.shape[1] == 0:
+        return matrix, rows_opp_matrix, columns_opp_matrix
+    [x, y] = search_non_zero_elem(matrix)
+    if matrix[x, y] == 0:
+        return matrix, rows_opp_matrix, columns_opp_matrix
+
+    matrix = swap(matrix, [x, y], [0, 0])
+    rows_opp_matrix, columns_opp_matrix = swap_opp_matrix(rows_opp_matrix, columns_opp_matrix, [x, y], [0, 0])
+    inv = inverse(matrix[0, 0], group)
+    matrix[:, 0] = (inv * matrix[:, 0])
+    columns_opp_matrix[:, 0] = (inv * columns_opp_matrix[:, 0])
+
+    matrix, columns_opp_matrix = simplify_columns_Q(matrix, columns_opp_matrix, group)
+    matrix, rows_opp_matrix = simplify_rows_Q(matrix, rows_opp_matrix, group)
+
     aux = np.delete(matrix, 0, 0)
     aux = np.delete(aux, 0, 1)
     rows_sub_matrix = rows_opp_matrix[1:, :]
     columns_sub_matrix = columns_opp_matrix[:, 1:]
 
-    aux, aux_rows, aux_columns = smith_normal_form(aux, rows_sub_matrix, columns_sub_matrix, group=group)
+    aux, aux_rows, aux_columns = smith_normal_form_Q(aux, rows_sub_matrix, columns_sub_matrix, group=group)
     matrix, rows_opp_matrix, columns_opp_matrix = reconstruct_all(matrix, aux, rows_opp_matrix, aux_rows,
                                                                   columns_opp_matrix, aux_columns)
     return matrix, rows_opp_matrix, columns_opp_matrix
@@ -334,25 +442,6 @@ def _process_reduction(matrix: np.array, coord: tuple[int, int], rows_opp_matrix
         matrix, rows_opp_matrix, columns_opp_matrix = _process_reduction(matrix, [0, coord[1]], rows_opp_matrix,
                                                                          columns_opp_matrix)
     return matrix, rows_opp_matrix, columns_opp_matrix
-
-
-def swap_opp_matrix(rows_opp_matrix: np.array, columns_opp_matrix: np.array, source: list, obj: list) -> \
-        tuple[np.array, np.array]:
-    """
-    Swap the row and column given in source and the ones in obj
-    Args:
-        rows_opp_matrix (np.array): rows matrix
-        columns_opp_matrix (np.array): columns matrix
-        source (list): source indexes
-        obj (list): objective indexes 
-    Returns:
-        tuple[np.array, np.array]: swapped matrix's
-    """
-    if source[0] != obj[0]:
-        rows_opp_matrix = swap(rows_opp_matrix, [source[0], 0], [obj[0], 0])
-    if source[1] != obj[1]:
-        columns_opp_matrix = swap(columns_opp_matrix, [0, source[1]], [0, obj[1]])
-    return rows_opp_matrix, columns_opp_matrix
 
 
 def reconstruct_all(matrix: np.array, aux_matrix: np.array, rows_opp_matrix: np.array, aux_rows: np.array,
