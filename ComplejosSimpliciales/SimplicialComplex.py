@@ -213,8 +213,8 @@ class SimplicialComplex:
         Returns:
             int: betti_number
         """
-        mp = smith_normal_form(np.array(self.boundarymatrix(p)))
-        mp_1 = smith_normal_form(np.array(self.boundarymatrix(p + 1)))
+        mp, _, _ = smith_normal_form(np.array(self.boundarymatrix(p)))
+        mp_1, _, _ = smith_normal_form(np.array(self.boundarymatrix(p + 1)))
         dim_zp = len([x for x in np.transpose(mp) if 1 not in x])
         dim_bp = len([x for x in mp_1 if 1 in x])
         return dim_zp - dim_bp
