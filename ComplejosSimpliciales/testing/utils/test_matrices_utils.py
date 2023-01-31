@@ -6,7 +6,7 @@ from fractions import Fraction
 from ComplejosSimpliciales.AlphaComplex import AlphaComplex
 from ComplejosSimpliciales.utils.matrices_utils import search_non_zero_elem, swap, reconstruct, smith_normal_form, \
     gcd_euclides, matrix_gcd, min_abs_position, smith_normal_form_z, generalized_border_matrix, \
-    generalized_border_matrix_algorithm, extended_gcd, smith_normal_form_Q
+    generalized_border_matrix_algorithm, extended_gcd
 
 
 class Test(TestCase):
@@ -210,11 +210,38 @@ class Test(TestCase):
                          ((np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
                            np.matrix(expected_cols_matrix)) % group).tolist())
 
-    def test_smith_normal_form_Q(self):
+    def test_smith_normal_form_Z11_1(self):
+        matrix = np.array([[1, 2, 3],
+                           [4, 5, 6],
+                           [7, 8, 9],
+                           [10, 0, 1]])
+        expected_matrix = np.array([[1, 0, 0],
+                                    [0, 1, 0],
+                                    [0, 0, 0],
+                                    [0, 0, 0]])
+        expected_rows_matrix = np.array([[1, 0, 0, 0],
+                                         [10, 3, 0, 0],
+                                         [7, 8, 7, 0],
+                                         [2, 8, 0, 1]])
+        expected_cols_matrix = np.array([[1, 10, 3],
+                                         [0, 6, 5],
+                                         [0, 0, 3]])
+
+        group = 11
+        smf, rows_matrix, columns_matrix = smith_normal_form(matrix, group=group)
+
+        self.assertListEqual(expected_matrix.tolist(), smf.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
+        self.assertEqual(expected_cols_matrix.tolist(), columns_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         ((np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                           np.matrix(expected_cols_matrix)) % group).tolist())
+
+    def test_smith_normal_form_Q_1(self):
         matrix = np.array([[Fraction(1, 1), Fraction(2, 1), Fraction(3, 1)],
                            [Fraction(4, 1), Fraction(5, 1), Fraction(6, 1)]])
-        expected_matrix = np.array([[1, 0, 0],
-                                    [0, 1, 0]])
+        expected_matrix = np.array([[Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)],
+                                    [Fraction(0, 1), Fraction(1, 1), Fraction(0, 1)]])
         expected_rows_matrix = np.array([[Fraction(1, 1), Fraction(0, 1)],
                                          [Fraction(-1, 1), Fraction(1, 4)]])
         expected_cols_matrix = np.array([[Fraction(1, 1), Fraction(8, 3), Fraction(-2, 3)],
@@ -222,7 +249,30 @@ class Test(TestCase):
                                          [Fraction(0, 1), Fraction(0, 1), Fraction(-2, 3)]])
 
         group = 'Q'
-        smf, rows_matrix, columns_matrix = smith_normal_form_Q(matrix, group=group)
+        smf, rows_matrix, columns_matrix = smith_normal_form(matrix, group=group)
+
+        self.assertListEqual(expected_matrix.tolist(), smf.tolist())
+        self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
+        self.assertEqual(expected_cols_matrix.tolist(), columns_matrix.tolist())
+        self.assertEqual(np.matrix(expected_matrix).tolist(),
+                         ((np.matrix(expected_rows_matrix) @ np.matrix(matrix) @
+                           np.matrix(expected_cols_matrix))).tolist())
+
+    def test_smith_normal_form_Q_2(self):
+        matrix = np.array([[Fraction(3, 1), Fraction(2, 1)],
+                           [Fraction(3, 1), Fraction(5, 1)],
+                           [Fraction(4, 1), Fraction(1, 1)]])
+        expected_matrix = np.array([[Fraction(1, 1), Fraction(0, 1)],
+                                    [Fraction(0, 1), Fraction(1, 1)],
+                                    [Fraction(0, 1), Fraction(0, 1)]])
+        expected_rows_matrix = np.array([[Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)],
+                                         [Fraction(-1, 1), Fraction(1, 1), Fraction(0, 1)],
+                                         [Fraction(17, 5), Fraction(-1, 1), Fraction(-9, 5)]])
+        expected_cols_matrix = np.array([[Fraction(1, 3), Fraction(-2, 9)],
+                                         [Fraction(0, 1), Fraction(1, 3)]])
+
+        group = 'Q'
+        smf, rows_matrix, columns_matrix = smith_normal_form(matrix, group=group)
 
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
