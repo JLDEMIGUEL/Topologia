@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import numpy as np
 
-from ComplejosSimpliciales.utils.vietoris_complex_utils import all_faces, get_all_radios, calc_radio
+from SimplicialComplex.utils.vietoris_complex_utils import all_faces, get_all_radios, calc_radio
 
 
 class Test(TestCase):

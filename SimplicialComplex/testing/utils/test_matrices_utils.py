@@ -3,8 +3,8 @@ from unittest import TestCase
 import numpy as np
 from fractions import Fraction
 
-from ComplejosSimpliciales.AlphaComplex import AlphaComplex
-from ComplejosSimpliciales.utils.matrices_utils import search_non_zero_elem, swap, reconstruct, smith_normal_form, \
+from SimplicialComplex.AlphaComplex import AlphaComplex
+from SimplicialComplex.utils.matrices_utils import search_non_zero_elem, swap, reconstruct, smith_normal_form, \
     gcd_euclides, matrix_gcd, min_abs_position, smith_normal_form_z, generalized_border_matrix, \
     generalized_border_matrix_algorithm, extended_gcd
 

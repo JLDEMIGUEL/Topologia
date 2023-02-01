@@ -1,8 +1,8 @@
 import numpy as np
 
-from ComplejosSimpliciales.utils.matrices_utils import smith_normal_form, generalized_border_matrix_algorithm, \
+from SimplicialComplex.utils.matrices_utils import smith_normal_form, generalized_border_matrix_algorithm, \
     generalized_border_matrix
-from ComplejosSimpliciales.utils.simplicial_complex_utils import order, reachable, subFaces, updateDict, \
+from SimplicialComplex.utils.simplicial_complex_utils import order, reachable, subFaces, updateDict, \
     order_faces, calc_homology, plot_persistence_diagram, plot_barcode_diagram
 
 

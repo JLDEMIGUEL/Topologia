@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import numpy as np
 
-from ComplejosSimpliciales.VietorisRipsComplex import Vietoris_RipsComplex
+from SimplicialComplex.VietorisRipsComplex import Vietoris_RipsComplex
 
 
 class TestVietoris_RipsComplex(TestCase):

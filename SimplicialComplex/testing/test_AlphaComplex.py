@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from ComplejosSimpliciales.AlphaComplex import AlphaComplex
+from SimplicialComplex.AlphaComplex import AlphaComplex
 
 CLOUD_PATH = os.path.join(os.path.abspath(Path(__file__).parent.parent.parent), "docs", "clouds.json")
 

@@ -4,7 +4,7 @@ from unittest.mock import patch, ANY
 import numpy as np
 from scipy.spatial import Delaunay
 
-from ComplejosSimpliciales.utils.alpha_complex_utils import radius, edges, plotedges, plottriangles
+from SimplicialComplex.utils.alpha_complex_utils import radius, edges, plotedges, plottriangles
 
 
 class Test(TestCase):

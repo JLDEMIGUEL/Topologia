@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 import numpy as np
 
-from ComplejosSimpliciales.AlphaComplex import AlphaComplex
-from ComplejosSimpliciales.utils.simplicial_complex_utils import order, reachable, subFaces, updateDict, \
+from SimplicialComplex.AlphaComplex import AlphaComplex
+from SimplicialComplex.utils.simplicial_complex_utils import order, reachable, subFaces, updateDict, \
     order_faces, filterByFloat, noise, connected_components, reachable_alg, num_loops, calc_homology, num_triangles
 
 
