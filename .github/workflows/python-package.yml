@@ -1,4 +1,4 @@
-name: Python package
+name: SimplicialComplex tests
 
 on: [push]
 
@@ -20,7 +20,7 @@ jobs:
           pip install -r requirements.txt
       - name: Test with pytest
         run: |
-          cd ComplejosSimpliciales
+          cd SimplicialComplex
           run: |
             pip install pytest
             pytest testing/ --doctest-modules

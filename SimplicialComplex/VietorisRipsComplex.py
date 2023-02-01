@@ -4,7 +4,7 @@ from multiprocessing import Pool
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
 
-from ComplejosSimpliciales.SimplicialComplex import SimplicialComplex
+from SimplicialComplex.SimplicialComplex import SimplicialComplex
 
 
 class Vietoris_RipsComplex(SimplicialComplex):
