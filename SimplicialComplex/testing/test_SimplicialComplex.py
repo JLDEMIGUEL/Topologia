@@ -6,9 +6,9 @@ from unittest.mock import patch
 
 import numpy as np
 
-from ComplejosSimpliciales.AlphaComplex import AlphaComplex
-from ComplejosSimpliciales.SimplicialComplex import SimplicialComplex
-from ComplejosSimpliciales.utils.constants import tetraedro, toro, plano_proyectivo, botella_klein
+from SimplicialComplex.AlphaComplex import AlphaComplex
+from SimplicialComplex.SimplicialComplex import SimplicialComplex
+from SimplicialComplex.utils.constants import tetraedro, toro, plano_proyectivo, botella_klein
 
 CLOUD_PATH = os.path.join(os.path.abspath(Path(__file__).parent.parent.parent), "docs", "clouds.json")
 
