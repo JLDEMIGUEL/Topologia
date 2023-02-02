@@ -1,8 +1,7 @@
-from flask import jsonify
-from flask.views import MethodView
-from flask_smorest import Blueprint
+from flask import jsonify, Blueprint
 
-blp = Blueprint("Health", __name__, description="Health check")
+
+blp = Blueprint("Health", __name__)
 
 
 @blp.route("/")
