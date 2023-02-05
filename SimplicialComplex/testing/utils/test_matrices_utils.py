@@ -751,7 +751,7 @@ class Test(TestCase):
 
     def test_generalized_border_matrix_algorithm(self):
         simple_alpha = AlphaComplex([[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]])
-        matrix = generalized_border_matrix(simple_alpha.dic)
+        matrix = generalized_border_matrix(simple_alpha.faces)
         reduced_matrix, lows_list = generalized_border_matrix_algorithm(matrix)
 
         self.assertEqual([[0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -778,7 +778,7 @@ class Test(TestCase):
 
     def test_generalized_border_matrix(self):
         simple_alpha = AlphaComplex([[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]])
-        matrix = generalized_border_matrix(simple_alpha.dic)
+        matrix = generalized_border_matrix(simple_alpha.faces)
 
         self.assertListEqual([[0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
                               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0],

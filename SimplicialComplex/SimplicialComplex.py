@@ -11,9 +11,8 @@ class SimplicialComplex:
     Class used to represent a SimplicialComplex.
 
     Attributes:
-    
-    faces (set): stores a set of tuples with the vertex of the SimplicialComplex
-    dic (dict): stores a dictionary with faces as keys and float as value
+
+    faces (dict): stores a dictionary with faces as keys and float as value
 
     """
 
@@ -26,31 +25,29 @@ class SimplicialComplex:
             None: instantiates new SimplicialComplex
         """
 
-        faces = order_faces(faces)
+        ordered_faces = order_faces(faces)
 
-        self.dic = dict()
+        self.faces = dict()
 
-        self.faces = set()
-        for face in faces:
-            self.faces.add(face)
-            self.faces = self.faces.union(subFaces(face))
+        faces = set()
+        for face in ordered_faces:
+            faces.add(face)
+            faces = faces.union(subFaces(face))
 
-        self.dic = updateDict(self.dic, self.faces, 0)
+        self.faces = updateDict(self.faces, faces, 0)
 
     def add(self, faces: list | set | tuple, float_value: float) -> None:
         """
         Add the faces to the existing set of faces.
         Args:
-            float_value (float): value stored in self.dic
+            float_value (float): value stored in self.faces
             faces (list | set | tuple): list/set of tuples
         Returns:
             None:
         """
         faces = SimplicialComplex(faces).face_set()
 
-        self.faces = self.faces.union(faces)
-
-        self.dic = updateDict(self.dic, faces, float_value)
+        self.faces = updateDict(self.faces, faces, float_value)
 
     def filtration_order(self) -> list[tuple]:
         """
@@ -58,15 +55,15 @@ class SimplicialComplex:
         Returns:
              list[tuple]: list of faces ordered by their float value
         """
-        return sorted(self.dic.keys(), key=lambda a: (self.dic[a], len(a), a))
+        return sorted(self.faces.keys(), key=lambda a: (self.faces[a], len(a), a))
 
     def face_set(self) -> list[tuple]:
         """
-        Returns self.faces.
+        Returns sorted list of faces
         Returns:
-             list[tuple]: ordered list of self.faces
+             list[tuple]: ordered list of faces
         """
-        return order(self.faces)
+        return order(self.faces.keys())
 
     def thresholdvalues(self) -> list[int]:
         """
@@ -75,7 +72,7 @@ class SimplicialComplex:
              list[int]: ordered list of threshold values
 
         """
-        return sorted(list(set(self.dic.values())), key=lambda a: a)
+        return sorted(list(set(self.faces.values())), key=lambda a: a)
 
     def dimension(self) -> int:
         """
@@ -84,7 +81,7 @@ class SimplicialComplex:
             int: dimension
         """
         dim = 1
-        for face in self.faces:
+        for face in self.faces.keys():
             if dim < len(face):
                 dim = len(face)
         return dim - 1
@@ -97,7 +94,7 @@ class SimplicialComplex:
         Returns:
              list[tuple]: faces with dimension n
         """
-        return order(set(x for x in self.faces if len(x) - 1 == n))
+        return order(set(x for x in self.faces.keys() if len(x) - 1 == n))
 
     def star(self, face: tuple) -> list[tuple]:
         """
@@ -107,9 +104,9 @@ class SimplicialComplex:
         Returns:
              list[tuple]: star of the given face
         """
-        if face not in self.faces:
+        if face not in self.faces.keys():
             return list()
-        return order(set(x for x in self.faces if set(face).issubset(x)))
+        return order(set(x for x in self.faces.keys() if set(face).issubset(x)))
 
     def closedStar(self, face: tuple) -> list[tuple]:
         """
@@ -120,7 +117,7 @@ class SimplicialComplex:
              list[tuple]: closed star of the given face
         """
         star = self.star(face)
-        return order(SimplicialComplex(star).faces)
+        return order(SimplicialComplex(star).faces.keys())
 
     def link(self, face: tuple) -> list[tuple]:
         """
@@ -145,7 +142,7 @@ class SimplicialComplex:
             list[tuple]: skeleton with the given dimension
         """
         skeleton = set()
-        for x in self.faces:
+        for x in self.faces.keys():
             if len(x) <= dim + 1:
                 skeleton.add(x)
         return order(skeleton)
@@ -158,7 +155,7 @@ class SimplicialComplex:
         """
         euler = 0
         for i in range(self.dimension() + 1):
-            sk = len(set(x for x in self.faces if len(x) == i + 1))
+            sk = len(set(x for x in self.faces.keys() if len(x) == i + 1))
             euler += (-1) ** i * sk
         return euler
 
@@ -276,8 +273,8 @@ class SimplicialComplex:
             p = list(np.array(range(self.dimension())) + 1)
         else:
             p = [p]
-        M, lows_list = generalized_border_matrix_algorithm(generalized_border_matrix(self.dic))
-        faces = sorted(self.faces, key=lambda face: (self.dic[face], len(face), face))
+        M, lows_list = generalized_border_matrix_algorithm(generalized_border_matrix(self.faces))
+        faces = sorted(self.faces.keys(), key=lambda face: (self.faces[face], len(face), face))
         faces.remove(faces[0])
         infinite = 1.5 * max(self.thresholdvalues())
         points = {}
@@ -286,10 +283,10 @@ class SimplicialComplex:
             for j in range(len(faces)):
                 if lows_list[j] == -1:
                     if j not in lows_list and len(faces[j]) == dim:
-                        points_list.add((self.dic[faces[j]], infinite))
+                        points_list.add((self.faces[faces[j]], infinite))
                 elif len(faces[j]) - 1 == dim:
                     i = lows_list[j]
-                    points_list.add((self.dic[faces[i]], self.dic[faces[j]]))
+                    points_list.add((self.faces[faces[i]], self.faces[faces[j]]))
             points_list = sorted(points_list, key=lambda point: point[1] - point[0])
             points_list = np.array([np.array(point) for point in points_list])
             points[dim] = points_list

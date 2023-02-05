@@ -32,46 +32,6 @@ class TestSimplicialComplex(TestCase):
     # Simple AlphaComplex
     simple_alpha = AlphaComplex([[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]])
 
-    def test_basic_1(self):
-        aux = SimplicialComplex(tetraedro.face_set())
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(1000, 1001, 1002), (2000,)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(3000, 3001), (4000, 4001)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-
-    def test_basic_2(self):
-        aux = SimplicialComplex(self.sc2.face_set())
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(1000, 1001, 1002), (2000,)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(3000, 3001), (4000, 4001)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-
-    def test_basic_3(self):
-        aux = SimplicialComplex(self.sc3.face_set())
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(1000, 1001, 1002), (2000,)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(3000, 3001), (4000, 4001)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-
-    def test_basic_4(self):
-        aux = AlphaComplex(self.ac4.tri.points)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(1000, 1001, 1002), (2000,)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(3000, 3001), (4000, 4001)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-
     def test_add_1(self):
         sc = SimplicialComplex(tetraedro.face_set())
         sc.add([(9, 10), (10, 11)], 0)

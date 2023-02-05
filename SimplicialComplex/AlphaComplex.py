@@ -10,13 +10,13 @@ from SimplicialComplex.utils.alpha_complex_utils import radius, edges, plottrian
 from SimplicialComplex.utils.simplicial_complex_utils import filterByFloat
 
 
-def filter_faces(faces: set, dic: dict):
-    ordered_faces = sorted(faces, key=lambda face: dic[face])
+def filter_faces(dic: dict):
+    ordered_faces = sorted(dic.keys(), key=lambda face: dic[face])
     while statistics.mean(dic.values()) > 1.25 * statistics.median(dic.values()):
         last = ordered_faces[-1]
         ordered_faces.remove(last)
         dic.pop(last)
-    return set(ordered_faces), dic
+    return dic
 
 
 class AlphaComplex(SimplicialComplex):
@@ -50,8 +50,8 @@ class AlphaComplex(SimplicialComplex):
         for x in aux.n_faces(2):
             self.add({x}, radius(self.tri.points[x[0]], self.tri.points[x[1]], self.tri.points[x[2]]))
 
-        if len(self.faces) > 30:
-            self.faces, self.dic = filter_faces(self.faces, self.dic)
+        if len(self.faces.keys()) > 30:
+            self.faces = filter_faces(self.faces)
 
     def plotalpha(self, sleep_time=None) -> None:
         """
@@ -64,7 +64,7 @@ class AlphaComplex(SimplicialComplex):
         vor = Voronoi(self.tri.points)
         for x in self.thresholdvalues():
             clear_output()
-            faces = filterByFloat(self.dic, x)
+            faces = filterByFloat(self.faces, x)
             edges_list = [list(edge) for edge in faces if len(edge) == 2]
             triangles = [list(triangle) for triangle in faces if len(triangle) == 3]
 

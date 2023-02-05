@@ -62,7 +62,7 @@ def updateDict(dic_target: dict, faces: list | set | tuple, float_value: float) 
         faces (list | set | tuple): list/set of tuples
 
     Returns:
-        dict: dic with the faces given and the value
+        dict: faces with the faces given and the value
     """
     dic = dic_target.copy()
     for face in faces:
