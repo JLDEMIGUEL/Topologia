@@ -14,7 +14,7 @@ class Vietoris_RipsComplex(SimplicialComplex):
     Attributes:
 
     points (np.array): stores the complex points
-    combinations (set): all faces combinations
+    faces (dict): stores a dictionary with faces as keys and float as value
     """
 
     def __init__(self, points: np.array, max_size: int = None) -> None:
@@ -30,7 +30,7 @@ class Vietoris_RipsComplex(SimplicialComplex):
         self.max_size = max_size
 
         # Compute the Vietoris-Rips complex
-        self.faces, self.dic = self._compute()
+        self.faces = self._compute()
 
     def _compute_rips_complex_for_subset(self, subset: list) -> tuple[int, int]:
         """
@@ -90,11 +90,8 @@ class Vietoris_RipsComplex(SimplicialComplex):
                            combinations(range(len(self.points)), k + 1)]
             # Compute the maximum distance between any pair of points in each subset
             simplices = pool.map(self._compute_rips_complex_for_subset, subsets)
-        # Store the simplices in the faces attribute as tuples instead of arrays
-        faces = {tuple(simplex) for radius, simplex in simplices}
-        faces.add(tuple())
-        # Store the simplices and their corresponding radii in the dic attribute
+        # Store the simplices and their corresponding radii in the faces attribute
         dic = {tuple(simplex): radius for radius, simplex in simplices}
         dic[tuple()] = 0
 
-        return faces, dic
+        return dic

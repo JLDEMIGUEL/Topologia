@@ -5,8 +5,9 @@ from unittest.mock import patch
 import numpy as np
 
 from SimplicialComplex.AlphaComplex import AlphaComplex
-from SimplicialComplex.utils.simplicial_complex_utils import order, reachable, subFaces, updateDict, \
-    order_faces, filterByFloat, noise, connected_components, reachable_alg, num_loops, calc_homology, num_triangles
+from SimplicialComplex.utils.simplicial_complex_utils import order, reachable, sub_faces, updateDict, \
+    order_faces, filter_by_float, noise, connected_components, reachable_alg, num_loops, calc_homology, num_triangles, \
+    check_if_sub_face
 
 
 class Test(TestCase):
@@ -47,7 +48,7 @@ class Test(TestCase):
     def test_sub_faces_1(self):
         expected_subfaces = {(), (0,), (0, 1), (0, 1, 2), (0, 1, 3), (0, 2), (0, 2, 3), (0, 3), (1,), (1, 2), (1, 2, 3),
                              (1, 3), (2,), (2, 3), (3,)}
-        self.assertEqual(expected_subfaces, subFaces((0, 1, 2, 3)))
+        self.assertEqual(expected_subfaces, sub_faces((0, 1, 2, 3)))
 
     def test_update_dict_2(self):
         dic = {(6,): 0, (2,): 0, (5,): 0, (8,): 0, (4,): 0, (1,): 0, (7,): 0, (0,): 0, (): 0, (3,): 0, (9,): 0,
@@ -107,7 +108,14 @@ class Test(TestCase):
         value = 0.6811155450226897
         expected_faces = {(2,), (5,), (11,), (8,), (14,), (17,), (1, 9), (1, 15), (13, 17), (7, 16), (4,), (1,), (7,),
                           (10,), (16,), (13,), (19,), (6, 10), (0,), (3,), (9,), (6,), (12,), (18,), (15,), (9, 15), ()}
-        self.assertEqual(expected_faces, filterByFloat(dic, value))
+        self.assertEqual(expected_faces, filter_by_float(dic, value))
+
+    def test_check_if_sub_face(self):
+        self.assertTrue(check_if_sub_face((1, 2, 3), (1, 2, 3, 4)))
+        self.assertTrue(check_if_sub_face((1, 2), (1, 2, 3)))
+        self.assertFalse(check_if_sub_face((1, 2, 3), (1, 2)))
+        self.assertFalse(check_if_sub_face((1, 2, 3), (1, 2, 4)))
+        self.assertFalse(check_if_sub_face((1, 2), (3, 4)))
 
     def test_noise(self):
         points = np.array([[1, 2], [3, 4], [5, 6]])

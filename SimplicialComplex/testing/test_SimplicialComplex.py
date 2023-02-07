@@ -32,79 +32,39 @@ class TestSimplicialComplex(TestCase):
     # Simple AlphaComplex
     simple_alpha = AlphaComplex([[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]])
 
-    def test_basic_1(self):
-        aux = SimplicialComplex(tetraedro.face_set())
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(1000, 1001, 1002), (2000,)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(3000, 3001), (4000, 4001)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-
-    def test_basic_2(self):
-        aux = SimplicialComplex(self.sc2.face_set())
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(1000, 1001, 1002), (2000,)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(3000, 3001), (4000, 4001)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-
-    def test_basic_3(self):
-        aux = SimplicialComplex(self.sc3.face_set())
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(1000, 1001, 1002), (2000,)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(3000, 3001), (4000, 4001)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-
-    def test_basic_4(self):
-        aux = AlphaComplex(self.ac4.tri.points)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(1000, 1001, 1002), (2000,)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([(3000, 3001), (4000, 4001)], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-        aux.add([], 0)
-        self.assertEqual(aux.faces, aux.dic.keys())
-
     def test_add_1(self):
-        sc = SimplicialComplex(tetraedro.face_set())
+        sc = SimplicialComplex(tetraedro.faces_list())
         sc.add([(9, 10), (10, 11)], 0)
         expected_faces = [(), (0,), (0, 1), (0, 1, 2), (0, 1, 2, 3), (0, 1, 3), (0, 2), (0, 2, 3), (0, 3), (1,), (1, 2),
                           (1, 2, 3), (1, 3), (2,), (2, 3), (3,), (9,), (9, 10), (10,), (10, 11), (11,)]
-        self.assertEqual(expected_faces, sc.face_set())
+        self.assertEqual(expected_faces, sc.faces_list())
 
     def test_add_2(self):
-        sc = SimplicialComplex(self.sc2.face_set())
+        sc = SimplicialComplex(self.sc2.faces_list())
         sc.add([(10, 11), (11, 12)], 0)
         sc.add([(20, 21)], 0)
         expected_faces = [(), (0,), (0, 1), (1,), (1, 2), (1, 2, 3), (1, 2, 3, 4), (1, 2, 4), (1, 3), (1, 3, 4), (1, 4),
                           (2,), (2, 3), (2, 3, 4), (2, 4), (3,), (3, 4), (4,), (4, 5), (4, 6), (5,), (5, 6), (6,),
                           (6, 7), (6, 7, 8), (6, 8), (7,), (7, 8), (8,), (8, 9), (9,), (10,), (10, 11), (11,), (11, 12),
                           (12,), (20,), (20, 21), (21,)]
-        self.assertEqual(expected_faces, sc.face_set())
+        self.assertEqual(expected_faces, sc.faces_list())
 
     def test_face_set_1(self):
         expected_faces = [(), (0,), (0, 1), (0, 1, 2), (0, 1, 2, 3), (0, 1, 3), (0, 2), (0, 2, 3), (0, 3), (1,), (1, 2),
                           (1, 2, 3), (1, 3), (2,), (2, 3), (3,)]
-        self.assertEqual(expected_faces, tetraedro.face_set())
+        self.assertEqual(expected_faces, tetraedro.faces_list())
 
     def test_face_set_2(self):
         expected_faces = [(), (0,), (0, 1), (1,), (1, 2), (1, 2, 3), (1, 2, 3, 4), (1, 2, 4), (1, 3), (1, 3, 4), (1, 4),
                           (2,), (2, 3), (2, 3, 4), (2, 4), (3,), (3, 4), (4,), (4, 5), (4, 6), (5,), (5, 6), (6,),
                           (6, 7), (6, 7, 8), (6, 8), (7,), (7, 8), (8,), (8, 9), (9,)]
-        self.assertEqual(expected_faces, self.sc2.face_set())
+        self.assertEqual(expected_faces, self.sc2.faces_list())
 
     def test_face_set_3(self):
         expected_faces = [(), (0,), (1,), (2,), (2, 3), (3,), (4,), (4, 5), (4, 6), (5,), (5, 6), (6,), (6, 7),
                           (6, 7, 8), (6, 7, 8, 9), (6, 7, 9), (6, 8), (6, 8, 9), (6, 9), (7,), (7, 8), (7, 8, 9),
                           (7, 9), (8,), (8, 9), (9,)]
-        self.assertEqual(expected_faces, self.sc3.face_set())
+        self.assertEqual(expected_faces, self.sc3.faces_list())
 
     def test_dimension_1(self):
         dimension = tetraedro.dimension()
@@ -149,12 +109,12 @@ class TestSimplicialComplex(TestCase):
     def test_closed_star_1(self):
         expectedStar = [(), (0,), (0, 1), (0, 1, 2), (0, 1, 2, 3), (0, 1, 3), (0, 2), (0, 2, 3), (0, 3), (1,), (1, 2),
                         (1, 2, 3), (1, 3), (2,), (2, 3), (3,)]
-        self.assertEqual(expectedStar, tetraedro.closedStar((0, 1)))
+        self.assertEqual(expectedStar, tetraedro.closed_star((0, 1)))
 
     def test_closed_star_2(self):
         expectedStar = [(), (1,), (1, 2), (1, 2, 3), (1, 2, 3, 4), (1, 2, 4), (1, 3), (1, 3, 4), (1, 4), (2,), (2, 3),
                         (2, 3, 4), (2, 4), (3,), (3, 4), (4,), (4, 5), (4, 6), (5,), (6,)]
-        self.assertEqual(expectedStar, self.sc2.closedStar((4,)))
+        self.assertEqual(expectedStar, self.sc2.closed_star((4,)))
 
     def test_link_1(self):
         expected_link = [(), (2,), (2, 3), (3,)]
@@ -172,7 +132,7 @@ class TestSimplicialComplex(TestCase):
         expected_sk_2 = [(), (0,), (0, 1), (0, 1, 2), (0, 1, 3), (0, 2), (0, 2, 3), (0, 3), (1,), (1, 2), (1, 2, 3),
                          (1, 3), (2,), (2, 3), (3,)]
         self.assertEqual(expected_sk_2, tetraedro.skeleton(2))
-        expected_sk_3 = tetraedro.face_set()
+        expected_sk_3 = tetraedro.faces_list()
         self.assertEqual(expected_sk_3, tetraedro.skeleton(3))
 
     def test_skeleton_2(self):
@@ -185,7 +145,7 @@ class TestSimplicialComplex(TestCase):
                          (2, 3, 4), (2, 4), (3,), (3, 4), (4,), (4, 5), (4, 6), (5,), (5, 6), (6,), (6, 7), (6, 7, 8),
                          (6, 8), (7,), (7, 8), (8,), (8, 9), (9,)]
         self.assertEqual(expected_sk_2, self.sc2.skeleton(2))
-        expected_sk_3 = self.sc2.face_set()
+        expected_sk_3 = self.sc2.faces_list()
         self.assertEqual(expected_sk_3, self.sc2.skeleton(3))
 
     def test_euler_characteristic_1(self):
@@ -214,29 +174,29 @@ class TestSimplicialComplex(TestCase):
 
     def test_boundarymatrix_1(self):
         expected_bm_0 = [[0, 0, 0, 0]]
-        self.assertTrue((expected_bm_0 == tetraedro.boundarymatrix(0)).all())
+        self.assertTrue((expected_bm_0 == tetraedro.boundary_matrix(0)).all())
         expected_bm_1 = [[1, 1, 1, 0, 0, 0],
                          [1, 0, 0, 1, 1, 0],
                          [0, 1, 0, 1, 0, 1],
                          [0, 0, 1, 0, 1, 1]]
-        self.assertTrue((expected_bm_1 == tetraedro.boundarymatrix(1)).all())
+        self.assertTrue((expected_bm_1 == tetraedro.boundary_matrix(1)).all())
         expected_bm_2 = [[1, 1, 0, 0],
                          [1, 0, 1, 0],
                          [0, 1, 1, 0],
                          [1, 0, 0, 1],
                          [0, 1, 0, 1],
                          [0, 0, 1, 1]]
-        self.assertTrue((expected_bm_2 == tetraedro.boundarymatrix(2)).all())
+        self.assertTrue((expected_bm_2 == tetraedro.boundary_matrix(2)).all())
         expected_bm_3 = [[1],
                          [1],
                          [1],
                          [1]]
-        self.assertTrue((expected_bm_3 == tetraedro.boundarymatrix(3)).all())
-        self.assertTrue(([[]] == tetraedro.boundarymatrix(4)).all())
+        self.assertTrue((expected_bm_3 == tetraedro.boundary_matrix(3)).all())
+        self.assertTrue(([[]] == tetraedro.boundary_matrix(4)).all())
 
     def test_boundarymatrix_2(self):
         expected_bm_0 = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-        self.assertTrue((expected_bm_0 == self.sc2.boundarymatrix(0)).all())
+        self.assertTrue((expected_bm_0 == self.sc2.boundary_matrix(0)).all())
         expected_bm_1 = [[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                          [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                          [0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -247,7 +207,7 @@ class TestSimplicialComplex(TestCase):
                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]]
-        self.assertTrue((expected_bm_1 == self.sc2.boundarymatrix(1)).all())
+        self.assertTrue((expected_bm_1 == self.sc2.boundary_matrix(1)).all())
         expected_bm_2 = [[0, 0, 0, 0, 0],
                          [1, 1, 0, 0, 0],
                          [1, 0, 1, 0, 0],
@@ -262,14 +222,39 @@ class TestSimplicialComplex(TestCase):
                          [0, 0, 0, 0, 1],
                          [0, 0, 0, 0, 1],
                          [0, 0, 0, 0, 0]]
-        self.assertTrue((expected_bm_2 == self.sc2.boundarymatrix(2)).all())
+        self.assertTrue((expected_bm_2 == self.sc2.boundary_matrix(2)).all())
         expected_bm_3 = [[1],
                          [1],
                          [1],
                          [1],
                          [0]]
-        self.assertTrue((expected_bm_3 == self.sc2.boundarymatrix(3)).all())
-        self.assertTrue(([[]] == self.sc2.boundarymatrix(4)).all())
+        self.assertTrue((expected_bm_3 == self.sc2.boundary_matrix(3)).all())
+        self.assertTrue(([[]] == self.sc2.boundary_matrix(4)).all())
+
+    def test_generalized_border_matrix(self):
+        simple_alpha = AlphaComplex([[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]])
+        matrix = simple_alpha.generalized_boundary_matrix()
+
+        expected_matrix = [[0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+        self.assertTrue((np.array(expected_matrix) == matrix).all())
 
     def test_betti_number_1(self):
         self.assertEqual(1, tetraedro.betti_number(0))
@@ -370,7 +355,7 @@ class TestSimplicialComplex(TestCase):
             mocked_show.assert_called_once()
 
     def test_process_diagram(self):
-        infinite, points = self.simple_alpha._process_diagram()
+        infinite, points = self.simple_alpha._compute_diagrams_points()
 
         self.assertEqual(2.874107142857142, infinite)
         self.assertEqual([[0.0, 1.110180165558726],

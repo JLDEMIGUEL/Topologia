@@ -1,9 +1,8 @@
 import numpy as np
 
-from SimplicialComplex.utils.matrices_utils import smith_normal_form, generalized_border_matrix_algorithm, \
-    generalized_border_matrix
-from SimplicialComplex.utils.simplicial_complex_utils import order, reachable, subFaces, updateDict, \
-    order_faces, calc_homology, plot_persistence_diagram, plot_barcode_diagram
+from SimplicialComplex.utils.matrices_utils import smith_normal_form, generalized_border_matrix_algorithm
+from SimplicialComplex.utils.simplicial_complex_utils import order, reachable, sub_faces, updateDict, \
+    order_faces, calc_homology, plot_persistence_diagram, plot_barcode_diagram, check_if_sub_face
 
 
 class SimplicialComplex:
@@ -11,9 +10,8 @@ class SimplicialComplex:
     Class used to represent a SimplicialComplex.
 
     Attributes:
-    
-    faces (set): stores a set of tuples with the vertex of the SimplicialComplex
-    dic (dict): stores a dictionary with faces as keys and float as value
+
+    faces (dict): stores a dictionary with faces as keys and float as value
 
     """
 
@@ -25,32 +23,28 @@ class SimplicialComplex:
         Returns:
             None: instantiates new SimplicialComplex
         """
-
-        faces = order_faces(faces)
-
-        self.dic = dict()
-
-        self.faces = set()
-        for face in faces:
-            self.faces.add(face)
-            self.faces = self.faces.union(subFaces(face))
-
-        self.dic = updateDict(self.dic, self.faces, 0)
+        # Sort the faces vertex lexicographically
+        ordered_faces = order_faces(faces)
+        # Compute all the faces of the complex
+        faces = set()
+        for face in ordered_faces:
+            faces.add(face)
+            faces = faces.union(sub_faces(face))
+        # Build the faces dictionary
+        self.faces = updateDict({}, faces, 0)
 
     def add(self, faces: list | set | tuple, float_value: float) -> None:
         """
         Add the faces to the existing set of faces.
         Args:
-            float_value (float): value stored in self.dic
+            float_value (float): value stored in self.faces
             faces (list | set | tuple): list/set of tuples
         Returns:
             None:
         """
-        faces = SimplicialComplex(faces).face_set()
-
-        self.faces = self.faces.union(faces)
-
-        self.dic = updateDict(self.dic, faces, float_value)
+        faces = SimplicialComplex(faces).faces_list()
+        # Updates the faces dictionary with the new faces
+        self.faces = updateDict(self.faces, faces, float_value)
 
     def filtration_order(self) -> list[tuple]:
         """
@@ -58,15 +52,15 @@ class SimplicialComplex:
         Returns:
              list[tuple]: list of faces ordered by their float value
         """
-        return sorted(self.dic.keys(), key=lambda a: (self.dic[a], len(a), a))
+        return sorted(self.faces.keys(), key=lambda a: (self.faces[a], len(a), a))
 
-    def face_set(self) -> list[tuple]:
+    def faces_list(self) -> list[tuple]:
         """
-        Returns self.faces.
+        Returns sorted list of faces
         Returns:
-             list[tuple]: ordered list of self.faces
+             list[tuple]: ordered list of faces
         """
-        return order(self.faces)
+        return order(self.faces.keys())
 
     def thresholdvalues(self) -> list[int]:
         """
@@ -75,7 +69,7 @@ class SimplicialComplex:
              list[int]: ordered list of threshold values
 
         """
-        return sorted(list(set(self.dic.values())), key=lambda a: a)
+        return sorted(list(set(self.faces.values())), key=lambda a: a)
 
     def dimension(self) -> int:
         """
@@ -83,11 +77,7 @@ class SimplicialComplex:
         Returns:
             int: dimension
         """
-        dim = 1
-        for face in self.faces:
-            if dim < len(face):
-                dim = len(face)
-        return dim - 1
+        return len(max(self.faces.keys(), key=len)) - 1
 
     def n_faces(self, n: int) -> list[tuple]:
         """
@@ -97,7 +87,7 @@ class SimplicialComplex:
         Returns:
              list[tuple]: faces with dimension n
         """
-        return order(set(x for x in self.faces if len(x) - 1 == n))
+        return order(set(x for x in self.faces.keys() if len(x) - 1 == n))
 
     def star(self, face: tuple) -> list[tuple]:
         """
@@ -107,20 +97,20 @@ class SimplicialComplex:
         Returns:
              list[tuple]: star of the given face
         """
-        if face not in self.faces:
+        if face not in self.faces.keys():
             return list()
-        return order(set(x for x in self.faces if set(face).issubset(x)))
+        return order(set(x for x in self.faces.keys() if set(face).issubset(x)))
 
-    def closedStar(self, face: tuple) -> list[tuple]:
+    def closed_star(self, face: tuple) -> list[tuple]:
         """
         Computes the closed star of the given face.
         Args:
-            face (tuple): base face of the closedStar
+            face (tuple): base face of the closed_star
         Returns:
              list[tuple]: closed star of the given face
         """
         star = self.star(face)
-        return order(SimplicialComplex(star).faces)
+        return order(SimplicialComplex(star).faces.keys())
 
     def link(self, face: tuple) -> list[tuple]:
         """
@@ -130,11 +120,11 @@ class SimplicialComplex:
         Returns:
             list[tuple]: link of the given face
         """
-        lk = set()
-        for x in self.closedStar(face):
+        link = set()
+        for x in self.closed_star(face):
             if len(set(x).intersection(face)) == 0:
-                lk.add(x)
-        return order(lk)
+                link.add(x)
+        return order(link)
 
     def skeleton(self, dim: int) -> list[tuple]:
         """
@@ -145,7 +135,7 @@ class SimplicialComplex:
             list[tuple]: skeleton with the given dimension
         """
         skeleton = set()
-        for x in self.faces:
+        for x in self.faces.keys():
             if len(x) <= dim + 1:
                 skeleton.add(x)
         return order(skeleton)
@@ -158,7 +148,7 @@ class SimplicialComplex:
         """
         euler = 0
         for i in range(self.dimension() + 1):
-            sk = len(set(x for x in self.faces if len(x) == i + 1))
+            sk = len({x for x in self.faces.keys() if len(x) == i + 1})
             euler += (-1) ** i * sk
         return euler
 
@@ -168,18 +158,20 @@ class SimplicialComplex:
         Returns:
             int: number of connected components
         """
-        vertex = [x[0] for x in self.n_faces(0)]
-        visitedVertex = dict()
+        # Build visited vertex dictionary
+        vertex, edges = [x[0] for x in self.n_faces(0)], self.n_faces(1)
+        visited_vertex = dict()
         for x in vertex:
-            visitedVertex[x] = False
+            visited_vertex[x] = False
+        # Compute connected components
         components = set()
         for vert in vertex:
-            if not visitedVertex[vert]:
-                reachableList = sorted(reachable(self.n_faces(1), vert, visitedVertex), key=lambda a: a)
-                components.add(tuple(reachableList))
+            if not visited_vertex[vert]:
+                reachable_list = sorted(reachable(edges, vert, visited_vertex), key=lambda a: a)
+                components.add(tuple(reachable_list))
         return len(components)
 
-    def boundarymatrix(self, p: int) -> np.array:
+    def boundary_matrix(self, p: int) -> np.array:
         """
         Returns the boundary matrix of the complex.
         Args:
@@ -189,21 +181,31 @@ class SimplicialComplex:
         """
         Cp = self.n_faces(p)
         Cp_1 = self.n_faces(p - 1)
-
         Md = [[0 for _ in range(len(Cp))] for _ in range(len(Cp_1))]
 
         for i in range(len(Cp_1)):
             for j in range(len(Cp)):
-                is_in = False
-                for vert in Cp_1[i]:
-                    if vert not in Cp[j]:
-                        is_in = False
-                        break
-                    is_in = True
-                if not is_in:
-                    continue
-                Md[i][j] = 1
+                # If is sub-face, add to matrix
+                if check_if_sub_face(Cp_1[i], Cp[j]):
+                    Md[i][j] = 1
         return np.array(Md)
+
+    def generalized_boundary_matrix(self) -> list[list[int]]:
+        """
+        Computes the generalized border matrix of the complex.
+        Returns:
+            list[list[int]]: the generalized border matrix
+        """
+        faces = sorted(self.faces.keys(), key=lambda face: (self.faces[face], len(face), face))
+        faces.remove(faces[0])
+        M = [[0 for _ in range(len(faces))] for _ in range(len(faces))]
+
+        for i in range(len(faces)):
+            for j in range(len(faces)):
+                # If is sub-face, add to matrix
+                if check_if_sub_face(faces[i], faces[j]):
+                    M[i][j] = 1
+        return np.array(M)
 
     def betti_number(self, p: int) -> int:
         """
@@ -213,10 +215,12 @@ class SimplicialComplex:
         Returns:
             int: betti_number
         """
-        mp, _, _ = smith_normal_form(np.array(self.boundarymatrix(p)))
-        mp_1, _, _ = smith_normal_form(np.array(self.boundarymatrix(p + 1)))
-        dim_zp = len([x for x in np.transpose(mp) if 1 not in x])
-        dim_bp = len([x for x in mp_1 if 1 in x])
+        mp, _, _ = smith_normal_form(np.array(self.boundary_matrix(p)))
+        mp_1, _, _ = smith_normal_form(np.array(self.boundary_matrix(p + 1)))
+        # Number of columns of zeros
+        dim_zp = len([_ for x in np.transpose(mp) if 1 not in x])
+        # Number of rows with ones
+        dim_bp = len([_ for x in mp_1 if 1 in x])
         return dim_zp - dim_bp
 
     def incremental_algth(self) -> list[int]:
@@ -229,11 +233,14 @@ class SimplicialComplex:
         faces = self.filtration_order()
         faces.remove(tuple())
         complex_faces = set()
+        # Initialize variables to zero
         betti_nums = [0, 0]
         components, loops, triangles = 0, 0, 0
+
         for face in faces:
             dim = len(face) - 1
             complex_faces.add(face)
+            # Compute homology for the current complex and update betti numbers
             c_aux, l_aux, t_aux = calc_homology(complex_faces)
             if c_aux > components or l_aux > loops:
                 betti_nums[dim] = betti_nums[dim] + 1
@@ -251,7 +258,7 @@ class SimplicialComplex:
              p (list[int]): list of dimensions to plot. If the argument is missing, all the dimensions are used
         Returns:
         """
-        infinite, points = self._process_diagram(p)
+        infinite, points = self._compute_diagrams_points(p)
         plot_persistence_diagram(points, infinite)
 
     def barcode_diagram(self,  p: list[int] = None) -> None:
@@ -261,10 +268,10 @@ class SimplicialComplex:
              p (list[int]): list of dimensions to plot. If the argument is missing, all the dimensions are used
         Returns:
         """
-        infinite, points = self._process_diagram(p)
+        infinite, points = self._compute_diagrams_points(p)
         plot_barcode_diagram(points)
 
-    def _process_diagram(self, p: list[int] = None) -> tuple[int, dict]:
+    def _compute_diagrams_points(self, p: list[int] = None) -> tuple[int, dict]:
         """
         Computes and plots the barcode diagram of the simplicial complex.
         Args:
@@ -276,20 +283,25 @@ class SimplicialComplex:
             p = list(np.array(range(self.dimension())) + 1)
         else:
             p = [p]
-        M, lows_list = generalized_border_matrix_algorithm(generalized_border_matrix(self.dic))
-        faces = sorted(self.faces, key=lambda face: (self.dic[face], len(face), face))
+        # Compute generalized border matrix and compute the final matrix and lows
+        M, lows_list = generalized_border_matrix_algorithm(self.generalized_boundary_matrix())
+        faces = sorted(self.faces.keys(), key=lambda _face: (self.faces[_face], len(_face), _face))
         faces.remove(faces[0])
         infinite = 1.5 * max(self.thresholdvalues())
+        # Compute points
         points = {}
         for dim in p:
             points_list = set()
-            for j in range(len(faces)):
+            for j, face in enumerate(faces):
+                # If face not in lows list, add point j is not a low and dim is correct
                 if lows_list[j] == -1:
-                    if j not in lows_list and len(faces[j]) == dim:
-                        points_list.add((self.dic[faces[j]], infinite))
-                elif len(faces[j]) - 1 == dim:
+                    if j not in lows_list and len(face) == dim:
+                        points_list.add((self.faces[face], infinite))
+                # If face is in lows list, add point if dim is correct
+                elif len(face) - 1 == dim:
                     i = lows_list[j]
-                    points_list.add((self.dic[faces[i]], self.dic[faces[j]]))
+                    points_list.add((self.faces[faces[i]], self.faces[face]))
+            # Add sorted points into points dictionary
             points_list = sorted(points_list, key=lambda point: point[1] - point[0])
             points_list = np.array([np.array(point) for point in points_list])
             points[dim] = points_list

@@ -123,7 +123,7 @@ class TestAlphaComplex(TestCase):
         with patch('matplotlib.pyplot.show') as mocked_show,\
                 patch('matplotlib.pyplot.plot') as mocked_plot,\
                 patch('matplotlib.pyplot.tripcolor') as mocked_tripcolor:
-            alpha.plotalpha()
+            alpha.plot_alpha()
             calls_list = mocked_plot.mock_calls
             calls_list.reverse()
 

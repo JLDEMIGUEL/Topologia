@@ -15,8 +15,8 @@ class TestVietoris_RipsComplex(TestCase):
                          (0, 1, 3): 6.0, (0, 2): 3.1622776601683795, (0, 2, 3): 6.0, (0, 3): 6.0, (1,): 0,
                          (1, 2): 2.8284271247461903, (1, 2, 3): 5.0990195135927845, (1, 3): 5.0990195135927845, (2,): 0,
                          (2, 3): 3.1622776601683795, (3,): 0}
-        self.assertEqual(expected_combinations, self.ac1.faces)
-        self.assertEqual(expected_dict, self.ac1.dic)
+        self.assertEqual(expected_combinations, self.ac1.faces.keys())
+        self.assertEqual(expected_dict, self.ac1.faces)
 
     def test_dimension(self):
         self.assertEqual(3, self.ac1.dimension())
