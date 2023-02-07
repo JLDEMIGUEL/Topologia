@@ -14,7 +14,7 @@ class Vietoris_RipsComplex(SimplicialComplex):
     Attributes:
 
     points (np.array): stores the complex points
-    combinations (set): all faces combinations
+    faces (dict): stores a dictionary with faces as keys and float as value
     """
 
     def __init__(self, points: np.array, max_size: int = None) -> None:

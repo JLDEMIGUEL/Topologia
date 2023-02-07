@@ -2,34 +2,6 @@ import numpy as np
 from fractions import Fraction
 
 
-def generalized_border_matrix(dic: dict) -> list[list[int]]:
-    """
-    Computes the generalized border matrix of the complex.
-    Args:
-        dic (dict): dictionary with faces
-    Returns:
-        list[list[int]]: the generalized border matrix
-    """
-    faces = sorted(dic.keys(), key=lambda face: (dic[face], len(face), face))
-    faces.remove(faces[0])
-
-    M = [[0 for _ in range(len(faces))] for _ in range(len(faces))]
-    for i in range(len(faces)):
-        for j in range(len(faces)):
-            if len(faces[i]) is not len(faces[j]) - 1:
-                continue
-            condition = False
-            for vert in faces[i]:
-                if vert not in faces[j]:
-                    condition = False
-                    break
-                condition = True
-            if not condition:
-                continue
-            M[i][j] = 1
-    return M
-
-
 def smith_normal_form(matrix: np.array, rows_opp_matrix: np.array = None, columns_opp_matrix: np.array = None,
                       group: int = 2) -> tuple[np.array, np.array, np.array]:
     """
@@ -97,17 +69,15 @@ def smith_normal_form_z(matrix: np.array, rows_opp_matrix=None, columns_opp_matr
         matrix, rows_opp_matrix, columns_opp_matrix = swap_and_sign(matrix, rows_opp_matrix, columns_opp_matrix,
                                                                     min_pos, [0, 0])
         if matrix[0, 0] > gcd:
-            coords = _find_element_with_property(matrix)
+            coords = _find_non_divisible_number(matrix)
             if coords is not None:
                 matrix, rows_opp_matrix, columns_opp_matrix = _process_reduction(matrix, coords, rows_opp_matrix,
                                                                                  columns_opp_matrix)
     # Make zeros in the first row and column
     matrix, rows_opp_matrix, columns_opp_matrix = reduce_rows_columns(matrix, rows_opp_matrix, columns_opp_matrix)
-
     # Compute the smith normal form of the sub-matrix (without first row and column)
     aux_matrix, aux_rows, aux_columns = smith_normal_form_z(matrix[1:, 1:], rows_opp_matrix[1:, :],
                                                             columns_opp_matrix[:, 1:])
-
     # Re-construct all the matrix´s
     matrix, rows_opp_matrix, columns_opp_matrix = reconstruct_all(matrix, aux_matrix, rows_opp_matrix, aux_rows,
                                                                   columns_opp_matrix, aux_columns)
@@ -142,12 +112,37 @@ def swap(matrix: np.array, source: list, obj: list) -> np.array:
         np.array: matrix with the applied swap
     """
     aux = matrix.copy()
+    # Swap rows
     if source[0] != obj[0]:
         aux[obj[0], :], aux[source[0], :] = matrix[source[0], :], matrix[obj[0], :]
     aux2 = aux.copy()
+    # Swap columns
     if source[1] != obj[1]:
         aux[:, obj[1]], aux[:, source[1]] = aux2[:, source[1]], aux2[:, obj[1]]
     return aux
+
+
+def swap_and_sign(matrix: np.array, rows_opp_matrix: np.array, columns_opp_matrix: np.array, source: list, obj: list) -> \
+        tuple[np.array, np.array, np.array]:
+    """
+    Swap the row and column given in source and the ones in obj
+    and change row sign if necessary
+    Args:
+        matrix (np.array): target matrix
+        columns_opp_matrix (np.array): columns matrix
+        rows_opp_matrix (np.array): rows matrix
+        source (list): source indexes
+        obj (list): objective indexes
+    Returns:
+        tuple[np.array,np.array, np.array]: matrix with the applied swap
+    """
+    matrix = swap(matrix, source, obj)
+    rows_opp_matrix, columns_opp_matrix = swap_opp_matrix(rows_opp_matrix, columns_opp_matrix, source, obj)
+    if matrix[obj[0], obj[1]] < 0:
+        matrix[obj[0], :] *= -1
+        rows_opp_matrix[obj[0], :] *= -1
+
+    return matrix, rows_opp_matrix, columns_opp_matrix
 
 
 def swap_opp_matrix(rows_opp_matrix: np.array, columns_opp_matrix: np.array, source: list, obj: list) -> \
@@ -162,8 +157,10 @@ def swap_opp_matrix(rows_opp_matrix: np.array, columns_opp_matrix: np.array, sou
     Returns:
         tuple[np.array, np.array]: swapped matrix's
     """
+    # Swap rows in rows matrix
     if source[0] != obj[0]:
         rows_opp_matrix = swap(rows_opp_matrix, [source[0], 0], [obj[0], 0])
+    # Swap columns in columns matrix
     if source[1] != obj[1]:
         columns_opp_matrix = swap(columns_opp_matrix, [0, source[1]], [0, obj[1]])
     return rows_opp_matrix, columns_opp_matrix
@@ -182,14 +179,14 @@ def simplify_rows_and_columns(matrix_target: np.array, rows_opp_matrix: np.array
         tuple[np.array, np.array, np.array]: simplified matrix
     """
     matrix = matrix_target.copy()
-
     rows, columns = matrix.shape
+    # Make zeros in the first column
     for i in range(1, rows):
         if matrix[i, 0] != 0:
             inv = inverse(matrix[i, 0], group)
             matrix[i, :] = (inv * matrix[i, :] - matrix[0, :])
             rows_opp_matrix[i, :] = (inv * rows_opp_matrix[i, :] - rows_opp_matrix[0, :])
-
+    # Make zeros in first row
     for i in range(1, columns):
         if matrix[0, i] != 0:
             inv = inverse(matrix[0, i], group)
@@ -214,15 +211,15 @@ def reduce_rows_columns(matrix: np.array, rows_opp_matrix, columns_opp_matrix) -
         np.array: matrix with the applied reduction
     """
     matrix = matrix.copy()
-    first_row = matrix[0, :]
-    first_col = matrix[:, 0]
+    first_row, first_col = matrix[0, :], matrix[:, 0]
     first_elem = matrix[0, 0]
+    # Make zeros in first column
     for i in range(1, len(first_row)):
         if first_row[i] != 0:
             inv = first_row[i] / first_elem
             matrix[:, i] = matrix[:, i] - inv * matrix[:, 0]
             columns_opp_matrix[:, i] = columns_opp_matrix[:, i] - inv * columns_opp_matrix[:, 0]
-
+    # Make zeros in first row
     for j in range(1, len(first_col)):
         if first_col[j] != 0:
             inv = first_col[j] / first_elem
@@ -261,8 +258,7 @@ def reconstruct(matrix: np.array, aux: np.array) -> np.array:
     """
     if len(aux) == 0:
         return matrix
-    first_row = matrix[0, 1:]
-    first_col = matrix[:, 0]
+    first_row, first_col = matrix[0, 1:], matrix[:, 0]
     matrix_res = np.r_[[first_row], aux]
     matrix_res = np.c_[first_col, matrix_res]
     return matrix_res
@@ -364,30 +360,7 @@ def min_abs_position(matrix: np.array) -> list[int, int]:
     return min_val_pos
 
 
-def swap_and_sign(matrix: np.array, rows_opp_matrix: np.array, columns_opp_matrix: np.array, source: list, obj: list) -> \
-        tuple[np.array, np.array, np.array]:
-    """
-    Swap the row and column given in source and the ones in obj
-    and change row sign if necessary
-    Args:
-        matrix (np.array): target matrix
-        columns_opp_matrix (np.array): columns matrix
-        rows_opp_matrix (np.array): rows matrix
-        source (list): source indexes
-        obj (list): objective indexes
-    Returns:
-        tuple[np.array,np.array, np.array]: matrix with the applied swap
-    """
-    matrix = swap(matrix, source, obj)
-    rows_opp_matrix, columns_opp_matrix = swap_opp_matrix(rows_opp_matrix, columns_opp_matrix, source, obj)
-    if matrix[obj[0], obj[1]] < 0:
-        matrix[obj[0], :] *= -1
-        rows_opp_matrix[obj[0], :] *= -1
-
-    return matrix, rows_opp_matrix, columns_opp_matrix
-
-
-def _find_element_with_property(matrix: np.array) -> tuple[int, int]:
+def _find_non_divisible_number(matrix: np.array) -> tuple[int, int]:
     """
     Finds the first element which can not be divided by the first one.
     Args:
@@ -397,14 +370,15 @@ def _find_element_with_property(matrix: np.array) -> tuple[int, int]:
     """
     rows, cols = matrix.shape
     first = matrix[0, 0]
-
+    # Find in first column
     for i in range(1, rows):
         if gcd_euclides(first, matrix[i][0]) < first:
             return i, 0
+    # Find in first row
     for j in range(1, cols):
         if gcd_euclides(first, matrix[0][j]) < first:
             return 0, j
-
+    # Find in the rest of the matrix
     for i in range(1, rows):
         for j in range(1, cols):
             if gcd_euclides(first, matrix[i][j]) < first:
@@ -422,6 +396,7 @@ def _process_reduction(matrix: np.array, coord: tuple[int, int], rows_opp_matrix
     """
     first = matrix[0, 0]
     elem = matrix[coord[0], coord[1]]
+    # Case 1: If element in first row, add a multiple of the first column to the corresponding one
     if coord[0] == 0:
         if matrix[coord[0], coord[1]] < 0:
             matrix[:, coord[1]] *= -1
@@ -429,6 +404,7 @@ def _process_reduction(matrix: np.array, coord: tuple[int, int], rows_opp_matrix
             elem *= -1
         matrix[:, coord[1]] -= int(elem / first) * matrix[:, 0]
         columns_opp_matrix[:, coord[1]] -= int(elem / first) * columns_opp_matrix[:, 0]
+    # Case 2: If element in first column, add a multiple of the first column to the corresponding one
     if coord[1] == 0:
         if matrix[coord[0], coord[1]] < 0:
             matrix[coord[0], :] *= -1
@@ -436,6 +412,7 @@ def _process_reduction(matrix: np.array, coord: tuple[int, int], rows_opp_matrix
             elem *= -1
         matrix[coord[0], :] -= int(elem / first) * matrix[0, :]
         rows_opp_matrix[coord[0], :] -= int(elem / first) * rows_opp_matrix[0, :]
+    # Case 3: If element in another the rest of the matrix, add the row to the corresponding one and do first case
     if coord[0] > 0 and coord[1] > 0:
         matrix[0, :] += matrix[coord[0], :]
         rows_opp_matrix[0, :] += rows_opp_matrix[coord[0], :]
@@ -459,10 +436,11 @@ def reconstruct_all(matrix: np.array, aux_matrix: np.array, rows_opp_matrix: np.
         tuple[np.array, np.array, np.array]: reconstructed matrix's
     """
     matrix = reconstruct(matrix, aux_matrix)
-
+    # Reconstruct rows matrix
     if len(aux_rows) != 0:
         first_row = rows_opp_matrix[0, :]
         rows_opp_matrix = np.r_[[first_row], aux_rows]
+    # Reconstruct columns matrix
     if len(aux_rows) != 0:
         first_col = columns_opp_matrix[:, 0]
         columns_opp_matrix = np.c_[first_col, aux_columns]
@@ -470,25 +448,26 @@ def reconstruct_all(matrix: np.array, aux_matrix: np.array, rows_opp_matrix: np.
     return matrix, rows_opp_matrix, columns_opp_matrix
 
 
-def generalized_border_matrix_algorithm(M: list[list[int]]) -> tuple[np.array, list]:
+def generalized_border_matrix_algorithm(M: np.array) -> tuple[np.array, list]:
     """
     Reduce the generalized border matrix and computes the lows list.
     Args:
-        M (list[list[int]]): dictionary with faces
+        M (np.array): generalize border matrix
     Returns:
         tuple[np.array, list]: the reduced generalized border matrix and the lows list
     """
-    M = np.array(M)
     rows, cols = M.shape
     lows_list = [-1 for _ in range(cols)]
+    # For each column, compute the low
     for j in range(cols):
         column = M[:, j]
+        # Search ones positions. If no one, next column
         ones_list = [x for x in range(rows) if column[x] == 1]
         if len(ones_list) == 0:
             continue
         low = max(ones_list)
-        lows_list[j] = low
-        prev_cols = [x for x in range(cols) if lows_list[x] == low and x != j]
+        # While the low is equal to a previous low, reduce columns
+        prev_cols = [x for x in range(j) if lows_list[x] == low]
         while len(prev_cols) > 0:
             prev_col = prev_cols[0]
             M[:, j] = (M[:, j] + M[:, prev_col]) % 2
@@ -496,6 +475,6 @@ def generalized_border_matrix_algorithm(M: list[list[int]]) -> tuple[np.array, l
             if len(ones_list) == 0:
                 break
             low = max(ones_list)
-            lows_list[j] = low
-            prev_cols = [x for x in range(cols) if lows_list[x] == low and x != j]
+            prev_cols = [x for x in range(j) if lows_list[x] == low]
+        lows_list[j] = low
     return M, lows_list

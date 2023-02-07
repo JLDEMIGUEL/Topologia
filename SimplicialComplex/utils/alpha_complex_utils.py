@@ -1,4 +1,5 @@
 import math
+import statistics
 
 import matplotlib.colors
 import numpy as np
@@ -6,7 +7,7 @@ from matplotlib import pyplot as plt
 from scipy.spatial import Delaunay
 
 
-def radius(a: tuple, b: tuple, c: tuple) -> float:
+def compute_circumference_radius(a: tuple, b: tuple, c: tuple) -> float:
     """
     Computes the radius of the circumference which contains the three points.
     Args:
@@ -16,36 +17,33 @@ def radius(a: tuple, b: tuple, c: tuple) -> float:
     Returns:
         float: circumscribed circle radius of the given triangle
     """
-    lado_a = math.dist(c, b)
-    lado_b = math.dist(a, c)
-    lado_c = math.dist(a, b)
-    semiperimetro = (lado_a + lado_b + lado_c) * 0.5
-    radio = lado_a * lado_b * lado_c * 0.25 / math.sqrt(
-        semiperimetro * (semiperimetro - lado_a) * (semiperimetro - lado_b) * (semiperimetro - lado_c))
-    return radio
+    edge_a, edge_b, edge_c = math.dist(c, b), math.dist(a, c), math.dist(a, b)
+    semi_perimeter = (edge_a + edge_b + edge_c) * 0.5
+    radius = edge_a * edge_b * edge_c * 0.25 / math.sqrt(
+        semi_perimeter * (semi_perimeter - edge_a) * (semi_perimeter - edge_b) * (semi_perimeter - edge_c))
+    return radius
 
 
-def edges(v1: tuple, v2: tuple, points: np.ndarray) -> float | None:
+def compute_edge_value(v1: np.array, v2: np.array, points: np.array) -> float | None:
     """
     Computes the length of the edge if exists.
     Args:
-        v1 (tuple): first point
-        v2 (tuple): second point
-        points (np.ndarray): array of other points
+        v1 (np.array): first point
+        v2 (np.array): second point
+        points (np.array): array of other points
     Returns:
-        float | None: None or radius depending on AlphaComplex algorithm
+        float | None: None or edge radius depending on AlphaComplex algorithm
     """
-    radio = math.dist(v1, v2) * 0.5
-    centro = (v1 + v2) * 0.5
-    for x in range(len(points)):
-        if math.dist(centro, points[x]) < radio:
-            if math.dist(points[x], v1) > 0:
-                if math.dist(points[x], v2) > 0:
-                    return
-    return radio
+    radius = math.dist(v1, v2) * 0.5
+    center = (v1 + v2) * 0.5
+    for point in points:
+        # If the point is in the other point's radius, return
+        if math.dist(center, point) < radius and point.tolist() not in (v1.tolist(), v2.tolist()):
+            return
+    return radius
 
 
-def plottriangles(triangles: list, tri: Delaunay) -> None:
+def plot_triangles(triangles: list, tri: Delaunay) -> None:
     """
     Plots the given triangles.
     Args:
@@ -60,9 +58,9 @@ def plottriangles(triangles: list, tri: Delaunay) -> None:
         plt.tripcolor(tri.points[:, 0], tri.points[:, 1], triangles, c, edgecolor="k", lw=2, cmap=cmap)
 
 
-def plotedges(edges_list: list, tri: Delaunay) -> None:
+def plot_edges(edges_list: list, tri: Delaunay) -> None:
     """
-    Plots the given edges.
+    Plots the given edge.
     Args:
         tri (Delaunay): Delaunay triangulation
         edges_list (list): list of edges
@@ -73,3 +71,19 @@ def plotedges(edges_list: list, tri: Delaunay) -> None:
         x = [tri.points[edge[0], 0], tri.points[edge[1], 0]]
         y = [tri.points[edge[0], 1], tri.points[edge[1], 1]]
         plt.plot(x, y, 'k')
+
+
+def filter_faces(dic: dict) -> dict:
+    """
+    Filter faces in a dictionary by removing faces with high values.
+    Args:
+        dic (dict): faces dictionary
+    Returns:
+        dict: The filtered dictionary with faces removed.
+    """
+    ordered_faces = sorted(dic.keys(), key=lambda face: dic[face])
+    while statistics.mean(dic.values()) > 1.25 * statistics.median(dic.values()):
+        last = ordered_faces[-1]
+        ordered_faces.remove(last)
+        dic.pop(last)
+    return dic

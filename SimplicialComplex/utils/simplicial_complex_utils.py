@@ -37,7 +37,7 @@ def reachable(edges: list | set | tuple, vert: int, visitedVertex: dict) -> list
     return reach
 
 
-def subFaces(face: list | set | tuple) -> set:
+def sub_faces(face: list | set | tuple) -> set:
     """
     Computes the sub-faces of the given face.
     Args:
@@ -49,7 +49,7 @@ def subFaces(face: list | set | tuple) -> set:
     for vert in face:
         face2 = tuple(x for x in face if x != vert)
         auxSet.add(face2)
-        auxSet = auxSet.union(subFaces(face2))
+        auxSet = auxSet.union(sub_faces(face2))
     return auxSet
 
 
@@ -88,7 +88,7 @@ def order_faces(faces: list | set | tuple) -> set:
     return faces
 
 
-def filterByFloat(dic: dict, value: float) -> set:
+def filter_by_float(dic: dict, value: float) -> set:
     """
     Returns a set of faces which float value is less than the given one.
     Args:
@@ -100,6 +100,24 @@ def filterByFloat(dic: dict, value: float) -> set:
     keys = dic.keys()
     res = {x for x in keys if dic[x] <= value}
     return res
+
+
+def check_if_sub_face(sub_face: tuple, super_face: tuple) -> bool:
+    """
+    Check if a tuple represents a sub-face of another tuple.
+    Args:
+        super_face (tuple): A tuple representing a face.
+        sub_face (tuple): A tuple representing a face.
+
+    Returns:
+        bool: A boolean indicating whether `sub_face` is a sub-face of `super_face`.
+    """
+    if len(sub_face) is not len(super_face) - 1 or len(sub_face) == 0:
+        return False
+    for vert in sub_face:
+        if vert not in super_face:
+            return False
+    return True
 
 
 def noise(points: np.array) -> np.array:
@@ -124,13 +142,13 @@ def connected_components(complex_faces: set) -> int:
     """
     vertex = [x[0] for x in complex_faces if len(x) == 1]
     edges = [x for x in complex_faces if len(x) == 2]
-    visitedVertex = dict()
-    for x in vertex:
-        visitedVertex[x] = False
+    # Build a visited vertex dictionary
+    visited_vertex = {x: False for x in vertex}
+    # For each vertex, compute its component
     components = set()
     for vert in vertex:
-        if not visitedVertex[vert]:
-            reachableList = sorted(reachable_alg(edges, vert, visitedVertex), key=lambda a: a)
+        if not visited_vertex[vert]:
+            reachableList = sorted(reachable_alg(edges, vert, visited_vertex), key=lambda a: a)
             components.add(tuple(reachableList))
     return len(components)
 
@@ -215,9 +233,11 @@ def plot_persistence_diagram(points: dict, infinite: int) -> None:
     Returns:
         None
     """
+    # Plot all points of the diagram
     for dim, points_list in points.items():
         points_list = np.array([np.array(point) for point in points_list])
         plt.plot(points_list[:, 0].tolist(), points_list[:, 1].tolist(), colors[dim % len(colors)] + "o")
+    # Plot axis
     plt.axis([-0.1 * infinite, infinite * 1.1, -0.1 * infinite, infinite * 1.1])
     plt.plot([-0.1 * infinite, infinite * 1.1], [-0.1 * infinite, infinite * 1.1], "b--")
     plt.plot([-0.1 * infinite, infinite * 1.1], [infinite, infinite], "b--")
@@ -233,6 +253,7 @@ def plot_barcode_diagram(points: dict) -> None:
     Returns:
         None
     """
+    # Plot all bars of the diagram
     height = 0
     for dim, points_list in points.items():
         for i in range(len(points_list)):
