@@ -190,11 +190,11 @@ class SimplicialComplex:
                     Md[i][j] = 1
         return np.array(Md)
 
-    def generalized_boundary_matrix(self) -> list[list[int]]:
+    def generalized_boundary_matrix(self) -> np.array:
         """
         Computes the generalized border matrix of the complex.
         Returns:
-            list[list[int]]: the generalized border matrix
+            np.array: the generalized border matrix
         """
         faces = sorted(self.faces.keys(), key=lambda face: (self.faces[face], len(face), face))
         faces.remove(faces[0])
@@ -222,6 +222,16 @@ class SimplicialComplex:
         # Number of rows with ones
         dim_bp = len([_ for x in mp_1 if 1 in x])
         return dim_zp - dim_bp
+
+    def all_betti_numbers(self) -> int:
+        """
+        Gets the betti numbers of the simplicial complex for the given dimension p.
+        Args:
+            p (int): dimension
+        Returns:
+            int: betti_number
+        """
+        return [self.betti_number(dim) for dim in range(self.dimension())]
 
     def incremental_algth(self) -> list[int]:
         """
