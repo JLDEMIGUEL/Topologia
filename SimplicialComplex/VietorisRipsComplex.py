@@ -5,6 +5,7 @@ import numpy as np
 from scipy.spatial.distance import pdist, squareform
 
 from SimplicialComplex.SimplicialComplex import SimplicialComplex
+from SimplicialComplex.utils.vietoris_complex_utils import all_faces, get_all_radios
 
 
 class Vietoris_RipsComplex(SimplicialComplex):
@@ -17,7 +18,7 @@ class Vietoris_RipsComplex(SimplicialComplex):
     faces (dict): stores a dictionary with faces as keys and float as value
     """
 
-    def __init__(self, points: np.array, max_size: int = None) -> None:
+    def __init__(self, points: np.array, efficient: bool = True, max_size: int = None) -> None:
         """
         Instantiates a new Vietoris Rips Complex.
         Args:
@@ -30,7 +31,12 @@ class Vietoris_RipsComplex(SimplicialComplex):
         self.max_size = max_size
 
         # Compute the Vietoris-Rips complex
-        self.faces = self._compute()
+        if efficient:
+            self.faces = self._compute()
+        else:
+            pointPositions = tuple(i for i in range(len(points)))
+            faces = all_faces({tuple(x for x in range(len(points)))}, pointPositions)
+            self.faces = get_all_radios(faces, self.points)
 
     def _compute_rips_complex_for_subset(self, subset: list) -> tuple[int, int]:
         """

@@ -1,8 +1,6 @@
 import os
 from ast import literal_eval
-from io import BytesIO
 
-import matplotlib.pyplot as plt
 from flask import Blueprint, request, Response, abort, jsonify
 
 from SimplicialComplex.AlphaComplex import AlphaComplex
