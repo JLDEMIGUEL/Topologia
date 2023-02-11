@@ -1,11 +1,16 @@
+import os
 import time
+import uuid
+
+import imageio
 import matplotlib.pyplot as plt
 import numpy as np
 from IPython.core.display_functions import clear_output
 from scipy.spatial import Delaunay, Voronoi, voronoi_plot_2d
 
 from SimplicialComplex.SimplicialComplex import SimplicialComplex
-from SimplicialComplex.utils.alpha_complex_utils import compute_circumference_radius, compute_edge_value, plot_triangles, plot_edges, filter_faces
+from SimplicialComplex.utils.alpha_complex_utils import compute_circumference_radius, compute_edge_value, \
+    plot_triangles, plot_edges, filter_faces, gif_plot_edges, gif_plot_triangles
 from SimplicialComplex.utils.simplicial_complex_utils import filter_by_float
 
 
@@ -40,7 +45,8 @@ class AlphaComplex(SimplicialComplex):
                 self.add({x}, r)
         # Add the value of each triangle
         for x in aux.n_faces(2):
-            self.add({x}, compute_circumference_radius(self.tri.points[x[0]], self.tri.points[x[1]], self.tri.points[x[2]]))
+            self.add({x},
+                     compute_circumference_radius(self.tri.points[x[0]], self.tri.points[x[1]], self.tri.points[x[2]]))
 
         if len(self.faces.keys()) > 30:
             self.faces = filter_faces(self.faces)
@@ -69,3 +75,38 @@ class AlphaComplex(SimplicialComplex):
 
             plt.show()
             time.sleep(sleep_time)
+
+    def gif_alpha(self):
+        """
+        Plots the AlphaComplex iterating the dict values in order.
+        """
+        images = []
+        vor = Voronoi(self.tri.points)
+        for x in self.thresholdvalues():
+            fig, ax = plt.subplots()
+            # Compute compute_edge_value and triangles
+            faces = filter_by_float(self.faces, x)
+            edges_list = [list(edge) for edge in faces if len(edge) == 2]
+            triangles = [list(triangle) for triangle in faces if len(triangle) == 3]
+            # Plot voronoi, points, compute_edge_value and triangles
+            voronoi_plot_2d(vor, ax=ax,
+                            show_vertices=False, line_width=2, line_colors='blue')
+            ax.plot(self.tri.points[:, 0], self.tri.points[:, 1], 'ko')
+            gif_plot_edges(edges_list, self.tri, ax)
+            gif_plot_triangles(triangles, self.tri, ax)
+            images.append(fig)
+            plt.close()
+
+        unique_id = str(uuid.uuid4())
+        gifname = "app/routes/media/plots-{}.gif".format(unique_id)
+        with imageio.get_writer(gifname, mode='I', fps=3) as writer:
+            for plot in images:
+                fig = plot
+                filename = 'app/routes/media/plot-{}.png'.format(unique_id)
+                fig.savefig(filename)
+                image = imageio.imread(filename)
+                writer.append_data(image)
+                plt.close(plot)
+                os.remove(filename)
+        return gifname
+

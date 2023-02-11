@@ -73,6 +73,40 @@ def plot_edges(edges_list: list, tri: Delaunay) -> None:
         plt.plot(x, y, 'k')
 
 
+def gif_plot_triangles(triangles: list, tri: Delaunay, ax) -> None:
+    """
+    Plots the given triangles.
+    Args:
+        tri (Delaunay): Delaunay triangulation
+        triangles (list): list of triangles
+    Returns:
+        None:
+    """
+    plots = []
+    if len(triangles) > 0:
+        c = np.ones(len(triangles))
+        cmap = matplotlib.colors.ListedColormap("limegreen")
+        plots.append(ax.tripcolor(tri.points[:, 0], tri.points[:, 1], triangles, c, edgecolor="k", lw=2, cmap=cmap))
+    return plots
+
+
+def gif_plot_edges(edges_list: list, tri: Delaunay, ax) -> None:
+    """
+    Plots the given edge.
+    Args:
+        tri (Delaunay): Delaunay triangulation
+        edges_list (list): list of edges
+    Returns:
+        None:
+    """
+    plots = []
+    for edge in edges_list:
+        x = [tri.points[edge[0], 0], tri.points[edge[1], 0]]
+        y = [tri.points[edge[0], 1], tri.points[edge[1], 1]]
+        plots.append(ax.plot(x, y, 'k'))
+    return plots
+
+
 def filter_faces(dic: dict) -> dict:
     """
     Filter faces in a dictionary by removing faces with high values.
