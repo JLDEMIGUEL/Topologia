@@ -12,7 +12,7 @@ def all():
     faces = literal_eval(req['faces'])
     sc = SimplicialComplex(faces)
     resp = {
-        "faces": sc.faces_list(),
+        "faces_list": sc.faces_list(),
         "dimension": sc.dimension(),
         "euler": sc.euler_characteristic(),
         "components": sc.connected_components(),

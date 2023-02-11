@@ -36,7 +36,7 @@ class AlphaComplex(SimplicialComplex):
         """
         self.tri = Delaunay(points)
         # Add all the vertex to the complex
-        aux = SimplicialComplex([tuple(e) for e in self.tri.simplices])
+        aux = SimplicialComplex([tuple([int(num) for num in tup]) for tup in self.tri.simplices])
         super().__init__(aux.n_faces(0))
         # Add the value of each edge
         for x in aux.n_faces(1):
@@ -61,7 +61,7 @@ class AlphaComplex(SimplicialComplex):
             sleep_time = .1
         vor = Voronoi(self.tri.points)
 
-        for x in self.thresholdvalues():
+        for x in self.threshold_values():
             clear_output()
             # Compute compute_edge_value and triangles
             faces = filter_by_float(self.faces, x)
@@ -82,7 +82,7 @@ class AlphaComplex(SimplicialComplex):
         """
         images = []
         vor = Voronoi(self.tri.points)
-        for x in self.thresholdvalues():
+        for x in self.threshold_values():
             fig, ax = plt.subplots()
             # Compute compute_edge_value and triangles
             faces = filter_by_float(self.faces, x)
