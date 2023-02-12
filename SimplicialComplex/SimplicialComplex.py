@@ -1,3 +1,6 @@
+from io import BytesIO
+
+import matplotlib.pyplot as plt
 import numpy as np
 
 from SimplicialComplex.utils.matrices_utils import smith_normal_form, generalized_border_matrix_algorithm
@@ -62,7 +65,7 @@ class SimplicialComplex:
         """
         return order(self.faces.keys())
 
-    def thresholdvalues(self) -> list[int]:
+    def threshold_values(self) -> list[int]:
         """
         Returns list of threshold values.
         Returns:
@@ -190,11 +193,11 @@ class SimplicialComplex:
                     Md[i][j] = 1
         return np.array(Md)
 
-    def generalized_boundary_matrix(self) -> list[list[int]]:
+    def generalized_boundary_matrix(self) -> np.array:
         """
         Computes the generalized border matrix of the complex.
         Returns:
-            list[list[int]]: the generalized border matrix
+            np.array: the generalized border matrix
         """
         faces = sorted(self.faces.keys(), key=lambda face: (self.faces[face], len(face), face))
         faces.remove(faces[0])
@@ -222,6 +225,16 @@ class SimplicialComplex:
         # Number of rows with ones
         dim_bp = len([_ for x in mp_1 if 1 in x])
         return dim_zp - dim_bp
+
+    def all_betti_numbers(self) -> int:
+        """
+        Gets the betti numbers of the simplicial complex for the given dimension p.
+        Args:
+            p (int): dimension
+        Returns:
+            int: betti_number
+        """
+        return [self.betti_number(dim) for dim in range(self.dimension())]
 
     def incremental_algth(self) -> list[int]:
         """
@@ -260,8 +273,9 @@ class SimplicialComplex:
         """
         infinite, points = self._compute_diagrams_points(p)
         plot_persistence_diagram(points, infinite)
+        plt.show()
 
-    def barcode_diagram(self,  p: list[int] = None) -> None:
+    def barcode_diagram(self, p: list[int] = None) -> None:
         """
         Computes and plots the barcode diagram of the simplicial complex.
         Args:
@@ -270,6 +284,39 @@ class SimplicialComplex:
         """
         infinite, points = self._compute_diagrams_points(p)
         plot_barcode_diagram(points)
+        plt.show()
+
+    def png_persistence_diagram(self, p: list[int] = None) -> None:
+        """
+        Computes and plots the persistence diagram of the simplicial complex.
+        Args:
+             p (list[int]): list of dimensions to plot. If the argument is missing, all the dimensions are used
+        Returns:
+        """
+        infinite, points = self._compute_diagrams_points(p)
+        fig = plt.figure()
+        plot_persistence_diagram(points, infinite)
+        plt.close()
+        png_output = BytesIO()
+        fig.savefig(png_output, format='png')
+        png_output.seek(0)
+        return png_output.getvalue()
+
+    def png_barcode_diagram(self, p: list[int] = None) -> None:
+        """
+        Computes and plots the barcode diagram of the simplicial complex.
+        Args:
+             p (list[int]): list of dimensions to plot. If the argument is missing, all the dimensions are used
+        Returns:
+        """
+        infinite, points = self._compute_diagrams_points(p)
+        fig = plt.figure()
+        plot_barcode_diagram(points)
+        plt.close()
+        png_output = BytesIO()
+        fig.savefig(png_output, format='png')
+        png_output.seek(0)
+        return png_output.getvalue()
 
     def _compute_diagrams_points(self, p: list[int] = None) -> tuple[int, dict]:
         """
@@ -287,7 +334,7 @@ class SimplicialComplex:
         M, lows_list = generalized_border_matrix_algorithm(self.generalized_boundary_matrix())
         faces = sorted(self.faces.keys(), key=lambda _face: (self.faces[_face], len(_face), _face))
         faces.remove(faces[0])
-        infinite = 1.5 * max(self.thresholdvalues())
+        infinite = 1.5 * max(self.threshold_values())
         # Compute points
         points = {}
         for dim in p:

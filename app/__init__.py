@@ -1,5 +1,9 @@
 from flask import Flask
 from app.routes.health import blp as HealthBlueprint
+from app.routes.alpha import blp as AlphaBlueprint
+from app.routes.matrix import blp as MatrixBlueprint
+from app.routes.simplicial import blp as SimplicialBlueprint
+from app.routes.vietoris import blp as VietorisBlueprint
 
 
 def create_app():
@@ -8,5 +12,9 @@ def create_app():
 
     # Register routes blueprints
     app.register_blueprint(HealthBlueprint)
+    app.register_blueprint(AlphaBlueprint)
+    app.register_blueprint(MatrixBlueprint)
+    app.register_blueprint(SimplicialBlueprint)
+    app.register_blueprint(VietorisBlueprint)
 
     return app

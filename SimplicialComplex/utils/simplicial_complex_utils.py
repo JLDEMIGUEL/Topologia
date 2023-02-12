@@ -241,7 +241,6 @@ def plot_persistence_diagram(points: dict, infinite: int) -> None:
     plt.axis([-0.1 * infinite, infinite * 1.1, -0.1 * infinite, infinite * 1.1])
     plt.plot([-0.1 * infinite, infinite * 1.1], [-0.1 * infinite, infinite * 1.1], "b--")
     plt.plot([-0.1 * infinite, infinite * 1.1], [infinite, infinite], "b--")
-    plt.show()
 
 
 def plot_barcode_diagram(points: dict) -> None:
@@ -256,7 +255,7 @@ def plot_barcode_diagram(points: dict) -> None:
     # Plot all bars of the diagram
     height = 0
     for dim, points_list in points.items():
-        for i in range(len(points_list)):
-            plt.plot([points_list[i][0], points_list[i][1]], [height, height], colors[dim])
-            height += 1
-    plt.show()
+        for point in points_list:
+            if point[0] != point[1]:
+                plt.plot([point[0], point[1]], [height, height], colors[dim])
+                height += 1

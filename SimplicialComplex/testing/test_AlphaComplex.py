@@ -69,7 +69,7 @@ class TestAlphaComplex(TestCase):
                            0.2146289409772831, 0.2204212878472461, 0.2207272203518557, 0.23243829737556373,
                            0.24143718415372575, 0.25427755231828075, 0.25434295608514496, 0.259566655903143,
                            0.2660519202667225, 0.27011640994552, 0.7144105889522725]
-        self.assertEqual(expected_values, self.ac1.thresholdvalues())
+        self.assertEqual(expected_values, self.ac1.threshold_values())
 
     def test_thresholdvalues_2(self):
         expected_values = [0.0, 0.036163698601824126, 0.0687469369692617, 0.08658875829741433, 0.1004969808973941,
@@ -79,7 +79,7 @@ class TestAlphaComplex(TestCase):
                            0.2075916243129811, 0.23832327791636146, 0.26398454833358354, 0.26768993299910265,
                            0.27072941952967905, 0.3372151209564786, 0.33722983315924704, 0.33907631848107095,
                            0.36210637012732005]
-        self.assertEqual(expected_values, self.ac2.thresholdvalues())
+        self.assertEqual(expected_values, self.ac2.threshold_values())
 
     def test_thresholdvalues_3(self):
         expected_values = [0, 0.013372492334073725, 0.04142029475612175, 0.04400202037538318, 0.04911455963807197,
@@ -99,7 +99,7 @@ class TestAlphaComplex(TestCase):
                            0.18342630211201155, 0.18423901400199627, 0.18530372758297417, 0.1860185439096894,
                            0.18794891774059622, 0.2050574349332995, 0.20903538737809907, 0.39184153947179895,
                            1.0558267620678874]
-        self.assertEqual(expected_values, self.ac3.thresholdvalues())
+        self.assertEqual(expected_values, self.ac3.threshold_values())
 
     def test_thresholdvalues_4(self):
         expected_values = [0, 0.10565789180691254, 0.3594476020513678, 0.512709492652287, 0.6337392347297187,
@@ -116,7 +116,7 @@ class TestAlphaComplex(TestCase):
                            2.655928521333648, 2.9851322460962346, 3.075420599920237, 3.0897352223305905,
                            3.3474070826562006, 3.81894308488309, 3.8192688178009524, 3.8800339027875133,
                            3.9262271123430863, 3.9903330121627274, 5.611766756773166]
-        self.assertEqual(expected_values, self.ac4.thresholdvalues())
+        self.assertEqual(expected_values, self.ac4.threshold_values())
 
     def test_plotalpha(self):
         alpha = AlphaComplex([[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]])
