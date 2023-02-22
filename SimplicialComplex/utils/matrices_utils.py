@@ -1,3 +1,5 @@
+import re
+
 import numpy as np
 from fractions import Fraction
 
@@ -22,23 +24,25 @@ def smith_normal_form(matrix: np.array, rows_opp_matrix: np.array = None, column
     # Build columns and rows matrix´s in the first iteration
     if rows_opp_matrix is None or columns_opp_matrix is None:
         columns_opp_matrix, rows_opp_matrix = _build_eye_matrix(*matrix.shape, group)
-        steps = [(matrix, rows_opp_matrix, columns_opp_matrix)]
+        steps = [(matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(), "Inicial")]
     # Search the first none zero number coordinates and return matrix´s in zero matrix case
     [x, y] = search_non_zero_elem(matrix)
     if matrix[x, y] == 0:
         return matrix, rows_opp_matrix, columns_opp_matrix, []
     # Swap and reduce first row and column
-    matrix = swap(matrix, [x, y], [0, 0])
-    rows_opp_matrix, columns_opp_matrix = swap_opp_matrix(rows_opp_matrix, columns_opp_matrix, [x, y], [0, 0])
+    if [x, y] != [0, 0]:
+        matrix = swap(matrix, [x, y], [0, 0])
+        rows_opp_matrix, columns_opp_matrix = swap_opp_matrix(rows_opp_matrix, columns_opp_matrix, [x, y], [0, 0])
+        steps.extend([(matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
+                       "Intercambiar r0 por r{} y c0 por {}".format(x, y))])
     inv = inverse(matrix[0, 0], group)
     matrix[:, 0], columns_opp_matrix[:, 0] = inv * matrix[:, 0], inv * columns_opp_matrix[:, 0]
     if group != 'Q':
         matrix, columns_opp_matrix = matrix % group, columns_opp_matrix % group
-    steps.extend([(matrix, rows_opp_matrix, columns_opp_matrix)])
+    steps.extend([(matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(), "Dividir c1 entre {}".format(inv))])
     # Make zeros in the first row and column
     matrix, rows_opp_matrix, columns_opp_matrix = simplify_rows_and_columns(matrix, rows_opp_matrix, columns_opp_matrix,
-                                                                            group)
-    steps.extend([(matrix, rows_opp_matrix, columns_opp_matrix)])
+                                                                            group, steps)
     # Compute the smith normal form of the sub-matrix (without first row and column)
     sub_matrix, aux_rows, aux_columns, prev_steps = smith_normal_form(matrix[1:, 1:], rows_opp_matrix[1:, :],
                                                                       columns_opp_matrix[:, 1:], group=group)
@@ -46,8 +50,13 @@ def smith_normal_form(matrix: np.array, rows_opp_matrix: np.array = None, column
     matrix, rows_opp_matrix, columns_opp_matrix = reconstruct_all(matrix, sub_matrix, rows_opp_matrix, aux_rows,
                                                                   columns_opp_matrix, aux_columns)
 
-    steps.extend([reconstruct_all(matrix, mat, rows_opp_matrix, row, columns_opp_matrix, col) for mat, row, col in prev_steps])
+    steps.extend([(*reconstruct_all(matrix, mat, rows_opp_matrix, row, columns_opp_matrix, col), adjust_desc(desc))
+                  for mat, row, col, desc in prev_steps])
     return matrix, rows_opp_matrix, columns_opp_matrix, steps
+
+
+def adjust_desc(desc):
+    return re.sub(r"(cn|rn)(\d+)", lambda match: f"{match.group(1)}{int(match.group(2)) + 1}", desc)
 
 
 def smith_normal_form_z(matrix: np.array, rows_opp_matrix=None, columns_opp_matrix=None) -> np.array:
@@ -173,7 +182,7 @@ def swap_opp_matrix(rows_opp_matrix: np.array, columns_opp_matrix: np.array, sou
 
 
 def simplify_rows_and_columns(matrix_target: np.array, rows_opp_matrix: np.array, columns_opp_matrix: np.array,
-                              group: object) -> tuple[np.array, np.array, np.array]:
+                              group: object, steps=[]) -> tuple[np.array, np.array, np.array]:
     """
     Simplifies the columns of the given matrix.
     Args:
@@ -181,6 +190,7 @@ def simplify_rows_and_columns(matrix_target: np.array, rows_opp_matrix: np.array
         matrix_target (np.array): target matrix
         columns_opp_matrix (np.array): columns opp matrix
         group (object): group
+        steps:
     Returns:
         tuple[np.array, np.array, np.array]: simplified matrix
     """
@@ -192,15 +202,20 @@ def simplify_rows_and_columns(matrix_target: np.array, rows_opp_matrix: np.array
             inv = inverse(matrix[i, 0], group)
             matrix[i, :] = (inv * matrix[i, :] - matrix[0, :])
             rows_opp_matrix[i, :] = (inv * rows_opp_matrix[i, :] - rows_opp_matrix[0, :])
+            if group is not None and group != 'Q':
+                matrix, rows_opp_matrix = matrix % group, rows_opp_matrix % group
+            steps.extend([(matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
+                           "Multiplicar r{} por {} y restar r0".format(i, inv))])
     # Make zeros in first row
     for i in range(1, columns):
         if matrix[0, i] != 0:
             inv = inverse(matrix[0, i], group)
             matrix[:, i] = (inv * matrix[:, i] - matrix[:, 0])
             columns_opp_matrix[:, i] = (inv * columns_opp_matrix[:, i] - columns_opp_matrix[:, 0])
-
-    if group is not None and group != 'Q':
-        matrix, rows_opp_matrix, columns_opp_matrix = matrix % group, rows_opp_matrix % group, columns_opp_matrix % group
+            if group is not None and group != 'Q':
+                matrix, columns_opp_matrix = matrix % group, columns_opp_matrix % group
+            steps.extend([(matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
+                           "Multiplicar c{} por {} y restar r0".format(i, inv))])
 
     return matrix, rows_opp_matrix, columns_opp_matrix
 
