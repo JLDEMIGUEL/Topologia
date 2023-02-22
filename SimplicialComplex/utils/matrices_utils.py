@@ -3,7 +3,7 @@ from fractions import Fraction
 
 
 def smith_normal_form(matrix: np.array, rows_opp_matrix: np.array = None, columns_opp_matrix: np.array = None,
-                      group: int = 2) -> tuple[np.array, np.array, np.array]:
+                      group: int = 2) -> tuple[np.array, np.array, np.array, list]:
     """
     Smith normal form of the given matrix.
     Args:
@@ -12,19 +12,21 @@ def smith_normal_form(matrix: np.array, rows_opp_matrix: np.array = None, column
         columns_opp_matrix (np.array): columns matrix
         group (int): group
     Returns:
-        tuple[np.array, np.array, np.array]: smith normal form of the given matrix
+        tuple[np.array, np.array, np.array, list]: smith normal form of the given matrix
     """
     matrix = matrix.copy()
+    steps = []
     # Base case: return the matrix's
     if matrix.shape[0] == 0 or matrix.shape[1] == 0:
-        return matrix, rows_opp_matrix, columns_opp_matrix
+        return matrix, rows_opp_matrix, columns_opp_matrix, []
     # Build columns and rows matrix´s in the first iteration
     if rows_opp_matrix is None or columns_opp_matrix is None:
         columns_opp_matrix, rows_opp_matrix = _build_eye_matrix(*matrix.shape, group)
+        steps = [(matrix, rows_opp_matrix, columns_opp_matrix)]
     # Search the first none zero number coordinates and return matrix´s in zero matrix case
     [x, y] = search_non_zero_elem(matrix)
     if matrix[x, y] == 0:
-        return matrix, rows_opp_matrix, columns_opp_matrix
+        return matrix, rows_opp_matrix, columns_opp_matrix, []
     # Swap and reduce first row and column
     matrix = swap(matrix, [x, y], [0, 0])
     rows_opp_matrix, columns_opp_matrix = swap_opp_matrix(rows_opp_matrix, columns_opp_matrix, [x, y], [0, 0])
@@ -32,16 +34,20 @@ def smith_normal_form(matrix: np.array, rows_opp_matrix: np.array = None, column
     matrix[:, 0], columns_opp_matrix[:, 0] = inv * matrix[:, 0], inv * columns_opp_matrix[:, 0]
     if group != 'Q':
         matrix, columns_opp_matrix = matrix % group, columns_opp_matrix % group
+    steps.extend([(matrix, rows_opp_matrix, columns_opp_matrix)])
     # Make zeros in the first row and column
     matrix, rows_opp_matrix, columns_opp_matrix = simplify_rows_and_columns(matrix, rows_opp_matrix, columns_opp_matrix,
                                                                             group)
+    steps.extend([(matrix, rows_opp_matrix, columns_opp_matrix)])
     # Compute the smith normal form of the sub-matrix (without first row and column)
-    sub_matrix, aux_rows, aux_columns = smith_normal_form(matrix[1:, 1:], rows_opp_matrix[1:, :],
-                                                          columns_opp_matrix[:, 1:], group=group)
+    sub_matrix, aux_rows, aux_columns, prev_steps = smith_normal_form(matrix[1:, 1:], rows_opp_matrix[1:, :],
+                                                                      columns_opp_matrix[:, 1:], group=group)
     # Re-construct all the matrix´s
     matrix, rows_opp_matrix, columns_opp_matrix = reconstruct_all(matrix, sub_matrix, rows_opp_matrix, aux_rows,
                                                                   columns_opp_matrix, aux_columns)
-    return matrix, rows_opp_matrix, columns_opp_matrix
+
+    steps.extend([reconstruct_all(matrix, mat, rows_opp_matrix, row, columns_opp_matrix, col) for mat, row, col in prev_steps])
+    return matrix, rows_opp_matrix, columns_opp_matrix, steps
 
 
 def smith_normal_form_z(matrix: np.array, rows_opp_matrix=None, columns_opp_matrix=None) -> np.array:

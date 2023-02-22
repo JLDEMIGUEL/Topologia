@@ -218,8 +218,8 @@ class SimplicialComplex:
         Returns:
             int: betti_number
         """
-        mp, _, _ = smith_normal_form(np.array(self.boundary_matrix(p)))
-        mp_1, _, _ = smith_normal_form(np.array(self.boundary_matrix(p + 1)))
+        mp, _, _, _ = smith_normal_form(np.array(self.boundary_matrix(p)))
+        mp_1, _, _, _ = smith_normal_form(np.array(self.boundary_matrix(p + 1)))
         # Number of columns of zeros
         dim_zp = len([_ for x in np.transpose(mp) if 1 not in x])
         # Number of rows with ones

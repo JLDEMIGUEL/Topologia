@@ -119,7 +119,7 @@ class Test(TestCase):
                                          [0, 0, 0, 1, 0, 0],
                                          [0, 0, 0, 0, 1, 0],
                                          [0, 0, 0, 0, 0, 1]])
-        smf, rows_matrix, columns_matrix = smith_normal_form(self.m1)
+        smf, rows_matrix, columns_matrix, steps = smith_normal_form(self.m1)
 
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
@@ -141,7 +141,7 @@ class Test(TestCase):
                                          [1, 1, 0],
                                          [0, 1, 0]])
 
-        smf, rows_matrix, columns_matrix = smith_normal_form(self.m2)
+        smf, rows_matrix, columns_matrix, steps = smith_normal_form(self.m2)
 
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
@@ -162,7 +162,7 @@ class Test(TestCase):
                                          [0, 0, 1, 1]])
         expected_cols_matrix = np.array([[1]])
 
-        smf, rows_matrix, columns_matrix = smith_normal_form(self.m3)
+        smf, rows_matrix, columns_matrix, steps = smith_normal_form(self.m3)
 
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
@@ -179,7 +179,7 @@ class Test(TestCase):
                                          [0, 0, 1, 0],
                                          [0, 0, 0, 1]])
 
-        smf, rows_matrix, columns_matrix = smith_normal_form(self.m4)
+        smf, rows_matrix, columns_matrix, steps = smith_normal_form(self.m4)
 
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
@@ -200,7 +200,7 @@ class Test(TestCase):
                                          [0, 0, 4]])
 
         group = 7
-        smf, rows_matrix, columns_matrix = smith_normal_form(matrix, group=group)
+        smf, rows_matrix, columns_matrix, steps = smith_normal_form(matrix, group=group)
 
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
@@ -227,7 +227,7 @@ class Test(TestCase):
                                          [0, 0, 3]])
 
         group = 11
-        smf, rows_matrix, columns_matrix = smith_normal_form(matrix, group=group)
+        smf, rows_matrix, columns_matrix, steps = smith_normal_form(matrix, group=group)
 
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
@@ -248,7 +248,7 @@ class Test(TestCase):
                                          [Fraction(0, 1), Fraction(0, 1), Fraction(-2, 3)]])
 
         group = 'Q'
-        smf, rows_matrix, columns_matrix = smith_normal_form(matrix, group=group)
+        smf, rows_matrix, columns_matrix, steps = smith_normal_form(matrix, group=group)
 
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
@@ -271,7 +271,7 @@ class Test(TestCase):
                                          [Fraction(0, 1), Fraction(1, 3)]])
 
         group = 'Q'
-        smf, rows_matrix, columns_matrix = smith_normal_form(matrix, group=group)
+        smf, rows_matrix, columns_matrix, steps = smith_normal_form(matrix, group=group)
 
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
