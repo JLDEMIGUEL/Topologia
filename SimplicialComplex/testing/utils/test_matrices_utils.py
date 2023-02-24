@@ -124,7 +124,7 @@ class Test(TestCase):
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
         self.assertEqual(expected_cols_matrix.tolist(), columns_matrix.tolist())
-        self.assertEquals(14, len(steps))
+        self.assertEquals(13, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(),
                              ((np.matrix(rows) @ np.matrix(self.m1) @ np.matrix(cols)) % 2).tolist())
@@ -147,7 +147,7 @@ class Test(TestCase):
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
         self.assertEqual(expected_cols_matrix.tolist(), columns_matrix.tolist())
-        self.assertEquals(6, len(steps))
+        self.assertEquals(4, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(),
                              ((np.matrix(rows) @ np.matrix(self.m2) @ np.matrix(cols)) % 2).tolist())
@@ -169,7 +169,7 @@ class Test(TestCase):
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
         self.assertEqual(expected_cols_matrix.tolist(), columns_matrix.tolist())
-        self.assertEquals(4, len(steps))
+        self.assertEquals(3, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(),
                              ((np.matrix(rows) @ np.matrix(self.m3) @ np.matrix(cols)) % 2).tolist())
@@ -187,7 +187,7 @@ class Test(TestCase):
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
         self.assertEqual(expected_cols_matrix.tolist(), columns_matrix.tolist())
-        self.assertEquals(5, len(steps))
+        self.assertEquals(4, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(),
                              ((np.matrix(rows) @ np.matrix(self.m4) @ np.matrix(cols)) % 2).tolist())
@@ -209,7 +209,7 @@ class Test(TestCase):
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
         self.assertEqual(expected_cols_matrix.tolist(), columns_matrix.tolist())
-        self.assertEquals(7, len(steps))
+        self.assertEquals(6, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(),
                              ((np.matrix(rows) @ np.matrix(matrix) @ np.matrix(cols)) % group).tolist())
@@ -237,7 +237,7 @@ class Test(TestCase):
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
         self.assertEqual(expected_cols_matrix.tolist(), columns_matrix.tolist())
-        self.assertEquals(11, len(steps))
+        self.assertEquals(10, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(),
                              ((np.matrix(rows) @ np.matrix(matrix) @ np.matrix(cols)) % group).tolist())
@@ -259,7 +259,7 @@ class Test(TestCase):
         self.assertListEqual(expected_matrix.tolist(), smf.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_matrix.tolist())
         self.assertEqual(expected_cols_matrix.tolist(), columns_matrix.tolist())
-        self.assertEquals(7, len(steps))
+        self.assertEquals(6, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(), (np.matrix(rows) @ np.matrix(matrix) @ np.matrix(cols)).tolist())
 
@@ -367,7 +367,7 @@ class Test(TestCase):
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
         self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
-        self.assertEquals(6, len(steps))
+        self.assertEquals(5, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(), (np.matrix(rows) @ np.matrix(matrix) @ np.matrix(cols)).tolist())
 
@@ -388,7 +388,7 @@ class Test(TestCase):
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
         self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
-        self.assertEquals(6, len(steps))
+        self.assertEquals(5, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(), (np.matrix(rows) @ np.matrix(matrix) @ np.matrix(cols)).tolist())
 
@@ -411,7 +411,7 @@ class Test(TestCase):
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
         self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
-        self.assertEquals(12, len(steps))
+        self.assertEquals(10, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(), (np.matrix(rows) @ np.matrix(matrix) @ np.matrix(cols)).tolist())
 
@@ -483,7 +483,7 @@ class Test(TestCase):
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
         self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
-        self.assertEquals(17, len(steps))
+        self.assertEquals(16, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(), (np.matrix(rows) @ np.matrix(matrix) @ np.matrix(cols)).tolist())
 
@@ -530,7 +530,7 @@ class Test(TestCase):
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
         self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
-        self.assertEquals(7, len(steps))
+        self.assertEquals(6, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(), (np.matrix(rows) @ np.matrix(matrix) @ np.matrix(cols)).tolist())
 
@@ -556,7 +556,7 @@ class Test(TestCase):
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
         self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
-        self.assertEquals(9, len(steps))
+        self.assertEquals(8, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(), (np.matrix(rows) @ np.matrix(matrix) @ np.matrix(cols)).tolist())
 
@@ -576,7 +576,7 @@ class Test(TestCase):
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
         self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
-        self.assertEquals(7, len(steps))
+        self.assertEquals(6, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(), (np.matrix(rows) @ np.matrix(matrix) @ np.matrix(cols)).tolist())
 
@@ -705,7 +705,7 @@ class Test(TestCase):
         self.assertEqual(expected_matrix.tolist(), reduced_matrix.tolist())
         self.assertEqual(expected_rows_matrix.tolist(), rows_opp_matrix.tolist())
         self.assertEqual(expected_columns_matrix.tolist(), columns_opp_matrix.tolist())
-        self.assertEquals(8, len(steps))
+        self.assertEquals(7, len(steps))
         for mat, rows, cols, _ in steps:
             self.assertEqual(np.matrix(mat).tolist(), (np.matrix(rows) @ np.matrix(matrix) @ np.matrix(cols)).tolist())
 
