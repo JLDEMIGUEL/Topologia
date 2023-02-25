@@ -31,15 +31,14 @@ def smith_normal_form(matrix: np.array, rows_opp_matrix: np.array = None, column
         return matrix, rows_opp_matrix, columns_opp_matrix, steps
     # Swap and reduce first row and column
     if [x, y] != [0, 0]:
-        matrix = swap(matrix, [x, y], [0, 0])
-        rows_opp_matrix, columns_opp_matrix = swap_opp_matrix(rows_opp_matrix, columns_opp_matrix, [x, y], [0, 0])
-        add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
-                 "Intercambiar r1 por r{} y c1 por c{}".format(x + 1, y + 1))
+        matrix, rows_opp_matrix, columns_opp_matrix = swap_all(matrix, rows_opp_matrix, columns_opp_matrix,
+                                                               [x, y], [0, 0], steps)
     inv = inverse(matrix[0, 0], group)
     matrix[:, 0], columns_opp_matrix[:, 0] = inv * matrix[:, 0], inv * columns_opp_matrix[:, 0]
     if group != 'Q':
         matrix, columns_opp_matrix = matrix % group, columns_opp_matrix % group
-    add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(), "Dividir c1 entre {}".format(inv))
+    if inv != 1:
+        add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(), "Dividir c1 entre {}".format(inv))
     # Make zeros in the first row and column
     matrix, rows_opp_matrix, columns_opp_matrix = simplify_rows_and_columns(matrix, rows_opp_matrix, columns_opp_matrix,
                                                                             group, steps)
@@ -81,10 +80,8 @@ def smith_normal_form_z(matrix: np.array, rows_opp_matrix=None, columns_opp_matr
         min_pos = min_abs_position(matrix)
 
         matrix, rows_opp_matrix, columns_opp_matrix = swap_and_sign(matrix, rows_opp_matrix, columns_opp_matrix,
-                                                                    min_pos, [0, 0])
-        if min_pos != [0, 0]:
-            add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
-                     "Intercambiar r1 por r{} y c1 por c{}".format(min_pos[0] + 1, min_pos[1] + 1))
+                                                                    min_pos, [0, 0], steps)
+
         if matrix[0, 0] > gcd:
             coords = _find_non_divisible_number(matrix)
             if coords is not None:
@@ -106,7 +103,7 @@ def smith_normal_form_z(matrix: np.array, rows_opp_matrix=None, columns_opp_matr
 
 
 def adjust_desc(desc):
-    return re.sub(r"(c|r)(\d+)", lambda match: f"{match.group(1)}{int(match.group(2)) + 1}", desc)
+    return re.sub(r"([cr])(\d+)", lambda match: f"{match.group(1)}{int(match.group(2)) + 1}", desc)
 
 
 def add_step(steps, mat, row, col, desc):
@@ -114,7 +111,8 @@ def add_step(steps, mat, row, col, desc):
         steps.extend([(mat.copy(), row.copy(), col.copy(), desc)])
         return
     last_step = steps[-1]
-    if not (np.array_equal(last_step[0], mat) and np.array_equal(last_step[1], row) and np.array_equal(last_step[2], col)):
+    if not (np.array_equal(last_step[0], mat) and np.array_equal(last_step[1], row) and np.array_equal(last_step[2],
+                                                                                                       col)):
         steps.extend([(mat.copy(), row.copy(), col.copy(), desc)])
 
 
@@ -156,26 +154,47 @@ def swap(matrix: np.array, source: list, obj: list) -> np.array:
     return aux
 
 
-def swap_and_sign(matrix: np.array, rows_opp_matrix: np.array, columns_opp_matrix: np.array, source: list, obj: list) -> \
-        tuple[np.array, np.array, np.array]:
+def swap_and_sign(matrix: np.array, rows_opp_matrix: np.array, columns_opp_matrix: np.array, source: list, obj: list,
+                  steps: list) -> tuple[np.array, np.array, np.array]:
     """
     Swap the row and column given in source and the ones in obj
     and change row sign if necessary
     Args:
+
         matrix (np.array): target matrix
         columns_opp_matrix (np.array): columns matrix
         rows_opp_matrix (np.array): rows matrix
         source (list): source indexes
         obj (list): objective indexes
+        steps (list): steps list
     Returns:
         tuple[np.array,np.array, np.array]: matrix with the applied swap
     """
-    matrix = swap(matrix, source, obj)
-    rows_opp_matrix, columns_opp_matrix = swap_opp_matrix(rows_opp_matrix, columns_opp_matrix, source, obj)
+    matrix, rows_opp_matrix, columns_opp_matrix = swap_all(matrix, rows_opp_matrix, columns_opp_matrix, source, obj,
+                                                           steps)
+
     if matrix[obj[0], obj[1]] < 0:
         matrix[obj[0], :] *= -1
         rows_opp_matrix[obj[0], :] *= -1
+        add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
+                 "Cambiar signo r{}".format(obj[0] + 1))
+    return matrix, rows_opp_matrix, columns_opp_matrix
 
+
+def swap_all(matrix, rows_opp_matrix, columns_opp_matrix, source, obj, steps):
+    if source[0] != obj[0]:
+        matrix = swap(matrix, [source[0], 0], [obj[0], 0])
+        rows_opp_matrix, columns_opp_matrix = swap_opp_matrix(rows_opp_matrix, columns_opp_matrix, [source[0], 0],
+                                                              [obj[0], 0])
+        add_step(steps, matrix, rows_opp_matrix, columns_opp_matrix,
+                 "Intercambiar r{} por r{}".format(source[0] + 1, obj[0] + 1))
+
+    if source[1] != obj[1]:
+        matrix = swap(matrix, [0, source[1]], [0, obj[1]])
+        rows_opp_matrix, columns_opp_matrix = swap_opp_matrix(rows_opp_matrix, columns_opp_matrix, [0, source[1]],
+                                                              [0, obj[1]])
+        add_step(steps, matrix, rows_opp_matrix, columns_opp_matrix,
+                 "Intercambiar c{} por c{}".format(source[1] + 1, obj[1] + 1))
     return matrix, rows_opp_matrix, columns_opp_matrix
 
 
@@ -201,7 +220,7 @@ def swap_opp_matrix(rows_opp_matrix: np.array, columns_opp_matrix: np.array, sou
 
 
 def simplify_rows_and_columns(matrix_target: np.array, rows_opp_matrix: np.array, columns_opp_matrix: np.array,
-                              group: object, steps=[]) -> tuple[np.array, np.array, np.array]:
+                              group: object, steps) -> tuple[np.array, np.array, np.array]:
     """
     Simplifies the columns of the given matrix.
     Args:
@@ -209,7 +228,7 @@ def simplify_rows_and_columns(matrix_target: np.array, rows_opp_matrix: np.array
         matrix_target (np.array): target matrix
         columns_opp_matrix (np.array): columns opp matrix
         group (object): group
-        steps:
+        steps (list): steps list
     Returns:
         tuple[np.array, np.array, np.array]: simplified matrix
     """
@@ -219,27 +238,39 @@ def simplify_rows_and_columns(matrix_target: np.array, rows_opp_matrix: np.array
     for i in range(1, rows):
         if matrix[i, 0] != 0:
             inv = inverse(matrix[i, 0], group)
-            matrix[i, :] = (inv * matrix[i, :] - matrix[0, :])
-            rows_opp_matrix[i, :] = (inv * rows_opp_matrix[i, :] - rows_opp_matrix[0, :])
+            matrix[i, :] *= inv
+            rows_opp_matrix[i, :] *= inv
             if group is not None and group != 'Q':
                 matrix, rows_opp_matrix = matrix % group, rows_opp_matrix % group
             add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
-                     "Multiplicar r{} por {} y restar r1".format(i + 1, inv))
+                     "Multiplicar r{} por {}".format(i + 1, inv))
+            matrix[i, :] -= matrix[0, :]
+            rows_opp_matrix[i, :] -= rows_opp_matrix[0, :]
+            if group is not None and group != 'Q':
+                matrix, rows_opp_matrix = matrix % group, rows_opp_matrix % group
+            add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
+                     "Restar a r{}, r1".format(i + 1))
     # Make zeros in first row
     for i in range(1, columns):
         if matrix[0, i] != 0:
             inv = inverse(matrix[0, i], group)
-            matrix[:, i] = (inv * matrix[:, i] - matrix[:, 0])
-            columns_opp_matrix[:, i] = (inv * columns_opp_matrix[:, i] - columns_opp_matrix[:, 0])
+            matrix[:, i] *= inv
+            columns_opp_matrix[:, i] *= inv
             if group is not None and group != 'Q':
                 matrix, columns_opp_matrix = matrix % group, columns_opp_matrix % group
             add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
-                     "Multiplicar c{} por {} y restar c1".format(i + 1, inv))
+                     "Multiplicar c{} por {}".format(i + 1, inv))
+            matrix[:, i] -= matrix[:, 0]
+            columns_opp_matrix[:, i] -= columns_opp_matrix[:, 0]
+            if group is not None and group != 'Q':
+                matrix, columns_opp_matrix = matrix % group, columns_opp_matrix % group
+            add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
+                     "Restar a c{}, c1".format(i + 1))
 
     return matrix, rows_opp_matrix, columns_opp_matrix
 
 
-def reduce_rows_columns(matrix: np.array, rows_opp_matrix, columns_opp_matrix, steps=[]) -> np.array:
+def reduce_rows_columns(matrix: np.array, rows_opp_matrix, columns_opp_matrix, steps: list) -> np.array:
     """
     Reduces the first column and first row assuming that the element [0, 0] divides
     every element in both, the first column and first row.
@@ -247,6 +278,7 @@ def reduce_rows_columns(matrix: np.array, rows_opp_matrix, columns_opp_matrix, s
         columns_opp_matrix:
         rows_opp_matrix:
         matrix (np.array): target matrix to reduce
+        steps (list): steps list
     Returns:
         np.array: matrix with the applied reduction
     """
@@ -430,7 +462,7 @@ def _find_non_divisible_number(matrix: np.array) -> tuple[int, int]:
 
 
 def _process_reduction(matrix: np.array, coord: tuple[int, int], rows_opp_matrix, columns_opp_matrix,
-                       steps=[]) -> np.array:
+                       steps=None) -> np.array:
     """
     Returns the matrix with the reduction applied.
     Args:
@@ -439,6 +471,8 @@ def _process_reduction(matrix: np.array, coord: tuple[int, int], rows_opp_matrix
     Returns:
         np.array: reduced matrix
     """
+    if steps is None:
+        steps = []
     first = matrix[0, 0]
     elem = matrix[coord[0], coord[1]]
     # Case 1: If element in first row, add a multiple of the first column to the corresponding one
@@ -447,7 +481,7 @@ def _process_reduction(matrix: np.array, coord: tuple[int, int], rows_opp_matrix
             matrix[:, coord[1]] *= -1
             columns_opp_matrix[:, coord[1]] *= -1
             elem *= -1
-            add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(), "Cambiar signo c1")
+            add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(), "Cambiar signo c{}".format(coord[1] + 1))
         matrix[:, coord[1]] -= int(elem / first) * matrix[:, 0]
         columns_opp_matrix[:, coord[1]] -= int(elem / first) * columns_opp_matrix[:, 0]
         add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
@@ -458,7 +492,7 @@ def _process_reduction(matrix: np.array, coord: tuple[int, int], rows_opp_matrix
             matrix[coord[0], :] *= -1
             rows_opp_matrix[coord[0], :] *= -1
             elem *= -1
-            add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(), "Cambiar signo r1")
+            add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(), "Cambiar signo r{}".format(coord[0] + 1))
         matrix[coord[0], :] -= int(elem / first) * matrix[0, :]
         rows_opp_matrix[coord[0], :] -= int(elem / first) * rows_opp_matrix[0, :]
         add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
