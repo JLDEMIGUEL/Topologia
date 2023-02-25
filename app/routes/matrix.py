@@ -15,6 +15,7 @@ class MatrixResponse(Schema):
     matrix = fields.List(fields.Field(), dump_only=True)
     rows_opp_matrix = fields.List(fields.Field(), dump_only=True)
     columns_opp_matrix = fields.List(fields.Field(), dump_only=True)
+    steps = fields.List(fields.Field(), dump_only=True)
 
 
 class MatrixRequest(Schema):
@@ -68,11 +69,15 @@ def smith_normal_form(matrix_request, group):
     else:
         abort(500, "Group not supported, must be a prime number")
 
-    smf_matrix, rows_opp_matrix, columns_opp_matrix = matrices_utils.smith_normal_form(np.array(matrix),
-                                                                                       group=group)
+    smf_matrix, rows_opp_matrix, columns_opp_matrix, steps = matrices_utils.smith_normal_form(np.array(matrix),
+                                                                                              group=group)
+
+    steps = [(mat.tolist(), rows.tolist(), cols.tolist(), desc) for mat, rows, cols, desc in steps]
+
     return {"matrix": smf_matrix.tolist(),
             "rows_opp_matrix": rows_opp_matrix.tolist(),
-            "columns_opp_matrix": columns_opp_matrix.tolist()}
+            "columns_opp_matrix": columns_opp_matrix.tolist(),
+            "steps": steps}
 
 
 @blp.route("/smith_normal_form_q", methods=['POST'])
@@ -119,15 +124,23 @@ def smith_normal_form_q(matrix_request):
     matrix = matrix_request['matrix']
     matrix = [[Fraction(fraction) for fraction in row] for row in matrix]
 
-    smf_matrix, rows_opp_matrix, columns_opp_matrix = matrices_utils.smith_normal_form(np.array(matrix), group='Q')
+    smf_matrix, rows_opp_matrix, columns_opp_matrix, steps = matrices_utils.smith_normal_form(np.array(matrix),
+                                                                                              group='Q')
 
     smf_matrix = np.array([[str(fraction) for fraction in row] for row in smf_matrix])
     rows_opp_matrix = np.array([[str(fraction) for fraction in row] for row in rows_opp_matrix])
     columns_opp_matrix = np.array([[str(fraction) for fraction in row] for row in columns_opp_matrix])
+    formatted_steps = []
+    for mat, rows, cols, desc in steps:
+        mat = [[str(fraction) for fraction in row] for row in mat]
+        rows = [[str(fraction) for fraction in row] for row in rows]
+        cols = [[str(fraction) for fraction in row] for row in cols]
+        formatted_steps.append((mat, rows, cols, desc))
 
     return {"matrix": smf_matrix.tolist(),
             "rows_opp_matrix": rows_opp_matrix.tolist(),
-            "columns_opp_matrix": columns_opp_matrix.tolist()}
+            "columns_opp_matrix": columns_opp_matrix.tolist(),
+            "steps": formatted_steps}
 
 
 @blp.route("/smith_normal_form_z", methods=['POST'])
@@ -173,7 +186,11 @@ def smith_normal_form_q(matrix_request):
          )
 def smith_normal_form_z(matrix_request):
     matrix = matrix_request["matrix"]
-    smf_matrix, rows_opp_matrix, columns_opp_matrix = matrices_utils.smith_normal_form_z(np.array(matrix))
+    smf_matrix, rows_opp_matrix, columns_opp_matrix, steps = matrices_utils.smith_normal_form_z(np.array(matrix))
+
+    steps = [(mat.tolist(), rows.tolist(), cols.tolist(), desc) for mat, rows, cols, desc in steps]
+
     return {"matrix": smf_matrix.tolist(),
             "rows_opp_matrix": rows_opp_matrix.tolist(),
-            "columns_opp_matrix": columns_opp_matrix.tolist()}
+            "columns_opp_matrix": columns_opp_matrix.tolist(),
+            "steps": steps}
