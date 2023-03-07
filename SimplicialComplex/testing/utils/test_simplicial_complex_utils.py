@@ -7,7 +7,7 @@ import numpy as np
 from SimplicialComplex.AlphaComplex import AlphaComplex
 from SimplicialComplex.utils.simplicial_complex_utils import order, reachable, sub_faces, updateDict, \
     order_faces, filter_by_float, noise, connected_components, reachable_alg, num_loops, calc_homology, num_triangles, \
-    check_if_sub_face
+    check_if_sub_face, check_if_directed_sub_face
 
 
 class Test(TestCase):
@@ -116,6 +116,13 @@ class Test(TestCase):
         self.assertFalse(check_if_sub_face((1, 2, 3), (1, 2)))
         self.assertFalse(check_if_sub_face((1, 2, 3), (1, 2, 4)))
         self.assertFalse(check_if_sub_face((1, 2), (3, 4)))
+
+    def test_check_if_directed_sub_face(self):
+        self.assertEqual(0, check_if_directed_sub_face((1, 2), (2, 3)))
+        self.assertEqual(1, check_if_directed_sub_face((1, 2), (1, 2, 3)))
+        self.assertEqual(-1, check_if_directed_sub_face((1, 3), (1, 2, 3)))
+        self.assertEqual(-1, check_if_directed_sub_face((1, 2), (1, 3, 2)))
+        self.assertEqual(1, check_if_directed_sub_face((1, 3), (1, 3, 2)))
 
     def test_noise(self):
         points = np.array([[1, 2], [3, 4], [5, 6]])

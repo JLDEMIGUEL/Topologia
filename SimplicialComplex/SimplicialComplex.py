@@ -5,7 +5,8 @@ import numpy as np
 
 from SimplicialComplex.utils.matrices_utils import smith_normal_form, generalized_border_matrix_algorithm
 from SimplicialComplex.utils.simplicial_complex_utils import order, reachable, sub_faces, updateDict, \
-    order_faces, calc_homology, plot_persistence_diagram, plot_barcode_diagram, check_if_sub_face
+    order_faces, calc_homology, plot_persistence_diagram, plot_barcode_diagram, check_if_sub_face, \
+    check_if_directed_sub_face
 
 
 class SimplicialComplex:
@@ -210,7 +211,19 @@ class SimplicialComplex:
                     M[i][j] = 1
         return np.array(M)
 
-    def betti_number(self, p: int) -> int:
+    def directed_boundary_matrix(self, p: int) -> np.array:
+        """
+        Returns the boundary matrix of the complex.
+        Args:
+            p (int): dimension
+        Returns:
+            np.array: boundary matrix for the given dimension
+        """
+        Cp = self.n_faces(p)
+        Cp_1 = self.n_faces(p - 1)
+        return [[check_if_directed_sub_face(sub_face, super_face) for super_face in Cp] for sub_face in Cp_1]
+
+    def betti_number(self, p: int, group=2) -> int:
         """
         Gets the betti numbers of the simplicial complex for the given dimension p.
         Args:

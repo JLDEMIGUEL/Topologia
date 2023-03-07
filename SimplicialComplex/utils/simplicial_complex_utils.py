@@ -112,12 +112,23 @@ def check_if_sub_face(sub_face: tuple, super_face: tuple) -> bool:
     Returns:
         bool: A boolean indicating whether `sub_face` is a sub-face of `super_face`.
     """
-    if len(sub_face) is not len(super_face) - 1 or len(sub_face) == 0:
+    if len(sub_face) != len(super_face) - 1 or len(sub_face) == 0:
         return False
     for vert in sub_face:
         if vert not in super_face:
             return False
     return True
+
+
+def check_if_directed_sub_face(sub_face: tuple, super_face: tuple) -> bool:
+    if not check_if_sub_face(sub_face, super_face):
+        return 0
+    for i, (a, b) in enumerate(zip(sub_face, super_face)):
+        if a != b:
+            if a == super_face[i + 1]:
+                return (-1) ** i
+            return (-1) ** (i + 1)
+    return (-1) ** (len(sub_face))
 
 
 def noise(points: np.array) -> np.array:
