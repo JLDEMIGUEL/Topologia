@@ -1,9 +1,13 @@
+from fractions import Fraction
 from io import BytesIO
 
+import latexify
 import matplotlib.pyplot as plt
 import numpy as np
+import sympy
 
-from SimplicialComplex.utils.matrices_utils import smith_normal_form, generalized_border_matrix_algorithm
+from SimplicialComplex.utils.matrices_utils import smith_normal_form, generalized_border_matrix_algorithm, \
+    smith_normal_form_z, elementary_divisors
 from SimplicialComplex.utils.simplicial_complex_utils import order, reachable, sub_faces, updateDict, \
     order_faces, calc_homology, plot_persistence_diagram, plot_barcode_diagram, check_if_sub_face, \
     check_if_directed_sub_face
@@ -175,7 +179,7 @@ class SimplicialComplex:
                 components.add(tuple(reachable_list))
         return len(components)
 
-    def boundary_matrix(self, p: int) -> np.array:
+    def boundary_matrix(self, p: int, group=None) -> np.array:
         """
         Returns the boundary matrix of the complex.
         Args:
@@ -187,11 +191,11 @@ class SimplicialComplex:
         Cp_1 = self.n_faces(p - 1)
         Md = [[0 for _ in range(len(Cp))] for _ in range(len(Cp_1))]
 
-        for i in range(len(Cp_1)):
-            for j in range(len(Cp)):
-                # If is sub-face, add to matrix
-                if check_if_sub_face(Cp_1[i], Cp[j]):
-                    Md[i][j] = 1
+        Md = [[check_if_directed_sub_face(sub_face, super_face) for super_face in Cp] for sub_face in Cp_1]
+        if group == 'Q':
+            Md = [[Fraction(elem) for elem in row] for row in Md]
+        elif group is not None:
+            Md = [[check_if_directed_sub_face(sub_face, super_face) % group for super_face in Cp] for sub_face in Cp_1]
         return np.array(Md)
 
     def generalized_boundary_matrix(self) -> np.array:
@@ -211,43 +215,95 @@ class SimplicialComplex:
                     M[i][j] = 1
         return np.array(M)
 
-    def directed_boundary_matrix(self, p: int) -> np.array:
-        """
-        Returns the boundary matrix of the complex.
-        Args:
-            p (int): dimension
-        Returns:
-            np.array: boundary matrix for the given dimension
-        """
-        Cp = self.n_faces(p)
-        Cp_1 = self.n_faces(p - 1)
-        return [[check_if_directed_sub_face(sub_face, super_face) for super_face in Cp] for sub_face in Cp_1]
-
-    def betti_number(self, p: int, group=2) -> int:
+    def betti_number(self, p: int, group=None) -> int:
         """
         Gets the betti numbers of the simplicial complex for the given dimension p.
         Args:
             p (int): dimension
+            group: group
         Returns:
             int: betti_number
         """
-        mp, _, _, _ = smith_normal_form(np.array(self.boundary_matrix(p)))
-        mp_1, _, _, _ = smith_normal_form(np.array(self.boundary_matrix(p + 1)))
+        if group is None:
+            mp, _, _, _ = smith_normal_form_z(self.boundary_matrix(p, group))
+            mp_1, _, _, _ = smith_normal_form_z(self.boundary_matrix(p + 1, group))
+        else:
+            mp, _, _, _ = smith_normal_form(self.boundary_matrix(p, group), group=group)
+            mp_1, _, _, _ = smith_normal_form(self.boundary_matrix(p + 1, group), group=group)
         # Number of columns of zeros
-        dim_zp = len([_ for x in np.transpose(mp) if 1 not in x])
+        dim_zp = len([_ for x in np.transpose(mp) if sum(x) == 0])
         # Number of rows with ones
-        dim_bp = len([_ for x in mp_1 if 1 in x])
+        dim_bp = len([_ for x in mp_1 if sum(x) != 0])
         return dim_zp - dim_bp
 
-    def all_betti_numbers(self) -> int:
+    def all_betti_numbers(self, group=None) -> int:
         """
         Gets the betti numbers of the simplicial complex for the given dimension p.
         Args:
-            p (int): dimension
+            group: group
         Returns:
             int: betti_number
         """
-        return [self.betti_number(dim) for dim in range(self.dimension())]
+        return [self.betti_number(dim, group) for dim in range(self.dimension())]
+
+    def homology(self, p, group=None):
+        """
+
+        """
+        if group is None:
+            mp_1, _, _, _ = smith_normal_form_z(self.boundary_matrix(p + 1, group))
+        else:
+            mp_1, _, _, _ = smith_normal_form(self.boundary_matrix(p + 1, group), group=group)
+
+        superscripts_dict = {0: '\u2070', 1: '\u00B9', 2: '\u00B2', 3: '\u00B3', 4: '\u2074', 5: '\u2075', 6: '\u2076',
+                             7: '\u2077', 8: '\u2078', 9: '\u2079'}
+
+        subscripts_dict = {0: '\u2080', 1: '\u2081', 2: '\u2082', 3: '\u2083', 4: '\u2084', 5: '\u2085', 6: '\u2086',
+                           7: '\u2087', 8: '\u2088', 9: '\u2089'}
+
+        betti = self.betti_number(p, group)
+        homology = ""
+        if betti != 0:
+            homology += f"Z{superscripts_dict[betti]}"
+        for num in elementary_divisors(mp_1):
+            if homology != "":
+                homology += "x"
+            homology += f"Z{num}"
+        if homology == "":
+            homology = "0"
+        return homology
+
+    def cohomology(self, p, group=None):
+        """
+
+        """
+        if group is None:
+            mp, _, _, _ = smith_normal_form_z(np.transpose(self.boundary_matrix(p - 1, group)))
+            mp_1, _, _, _ = smith_normal_form_z(np.transpose(self.boundary_matrix(p, group)))
+        else:
+            mp, _, _, _ = smith_normal_form(np.transpose(self.boundary_matrix(p - 1, group)), group=group)
+            mp_1, _, _, _ = smith_normal_form(np.transpose(self.boundary_matrix(p, group)), group=group)
+        # Number of columns of zeros
+        dim_zp = len([_ for x in np.transpose(mp_1) if sum(x) == 0])
+        # Number of rows with ones
+        dim_bp = len([_ for x in mp if sum(x) != 0])
+
+        superscripts_dict = {0: '\u2070', 1: '\u00B9', 2: '\u00B2', 3: '\u00B3', 4: '\u2074', 5: '\u2075', 6: '\u2076',
+                             7: '\u2077', 8: '\u2078', 9: '\u2079', -1: '-\u00B9', -2: '-\u00B2', -3: '-\u00B3', -4: '-\u2074', -5: '-\u2075', -6: '-\u2076',
+                             -7: '-\u2077', -8: '-\u2078', -9: '-\u2079'}
+
+        subscripts_dict = {0: '\u2080', 1: '\u2081', 2: '\u2082', 3: '\u2083', 4: '\u2084', 5: '\u2085', 6: '\u2086',
+                           7: '\u2087', 8: '\u2088', 9: '\u2089'}
+
+        betti = dim_zp - dim_bp
+        cohomology = ""
+        if betti != 0:
+            cohomology += f"Z^{betti}"
+        for num in elementary_divisors(mp):
+            if cohomology != "":
+                cohomology += "x"
+            cohomology += f"Z{num}"
+        return cohomology
 
     def incremental_algth(self) -> list[int]:
         """

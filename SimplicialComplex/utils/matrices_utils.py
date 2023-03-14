@@ -38,7 +38,8 @@ def smith_normal_form(matrix: np.array, rows_opp_matrix: np.array = None, column
     if group != 'Q':
         matrix, columns_opp_matrix = matrix % group, columns_opp_matrix % group
     if inv != 1:
-        add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(), "Dividir c1 entre {}".format(inv))
+        add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
+                 "Dividir c1 entre {}".format(inv))
     # Make zeros in the first row and column
     matrix, rows_opp_matrix, columns_opp_matrix = simplify_rows_and_columns(matrix, rows_opp_matrix, columns_opp_matrix,
                                                                             group, steps)
@@ -114,6 +115,10 @@ def add_step(steps, mat, row, col, desc):
     if not (np.array_equal(last_step[0], mat) and np.array_equal(last_step[1], row) and np.array_equal(last_step[2],
                                                                                                        col)):
         steps.extend([(mat.copy(), row.copy(), col.copy(), desc)])
+
+
+def elementary_divisors(matrix):
+    return [matrix[i][i] for i in range(min(len(matrix), len(matrix[0]))) if matrix[i][i] not in (0, 1)]
 
 
 def search_non_zero_elem(matrix: np.array) -> list:
@@ -481,7 +486,8 @@ def _process_reduction(matrix: np.array, coord: tuple[int, int], rows_opp_matrix
             matrix[:, coord[1]] *= -1
             columns_opp_matrix[:, coord[1]] *= -1
             elem *= -1
-            add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(), "Cambiar signo c{}".format(coord[1] + 1))
+            add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
+                     "Cambiar signo c{}".format(coord[1] + 1))
         matrix[:, coord[1]] -= int(elem / first) * matrix[:, 0]
         columns_opp_matrix[:, coord[1]] -= int(elem / first) * columns_opp_matrix[:, 0]
         add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
@@ -492,7 +498,8 @@ def _process_reduction(matrix: np.array, coord: tuple[int, int], rows_opp_matrix
             matrix[coord[0], :] *= -1
             rows_opp_matrix[coord[0], :] *= -1
             elem *= -1
-            add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(), "Cambiar signo r{}".format(coord[0] + 1))
+            add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
+                     "Cambiar signo r{}".format(coord[0] + 1))
         matrix[coord[0], :] -= int(elem / first) * matrix[0, :]
         rows_opp_matrix[coord[0], :] -= int(elem / first) * rows_opp_matrix[0, :]
         add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),

@@ -174,29 +174,29 @@ class TestSimplicialComplex(TestCase):
 
     def test_boundarymatrix_1(self):
         expected_bm_0 = [[0, 0, 0, 0]]
-        self.assertTrue((expected_bm_0 == tetraedro.boundary_matrix(0)).all())
+        self.assertTrue((expected_bm_0 == tetraedro.boundary_matrix(0, group=2)).all())
         expected_bm_1 = [[1, 1, 1, 0, 0, 0],
                          [1, 0, 0, 1, 1, 0],
                          [0, 1, 0, 1, 0, 1],
                          [0, 0, 1, 0, 1, 1]]
-        self.assertTrue((expected_bm_1 == tetraedro.boundary_matrix(1)).all())
+        self.assertTrue((expected_bm_1 == tetraedro.boundary_matrix(1, group=2)).all())
         expected_bm_2 = [[1, 1, 0, 0],
                          [1, 0, 1, 0],
                          [0, 1, 1, 0],
                          [1, 0, 0, 1],
                          [0, 1, 0, 1],
                          [0, 0, 1, 1]]
-        self.assertTrue((expected_bm_2 == tetraedro.boundary_matrix(2)).all())
+        self.assertTrue((expected_bm_2 == tetraedro.boundary_matrix(2, group=2)).all())
         expected_bm_3 = [[1],
                          [1],
                          [1],
                          [1]]
-        self.assertTrue((expected_bm_3 == tetraedro.boundary_matrix(3)).all())
+        self.assertTrue((expected_bm_3 == tetraedro.boundary_matrix(3, group=2)).all())
         self.assertTrue(([[]] == tetraedro.boundary_matrix(4)).all())
 
     def test_boundarymatrix_2(self):
         expected_bm_0 = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-        self.assertTrue((expected_bm_0 == self.sc2.boundary_matrix(0)).all())
+        self.assertTrue((expected_bm_0 == self.sc2.boundary_matrix(0, group=2)).all())
         expected_bm_1 = [[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                          [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                          [0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -207,7 +207,7 @@ class TestSimplicialComplex(TestCase):
                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]]
-        self.assertTrue((expected_bm_1 == self.sc2.boundary_matrix(1)).all())
+        self.assertTrue((expected_bm_1 == self.sc2.boundary_matrix(1, group=2)).all())
         expected_bm_2 = [[0, 0, 0, 0, 0],
                          [1, 1, 0, 0, 0],
                          [1, 0, 1, 0, 0],
@@ -222,13 +222,13 @@ class TestSimplicialComplex(TestCase):
                          [0, 0, 0, 0, 1],
                          [0, 0, 0, 0, 1],
                          [0, 0, 0, 0, 0]]
-        self.assertTrue((expected_bm_2 == self.sc2.boundary_matrix(2)).all())
+        self.assertTrue((expected_bm_2 == self.sc2.boundary_matrix(2, group=2)).all())
         expected_bm_3 = [[1],
                          [1],
                          [1],
                          [1],
                          [0]]
-        self.assertTrue((expected_bm_3 == self.sc2.boundary_matrix(3)).all())
+        self.assertTrue((expected_bm_3 == self.sc2.boundary_matrix(3, group=2)).all())
         self.assertTrue(([[]] == self.sc2.boundary_matrix(4)).all())
 
     def test_generalized_border_matrix(self):
@@ -256,68 +256,179 @@ class TestSimplicialComplex(TestCase):
                            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
         self.assertTrue((np.array(expected_matrix) == matrix).all())
 
-    def test_betti_number_1(self):
-        self.assertEqual(1, tetraedro.betti_number(0))
-        self.assertEqual(0, tetraedro.betti_number(1))
-        self.assertEqual(0, tetraedro.betti_number(2))
-        self.assertEqual(0, tetraedro.betti_number(3))
+    def test_boundary_matrix_1(self):
+        expected = [[-1, -1, -1, 0, 0, 0],
+                    [1, 0, 0, -1, -1, 0],
+                    [0, 1, 0, 1, 0, -1],
+                    [0, 0, 1, 0, 1, 1]]
+        self.assertTrue((np.array(expected) == tetraedro.boundary_matrix(1)).all())
 
-    def test_betti_number_2(self):
-        self.assertEqual(1, self.sc2.betti_number(0))
-        self.assertEqual(1, self.sc2.betti_number(1))
-        self.assertEqual(0, self.sc2.betti_number(2))
-        self.assertEqual(0, self.sc2.betti_number(3))
+    def test_boundary_matrix_2(self):
+        expected = [[1, 1, 0, 0],
+                    [-1, 0, 1, 0],
+                    [0, -1, -1, 0],
+                    [1, 0, 0, 1],
+                    [0, 1, 0, -1],
+                    [0, 0, 1, 1]]
+        self.assertTrue((np.array(expected) == tetraedro.boundary_matrix(2)).all())
+
+    def test_boundary_matrix_3(self):
+        expected = [[-1], [1], [-1], [1]]
+        self.assertTrue((np.array(expected) == tetraedro.boundary_matrix(3)).all())
+
+    def test_boundary_matrix_4(self):
+        sc = SimplicialComplex([(0, 1, 2, 3, 4)])
+        expected = [[-1, -1, 0, 0, 0],
+                    [1, 0, -1, 0, 0],
+                    [0, 1, 1, 0, 0],
+                    [-1, 0, 0, -1, 0],
+                    [0, -1, 0, 1, 0],
+                    [0, 0, -1, -1, 0],
+                    [1, 0, 0, 0, -1],
+                    [0, 1, 0, 0, 1],
+                    [0, 0, 1, 0, -1],
+                    [0, 0, 0, 1, 1]]
+        self.assertTrue((np.array(expected) == sc.boundary_matrix(3)).all())
 
     def test_all_betti_numbers_1(self):
         self.assertEqual([1, 0, 0], tetraedro.all_betti_numbers())
+        self.assertEqual([1, 0, 0], tetraedro.all_betti_numbers(group=2))
+        self.assertEqual([1, 0, 0], tetraedro.all_betti_numbers(group=7))
+        self.assertEqual([1, 0, 0], tetraedro.all_betti_numbers(group=11))
+        self.assertEqual([1, 0, 0], tetraedro.all_betti_numbers(group='Q'))
 
     def test_all_betti_numbers_2(self):
         self.assertEqual([1, 1, 0], self.sc2.all_betti_numbers())
+        self.assertEqual([1, 1, 0], self.sc2.all_betti_numbers(group=2))
+        self.assertEqual([1, 1, 0], self.sc2.all_betti_numbers(group=7))
+        self.assertEqual([1, 1, 0], self.sc2.all_betti_numbers(group=11))
+        self.assertEqual([1, 1, 0], self.sc2.all_betti_numbers(group='Q'))
 
     def test_all_betti_numbers_3(self):
         self.assertEqual([1, 0], self.ac4.all_betti_numbers())
+        self.assertEqual([1, 0], self.ac4.all_betti_numbers(group=2))
+        self.assertEqual([1, 0], self.ac4.all_betti_numbers(group=7))
+        self.assertEqual([1, 0], self.ac4.all_betti_numbers(group=11))
+        self.assertEqual([1, 0], self.ac4.all_betti_numbers(group='Q'))
+
+    def test_all_betti_numbers_4(self):
+        self.assertEqual([1, 2], toro.all_betti_numbers())
+        self.assertEqual([1, 2], toro.all_betti_numbers(group=2))
+        self.assertEqual([1, 2], toro.all_betti_numbers(group=7))
+        self.assertEqual([1, 2], toro.all_betti_numbers(group=11))
+        self.assertEqual([1, 2], toro.all_betti_numbers(group='Q'))
+
+    def test_all_betti_numbers_5(self):
+        self.assertEqual([1, 0], plano_proyectivo.all_betti_numbers())
+        self.assertEqual([1, 1], plano_proyectivo.all_betti_numbers(group=2))
+        self.assertEqual([1, 0], plano_proyectivo.all_betti_numbers(group=7))
+        self.assertEqual([1, 0], plano_proyectivo.all_betti_numbers(group=11))
+        self.assertEqual([1, 0], plano_proyectivo.all_betti_numbers(group='Q'))
+
+    def test_all_betti_numbers_6(self):
+        self.assertEqual([1, 1], botella_klein.all_betti_numbers())
+        self.assertEqual([1, 2], botella_klein.all_betti_numbers(group=2))
+        self.assertEqual([1, 1], botella_klein.all_betti_numbers(group=7))
+        self.assertEqual([1, 1], botella_klein.all_betti_numbers(group=11))
+        self.assertEqual([1, 1], botella_klein.all_betti_numbers(group='Q'))
 
     def test_euler_char_and_betti_char_1(self):
         euler = 0
         for i in range(tetraedro.dimension() + 1):
-            euler += (-1) ** i * tetraedro.betti_number(i)
+            euler += (-1) ** i * tetraedro.betti_number(i, group=2)
         self.assertEqual(tetraedro.euler_characteristic(), euler)
 
     def test_euler_char_and_betti_char_2(self):
         euler = 0
         for i in range(self.sc2.dimension() + 1):
-            euler += (-1) ** i * self.sc2.betti_number(i)
+            euler += (-1) ** i * self.sc2.betti_number(i, group=2)
         self.assertEqual(self.sc2.euler_characteristic(), euler)
 
     def test_euler_char_and_betti_char_3(self):
         euler = 0
         for i in range(self.sc3.dimension() + 1):
-            euler += (-1) ** i * self.sc3.betti_number(i)
+            euler += (-1) ** i * self.sc3.betti_number(i, group=2)
         self.assertEqual(self.sc3.euler_characteristic(), euler)
 
     def test_euler_char_and_betti_char_4(self):
         euler = 0
         for i in range(self.ac4.dimension() + 1):
-            euler += (-1) ** i * self.ac4.betti_number(i)
+            euler += (-1) ** i * self.ac4.betti_number(i, group=2)
         self.assertEqual(self.ac4.euler_characteristic(), euler)
 
     def test_euler_char_and_betti_char_5(self):
         euler = 0
         for i in range(toro.dimension() + 1):
-            euler += (-1) ** i * toro.betti_number(i)
+            euler += (-1) ** i * toro.betti_number(i, group=2)
         self.assertEqual(toro.euler_characteristic(), euler)
 
     def test_euler_char_and_betti_char_6(self):
         euler = 0
         for i in range(plano_proyectivo.dimension() + 1):
-            euler += (-1) ** i * plano_proyectivo.betti_number(i)
+            euler += (-1) ** i * plano_proyectivo.betti_number(i, group=2)
         self.assertEqual(plano_proyectivo.euler_characteristic(), euler)
 
     def test_euler_char_and_betti_char_7(self):
         euler = 0
         for i in range(botella_klein.dimension() + 1):
-            euler += (-1) ** i * botella_klein.betti_number(i)
+            euler += (-1) ** i * botella_klein.betti_number(i, group=2)
         self.assertEqual(botella_klein.euler_characteristic(), euler)
+
+    def test_homology_1(self):
+        self.assertEqual("0", tetraedro.homology(1))
+        self.assertEqual("0", tetraedro.homology(1, group=2))
+        self.assertEqual("0", tetraedro.homology(1, group=7))
+        self.assertEqual("0", tetraedro.homology(1, group=11))
+        self.assertEqual("0", tetraedro.homology(1, group='Q'))
+
+    def test_homology_2(self):
+        self.assertEqual("Z²", toro.homology(1))
+        self.assertEqual("Z²", toro.homology(1, group=2))
+        self.assertEqual("Z²", toro.homology(1, group=7))
+        self.assertEqual("Z²", toro.homology(1, group=11))
+        self.assertEqual("Z²", toro.homology(1, group='Q'))
+
+    def test_homology_3(self):
+        self.assertEqual("Z2", plano_proyectivo.homology(1))
+        self.assertEqual("Z¹", plano_proyectivo.homology(1, group=2))
+        self.assertEqual('0', plano_proyectivo.homology(1, group=7))
+        self.assertEqual('0', plano_proyectivo.homology(1, group=11))
+        self.assertEqual('0', plano_proyectivo.homology(1, group='Q'))
+
+    def test_homology_4(self):
+        self.assertEqual("Z¹xZ2", botella_klein.homology(1))
+        self.assertEqual("Z²", botella_klein.homology(1, group=2))
+        self.assertEqual("Z¹", botella_klein.homology(1, group=7))
+        self.assertEqual("Z¹", botella_klein.homology(1, group=11))
+        self.assertEqual("Z¹", botella_klein.homology(1, group='Q'))
+
+    def test_cohomology_1(self):
+        self.assertEqual("Z^-2", tetraedro.cohomology(1))
+        self.assertEqual("Z^-2", tetraedro.cohomology(1, group=2))
+        self.assertEqual("Z^-2", tetraedro.cohomology(1, group=7))
+        self.assertEqual("Z^-2", tetraedro.cohomology(1, group=11))
+        self.assertEqual("Z^-2", tetraedro.cohomology(1, group='Q'))
+
+    def test_cohomology_2(self):
+        self.assertEqual("Z^-7", toro.cohomology(1))
+        self.assertEqual("Z^-7", toro.cohomology(1, group=2))
+        self.assertEqual("Z^-7", toro.cohomology(1, group=7))
+        self.assertEqual("Z^-7", toro.cohomology(1, group=11))
+        self.assertEqual("Z^-7", toro.cohomology(1, group='Q'))
+
+    def test_cohomology_3(self):
+        self.assertEqual("Z^-4", plano_proyectivo.cohomology(1))
+        self.assertEqual("Z^-4", plano_proyectivo.cohomology(1, group=2))
+        self.assertEqual('Z^-4', plano_proyectivo.cohomology(1, group=7))
+        self.assertEqual('Z^-4', plano_proyectivo.cohomology(1, group=11))
+        self.assertEqual('Z^-4', plano_proyectivo.cohomology(1, group='Q'))
+
+    def test_cohomology_4(self):
+        self.assertEqual("Z^-7", botella_klein.cohomology(1))
+        self.assertEqual("Z^-7", botella_klein.cohomology(1, group=2))
+        self.assertEqual("Z^-7", botella_klein.cohomology(1, group=7))
+        self.assertEqual("Z^-7", botella_klein.cohomology(1, group=11))
+        self.assertEqual("Z^-7", botella_klein.cohomology(1, group='Q'))
 
     def test_incremental_algth(self):
         sc = SimplicialComplex([(0, 1, 2), (2, 3), (3, 4)])

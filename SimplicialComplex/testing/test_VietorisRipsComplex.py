@@ -28,5 +28,4 @@ class TestVietoris_RipsComplex(TestCase):
         self.assertEqual(1, self.ac1.euler_characteristic())
 
     def test_betti_numbers(self):
-        self.assertEqual((1, 0, 0, 0), (
-            self.ac1.betti_number(0), self.ac1.betti_number(1), self.ac1.betti_number(2), self.ac1.betti_number(3)))
+        self.assertEqual([1, 0, 0], self.ac1.all_betti_numbers(group=2))
