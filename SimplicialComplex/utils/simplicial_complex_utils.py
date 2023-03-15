@@ -3,6 +3,8 @@ import math
 import numpy as np
 from matplotlib import pyplot as plt
 
+from SimplicialComplex.utils.matrices_utils import elementary_divisors
+
 
 def order(faces: list | set | tuple) -> list:
     """
@@ -270,3 +272,27 @@ def plot_barcode_diagram(points: dict) -> None:
             if point[0] != point[1]:
                 plt.plot([point[0], point[1]], [height, height], colors[dim])
                 height += 1
+
+
+def build_homology_string(betti, group, mp_1):
+    superscripts_dict = {0: '\u2070', 1: '\u00B9', 2: '\u00B2', 3: '\u00B3', 4: '\u2074', 5: '\u2075', 6: '\u2076',
+                         7: '\u2077', 8: '\u2078', 9: '\u2079'}
+
+    subscripts_dict = {0: '\u2080', 1: '\u2081', 2: '\u2082', 3: '\u2083', 4: '\u2084', 5: '\u2085', 6: '\u2086',
+                       7: '\u2087', 8: '\u2088', 9: '\u2089'}
+    if group is None:
+        group = 'Z'
+    elif group != 'Q':
+        group = f'Z{group}'
+    homology = ""
+    if betti == 1:
+        homology += f"{group}"
+    elif betti != 0:
+        homology += f"{group}{superscripts_dict[betti]}"
+    for num in elementary_divisors(mp_1):
+        if homology != "":
+            homology += "x"
+        homology += f"Z{num}"
+    if homology == "":
+        homology = "0"
+    return homology
