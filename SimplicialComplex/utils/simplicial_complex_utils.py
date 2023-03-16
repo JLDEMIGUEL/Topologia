@@ -123,6 +123,19 @@ def check_if_sub_face(sub_face: tuple, super_face: tuple) -> bool:
 
 
 def check_if_directed_sub_face(sub_face: tuple, super_face: tuple) -> bool:
+    """
+    Checks if the given sub-face is a directed sub-face of the given super-face, and returns the sign of the
+    corresponding face map if so.
+
+    Args:
+        sub_face (tuple[int]): A tuple representing the vertices of the sub-face.
+        super_face (tuple[int]): A tuple representing the vertices of the super-face.
+
+    Returns:
+        int: If the sub-face is a directed sub-face of the super-face, returns either -1 or 1 depending on the relative
+             orientation of the sub-face with respect to the super-face. If the sub-face is not a directed sub-face of the
+             super-face, returns 0.
+    """
     if not check_if_sub_face(sub_face, super_face):
         return 0
     for i, (a, b) in enumerate(zip(sub_face, super_face)):
@@ -274,12 +287,18 @@ def plot_barcode_diagram(points: dict) -> None:
                 height += 1
 
 
-def build_homology_string(betti, group, mp_1):
-    superscripts_dict = {0: '\u2070', 1: '\u00B9', 2: '\u00B2', 3: '\u00B3', 4: '\u2074', 5: '\u2075', 6: '\u2076',
-                         7: '\u2077', 8: '\u2078', 9: '\u2079'}
-
-    subscripts_dict = {0: '\u2080', 1: '\u2081', 2: '\u2082', 3: '\u2083', 4: '\u2084', 5: '\u2085', 6: '\u2086',
-                       7: '\u2087', 8: '\u2088', 9: '\u2089'}
+def build_homology_string(betti: int, group: int | str, mp_1: np.matrix) -> str:
+    """
+    Build a LaTeX string describing the homology groups of the simplicial complex.
+    Args:
+        betti (int): The Betti number of the simplicial complex up to the specified degree.
+        group (optional): The coefficients used to compute the homology. If None, uses the integers (Z) as coefficients.
+            If 'Q', uses the rationals (Q) as coefficients. Otherwise, uses the integers modulo group.
+        mp_1: The Smith normal form of the boundary matrix up to the specified degree.
+    Returns:
+        str: A LaTeX string describing the homology groups of the simplicial complex up to the specified degree, with
+             coefficients in the specified group.
+    """
     if group is None:
         group = '\\mathbb{Z}'
     elif group == 'Q':

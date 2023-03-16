@@ -244,9 +244,16 @@ class SimplicialComplex:
         """
         return [self.betti_number(dim, group) for dim in range(self.dimension())]
 
-    def homology(self, p, group=None):
+    def homology(self, p: int, group: int | str = None) -> str:
         """
-            
+        Computes the homology of the simplicial complex up to degree p, with coefficients in the given group.
+
+        Args:
+            p (int): The degree up to which to compute the homology. The homology groups computed will have degree up to p.
+            group (optional): The coefficients to use in homology computations. If None, uses the integers (Z) as coefficients.
+
+        Returns:
+            str: A string describing the homology groups of the simplicial complex up to degree p, with coefficients in the given group.
         """
         if group is None:
             mp_1, _, _, _ = smith_normal_form_z(self.boundary_matrix(p + 1, group))
@@ -257,9 +264,16 @@ class SimplicialComplex:
 
         return build_homology_string(betti, group, mp_1)
 
-    def cohomology(self, p, group=None):
+    def cohomology(self, p: int, group: int | str = None) -> str:
         """
+        Computes the cohomology of the simplicial complex up to degree p, with coefficients in the given group.
 
+        Args:
+            p (int): The degree up to which to compute the cohomology. The homology groups computed will have degree up to p.
+            group (optional): The coefficients to use in cohomology computations. If None, uses the integers (Z) as coefficients.
+
+        Returns:
+            str: A string describing the cohomology groups of the simplicial complex up to degree p, with coefficients in the given group.
         """
         if group is None:
             mp_1, _, _, _ = smith_normal_form_z(self.boundary_matrix(p, group))

@@ -117,7 +117,18 @@ def add_step(steps, mat, row, col, desc):
         steps.extend([(mat.copy(), row.copy(), col.copy(), desc)])
 
 
-def elementary_divisors(matrix):
+def elementary_divisors(matrix: np.matrix) -> list[int]:
+    """
+    Computes the elementary divisors of a given matrix.
+
+    Args:
+        matrix (np.matrix): The matrix whose elementary divisors should be computed. Must be a square matrix.
+
+    Returns:
+        list[int]: A list of integers representing the elementary divisors of the matrix. If the matrix is not square, returns
+                   an empty list. If the matrix has no nontrivial elementary divisors, returns a list containing 1.
+
+    """
     return [matrix[i][i] for i in range(min(len(matrix), len(matrix[0]))) if matrix[i][i] not in (0, 1)]
 
 
