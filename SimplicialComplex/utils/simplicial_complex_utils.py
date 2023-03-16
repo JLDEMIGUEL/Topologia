@@ -281,18 +281,20 @@ def build_homology_string(betti, group, mp_1):
     subscripts_dict = {0: '\u2080', 1: '\u2081', 2: '\u2082', 3: '\u2083', 4: '\u2084', 5: '\u2085', 6: '\u2086',
                        7: '\u2087', 8: '\u2088', 9: '\u2089'}
     if group is None:
-        group = 'Z'
-    elif group != 'Q':
-        group = f'Z{group}'
+        group = '\\mathbb{Z}'
+    elif group == 'Q':
+        group = '\\mathbb{Q}'
+    else:
+        group = '\\mathbb{Z}_{'+f'{group}'+"}"
     homology = ""
     if betti == 1:
         homology += f"{group}"
     elif betti != 0:
-        homology += f"{group}{superscripts_dict[betti]}"
+        homology += f"{group}^"+"{"+f"{betti}"+"}"
     for num in elementary_divisors(mp_1):
         if homology != "":
-            homology += "x"
-        homology += f"Z{num}"
+            homology += "\\oplus"
+        homology += "\\mathbb{Z}_{"+f"{num}"+"}"
     if homology == "":
         homology = "0"
     return homology

@@ -375,146 +375,146 @@ class TestSimplicialComplex(TestCase):
         self.assertEqual(botella_klein.euler_characteristic(), euler)
 
     def test_homology_cohomology_tetraedro_Z(self):
-        self.assertEqual("Z", tetraedro.homology(0))
+        self.assertEqual("\\mathbb{Z}", tetraedro.homology(0))
         self.assertEqual("0", tetraedro.homology(1))
         self.assertEqual("0", tetraedro.homology(2))
 
-        self.assertEqual("Z", tetraedro.cohomology(0))
+        self.assertEqual("\\mathbb{Z}", tetraedro.cohomology(0))
         self.assertEqual("0", tetraedro.cohomology(1))
         self.assertEqual("0", tetraedro.cohomology(2))
 
     def test_homology_cohomology_tetraedro_Z2(self):
-        self.assertEqual("Z2", tetraedro.homology(0, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", tetraedro.homology(0, group=2))
         self.assertEqual("0", tetraedro.homology(1, group=2))
         self.assertEqual("0", tetraedro.homology(2, group=2))
 
-        self.assertEqual("Z2", tetraedro.cohomology(0, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", tetraedro.cohomology(0, group=2))
         self.assertEqual("0", tetraedro.cohomology(1, group=2))
         self.assertEqual("0", tetraedro.cohomology(2, group=2))
 
     def test_homology_cohomology_tetraedro_Z7(self):
-        self.assertEqual("Z7", tetraedro.homology(0, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}", tetraedro.homology(0, group=7))
         self.assertEqual("0", tetraedro.homology(1, group=7))
         self.assertEqual("0", tetraedro.homology(2, group=7))
 
-        self.assertEqual("Z7", tetraedro.cohomology(0, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}", tetraedro.cohomology(0, group=7))
         self.assertEqual("0", tetraedro.cohomology(1, group=7))
         self.assertEqual("0", tetraedro.cohomology(2, group=7))
 
     def test_homology_cohomology_tetraedro_Q(self):
-        self.assertEqual("Q", tetraedro.homology(0, group='Q'))
+        self.assertEqual("\\mathbb{Q}", tetraedro.homology(0, group='Q'))
         self.assertEqual("0", tetraedro.homology(1, group='Q'))
         self.assertEqual("0", tetraedro.homology(2, group='Q'))
 
-        self.assertEqual("Q", tetraedro.cohomology(0, group='Q'))
+        self.assertEqual("\\mathbb{Q}", tetraedro.cohomology(0, group='Q'))
         self.assertEqual("0", tetraedro.cohomology(1, group='Q'))
         self.assertEqual("0", tetraedro.cohomology(2, group='Q'))
 
     def test_homology_cohomology_toro_Z(self):
-        self.assertEqual("Z", toro.homology(0))
-        self.assertEqual("Z²", toro.homology(1))
-        self.assertEqual("Z", toro.homology(2))
+        self.assertEqual("\\mathbb{Z}", toro.homology(0))
+        self.assertEqual("\\mathbb{Z}^{2}", toro.homology(1))
+        self.assertEqual("\\mathbb{Z}", toro.homology(2))
 
-        self.assertEqual("Z", toro.cohomology(0))
-        self.assertEqual("Z²", toro.cohomology(1))
-        self.assertEqual("Z", toro.cohomology(2))
+        self.assertEqual("\\mathbb{Z}", toro.cohomology(0))
+        self.assertEqual("\\mathbb{Z}^{2}", toro.cohomology(1))
+        self.assertEqual("\\mathbb{Z}", toro.cohomology(2))
 
     def test_homology_cohomology_toro_Z2(self):
-        self.assertEqual("Z2", toro.homology(0, group=2))
-        self.assertEqual("Z2²", toro.homology(1, group=2))
-        self.assertEqual("Z2", toro.homology(2, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", toro.homology(0, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}^{2}", toro.homology(1, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", toro.homology(2, group=2))
 
-        self.assertEqual("Z2", toro.cohomology(0, group=2))
-        self.assertEqual("Z2²", toro.cohomology(1, group=2))
-        self.assertEqual("Z2", toro.cohomology(2, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", toro.cohomology(0, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}^{2}", toro.cohomology(1, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", toro.cohomology(2, group=2))
 
     def test_homology_cohomology_toro_Z7(self):
-        self.assertEqual("Z7", toro.homology(0, group=7))
-        self.assertEqual("Z7²", toro.homology(1, group=7))
-        self.assertEqual("Z7", toro.homology(2, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}", toro.homology(0, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}^{2}", toro.homology(1, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}", toro.homology(2, group=7))
 
-        self.assertEqual("Z7", toro.cohomology(0, group=7))
-        self.assertEqual("Z7²", toro.cohomology(1, group=7))
-        self.assertEqual("Z7", toro.cohomology(2, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}", toro.cohomology(0, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}^{2}", toro.cohomology(1, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}", toro.cohomology(2, group=7))
 
     def test_homology_cohomology_toro_Q(self):
-        self.assertEqual("Q", toro.homology(0, group='Q'))
-        self.assertEqual("Q²", toro.homology(1, group='Q'))
-        self.assertEqual("Q", toro.homology(2, group='Q'))
+        self.assertEqual("\\mathbb{Q}", toro.homology(0, group='Q'))
+        self.assertEqual("\\mathbb{Q}^{2}", toro.homology(1, group='Q'))
+        self.assertEqual("\\mathbb{Q}", toro.homology(2, group='Q'))
 
-        self.assertEqual("Q", toro.cohomology(0, group='Q'))
-        self.assertEqual("Q²", toro.cohomology(1, group='Q'))
-        self.assertEqual("Q", toro.cohomology(2, group='Q'))
+        self.assertEqual("\\mathbb{Q}", toro.cohomology(0, group='Q'))
+        self.assertEqual("\\mathbb{Q}^{2}", toro.cohomology(1, group='Q'))
+        self.assertEqual("\\mathbb{Q}", toro.cohomology(2, group='Q'))
 
     def test_homology_cohomology_botella_klein_Z(self):
-        self.assertEqual("Z", botella_klein.homology(0))
-        self.assertEqual("ZxZ2", botella_klein.homology(1))
+        self.assertEqual("\\mathbb{Z}", botella_klein.homology(0))
+        self.assertEqual("\\mathbb{Z}\\oplus\\mathbb{Z}_{2}", botella_klein.homology(1))
         self.assertEqual("0", botella_klein.homology(2))
 
-        self.assertEqual("Z", botella_klein.cohomology(0))
-        self.assertEqual("Z", botella_klein.cohomology(1))
-        self.assertEqual("Z2", botella_klein.cohomology(2))
+        self.assertEqual("\\mathbb{Z}", botella_klein.cohomology(0))
+        self.assertEqual("\\mathbb{Z}", botella_klein.cohomology(1))
+        self.assertEqual("\\mathbb{Z}_{2}", botella_klein.cohomology(2))
 
     def test_homology_cohomology_botella_klein_Z2(self):
-        self.assertEqual("Z2", botella_klein.homology(0, group=2))
-        self.assertEqual("Z2²", botella_klein.homology(1, group=2))
-        self.assertEqual("Z2", botella_klein.homology(2, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", botella_klein.homology(0, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}^{2}", botella_klein.homology(1, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", botella_klein.homology(2, group=2))
 
-        self.assertEqual("Z2", botella_klein.cohomology(0, group=2))
-        self.assertEqual("Z2²", botella_klein.cohomology(1, group=2))
-        self.assertEqual("Z2", botella_klein.cohomology(2, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", botella_klein.cohomology(0, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}^{2}", botella_klein.cohomology(1, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", botella_klein.cohomology(2, group=2))
 
     def test_homology_cohomology_botella_klein_Z7(self):
-        self.assertEqual("Z7", botella_klein.homology(0, group=7))
-        self.assertEqual("Z7", botella_klein.homology(1, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}", botella_klein.homology(0, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}", botella_klein.homology(1, group=7))
         self.assertEqual("0", botella_klein.homology(2, group=7))
 
-        self.assertEqual("Z7", botella_klein.cohomology(0, group=7))
-        self.assertEqual("Z7", botella_klein.cohomology(1, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}", botella_klein.cohomology(0, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}", botella_klein.cohomology(1, group=7))
         self.assertEqual("0", botella_klein.cohomology(2, group=7))
 
     def test_homology_cohomology_botella_klein_Q(self):
-        self.assertEqual("Q", botella_klein.homology(0, group='Q'))
-        self.assertEqual("Q", botella_klein.homology(1, group='Q'))
+        self.assertEqual("\\mathbb{Q}", botella_klein.homology(0, group='Q'))
+        self.assertEqual("\\mathbb{Q}", botella_klein.homology(1, group='Q'))
         self.assertEqual("0", botella_klein.homology(2, group='Q'))
 
-        self.assertEqual("Q", botella_klein.cohomology(0, group='Q'))
-        self.assertEqual("Q", botella_klein.cohomology(1, group='Q'))
+        self.assertEqual("\\mathbb{Q}", botella_klein.cohomology(0, group='Q'))
+        self.assertEqual("\\mathbb{Q}", botella_klein.cohomology(1, group='Q'))
         self.assertEqual("0", botella_klein.cohomology(2, group='Q'))
 
     def test_homology_cohomology_plano_proyectivo_Z(self):
-        self.assertEqual("Z", plano_proyectivo.homology(0))
-        self.assertEqual("Z2", plano_proyectivo.homology(1))
+        self.assertEqual("\\mathbb{Z}", plano_proyectivo.homology(0))
+        self.assertEqual("\\mathbb{Z}_{2}", plano_proyectivo.homology(1))
         self.assertEqual("0", plano_proyectivo.homology(2))
 
-        self.assertEqual("Z", plano_proyectivo.cohomology(0))
+        self.assertEqual("\\mathbb{Z}", plano_proyectivo.cohomology(0))
         self.assertEqual("0", plano_proyectivo.cohomology(1))
-        self.assertEqual("Z2", plano_proyectivo.cohomology(2))
+        self.assertEqual("\\mathbb{Z}_{2}", plano_proyectivo.cohomology(2))
 
     def test_homology_cohomology_plano_proyectivo_Z2(self):
-        self.assertEqual("Z2", plano_proyectivo.homology(0, group=2))
-        self.assertEqual("Z2", plano_proyectivo.homology(1, group=2))
-        self.assertEqual("Z2", plano_proyectivo.homology(2, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", plano_proyectivo.homology(0, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", plano_proyectivo.homology(1, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", plano_proyectivo.homology(2, group=2))
 
-        self.assertEqual("Z2", plano_proyectivo.cohomology(0, group=2))
-        self.assertEqual("Z2", plano_proyectivo.cohomology(1, group=2))
-        self.assertEqual("Z2", plano_proyectivo.cohomology(2, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", plano_proyectivo.cohomology(0, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", plano_proyectivo.cohomology(1, group=2))
+        self.assertEqual("\\mathbb{Z}_{2}", plano_proyectivo.cohomology(2, group=2))
 
     def test_homology_cohomology_plano_proyectivo_Z7(self):
-        self.assertEqual("Z7", plano_proyectivo.homology(0, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}", plano_proyectivo.homology(0, group=7))
         self.assertEqual("0", plano_proyectivo.homology(1, group=7))
         self.assertEqual("0", plano_proyectivo.homology(2, group=7))
 
-        self.assertEqual("Z7", plano_proyectivo.cohomology(0, group=7))
+        self.assertEqual("\\mathbb{Z}_{7}", plano_proyectivo.cohomology(0, group=7))
         self.assertEqual("0", plano_proyectivo.cohomology(1, group=7))
         self.assertEqual("0", plano_proyectivo.cohomology(2, group=7))
 
     def test_homology_cohomology_plano_proyectivo_Q(self):
-        self.assertEqual("Q", plano_proyectivo.homology(0, group='Q'))
+        self.assertEqual("\\mathbb{Q}", plano_proyectivo.homology(0, group='Q'))
         self.assertEqual("0", plano_proyectivo.homology(1, group='Q'))
         self.assertEqual("0", plano_proyectivo.homology(2, group='Q'))
 
-        self.assertEqual("Q", plano_proyectivo.cohomology(0, group='Q'))
+        self.assertEqual("\\mathbb{Q}", plano_proyectivo.cohomology(0, group='Q'))
         self.assertEqual("0", plano_proyectivo.cohomology(1, group='Q'))
         self.assertEqual("0", plano_proyectivo.cohomology(2, group='Q'))
 
