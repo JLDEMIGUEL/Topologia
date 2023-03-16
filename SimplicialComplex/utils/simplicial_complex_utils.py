@@ -3,6 +3,8 @@ import math
 import numpy as np
 from matplotlib import pyplot as plt
 
+from SimplicialComplex.utils.matrices_utils import elementary_divisors
+
 
 def order(faces: list | set | tuple) -> list:
     """
@@ -112,12 +114,36 @@ def check_if_sub_face(sub_face: tuple, super_face: tuple) -> bool:
     Returns:
         bool: A boolean indicating whether `sub_face` is a sub-face of `super_face`.
     """
-    if len(sub_face) is not len(super_face) - 1 or len(sub_face) == 0:
+    if len(sub_face) != len(super_face) - 1 or len(sub_face) == 0:
         return False
     for vert in sub_face:
         if vert not in super_face:
             return False
     return True
+
+
+def check_if_directed_sub_face(sub_face: tuple, super_face: tuple) -> bool:
+    """
+    Checks if the given sub-face is a directed sub-face of the given super-face, and returns the sign of the
+    corresponding face map if so.
+
+    Args:
+        sub_face (tuple[int]): A tuple representing the vertices of the sub-face.
+        super_face (tuple[int]): A tuple representing the vertices of the super-face.
+
+    Returns:
+        int: If the sub-face is a directed sub-face of the super-face, returns either -1 or 1 depending on the relative
+             orientation of the sub-face with respect to the super-face. If the sub-face is not a directed sub-face of the
+             super-face, returns 0.
+    """
+    if not check_if_sub_face(sub_face, super_face):
+        return 0
+    for i, (a, b) in enumerate(zip(sub_face, super_face)):
+        if a != b:
+            if a == super_face[i + 1]:
+                return (-1) ** i
+            return (-1) ** (i + 1)
+    return (-1) ** (len(sub_face))
 
 
 def noise(points: np.array) -> np.array:
@@ -259,3 +285,35 @@ def plot_barcode_diagram(points: dict) -> None:
             if point[0] != point[1]:
                 plt.plot([point[0], point[1]], [height, height], colors[dim])
                 height += 1
+
+
+def build_homology_string(betti: int, group: int | str, mp_1: np.matrix) -> str:
+    """
+    Build a LaTeX string describing the homology groups of the simplicial complex.
+    Args:
+        betti (int): The Betti number of the simplicial complex up to the specified degree.
+        group (optional): The coefficients used to compute the homology. If None, uses the integers (Z) as coefficients.
+            If 'Q', uses the rationals (Q) as coefficients. Otherwise, uses the integers modulo group.
+        mp_1: The Smith normal form of the boundary matrix up to the specified degree.
+    Returns:
+        str: A LaTeX string describing the homology groups of the simplicial complex up to the specified degree, with
+             coefficients in the specified group.
+    """
+    if group is None:
+        group = '\\mathbb{Z}'
+    elif group == 'Q':
+        group = '\\mathbb{Q}'
+    else:
+        group = '\\mathbb{Z}_{'+f'{group}'+"}"
+    homology = ""
+    if betti == 1:
+        homology += f"{group}"
+    elif betti != 0:
+        homology += f"{group}^"+"{"+f"{betti}"+"}"
+    for num in elementary_divisors(mp_1):
+        if homology != "":
+            homology += "\\oplus"
+        homology += "\\mathbb{Z}_{"+f"{num}"+"}"
+    if homology == "":
+        homology = "0"
+    return homology
