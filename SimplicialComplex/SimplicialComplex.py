@@ -6,9 +6,8 @@ import numpy as np
 
 from SimplicialComplex.utils.matrices_utils import smith_normal_form, generalized_border_matrix_algorithm, \
     smith_normal_form_z
-from SimplicialComplex.utils.simplicial_complex_utils import order, reachable, sub_faces, updateDict, \
-    order_faces, calc_homology, plot_persistence_diagram, plot_barcode_diagram, check_if_sub_face, \
-    boundary_operator, build_homology_string
+from SimplicialComplex.utils.simplicial_complex_utils import sort_faces, reachable, sub_faces, updateDict, \
+    sort_vertex, calc_homology, plot_persistence_diagram, plot_barcode_diagram, boundary_operator, build_homology_string
 
 
 class SimplicialComplex:
@@ -29,12 +28,9 @@ class SimplicialComplex:
         Returns:
             None: instantiates new SimplicialComplex
         """
-        # Sort the faces vertex lexicographically
-        ordered_faces = order_faces(faces)
+        faces = set(faces)
         # Compute all the faces of the complex
-        faces = set()
-        for face in ordered_faces:
-            faces.add(face)
+        for face in faces:
             faces = faces.union(sub_faces(face))
         # Build the faces dictionary
         self.faces = updateDict({}, faces, 0)
@@ -66,7 +62,7 @@ class SimplicialComplex:
         Returns:
              list[tuple]: ordered list of faces
         """
-        return order(self.faces.keys())
+        return sort_faces(self.faces.keys())
 
     def threshold_values(self) -> list[int]:
         """
@@ -93,7 +89,7 @@ class SimplicialComplex:
         Returns:
              list[tuple]: faces with dimension n
         """
-        return order(filter(lambda x: len(x) - 1 == n, self.faces.keys()))
+        return sort_faces(filter(lambda x: len(x) - 1 == n, self.faces.keys()))
 
     def star(self, face: tuple) -> list[tuple]:
         """
@@ -105,7 +101,7 @@ class SimplicialComplex:
         """
         if face not in self.faces.keys():
             return list()
-        return order(set(x for x in self.faces.keys() if set(face).issubset(x)))
+        return sort_faces(set(x for x in self.faces.keys() if set(face).issubset(x)))
 
     def closed_star(self, face: tuple) -> list[tuple]:
         """
@@ -115,7 +111,7 @@ class SimplicialComplex:
         Returns:
              list[tuple]: closed star of the given face
         """
-        return order(SimplicialComplex(self.star(face)).faces.keys())
+        return sort_faces(SimplicialComplex(self.star(face)).faces.keys())
 
     def link(self, face: tuple) -> list[tuple]:
         """
@@ -125,7 +121,7 @@ class SimplicialComplex:
         Returns:
             list[tuple]: link of the given face
         """
-        return order(filter(lambda x: len(set(x).intersection(face)) == 0, self.closed_star(face)))
+        return sort_faces(filter(lambda x: len(set(x).intersection(face)) == 0, self.closed_star(face)))
 
     def skeleton(self, dim: int) -> list[tuple]:
         """
@@ -135,7 +131,7 @@ class SimplicialComplex:
         Returns:
             list[tuple]: skeleton with the given dimension
         """
-        return order(filter(lambda face: len(face) <= dim + 1, self.faces.keys()))
+        return sort_faces(filter(lambda face: len(face) <= dim + 1, self.faces.keys()))
 
     def euler_characteristic(self) -> int:
         """

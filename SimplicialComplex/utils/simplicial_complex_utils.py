@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from SimplicialComplex.utils.matrices_utils import elementary_divisors
 
 
-def order(faces: list | set | tuple) -> list:
+def sort_faces(faces: list | set | tuple) -> list:
     """
     Sorts the list of faces following lexicographic and faces length.
     Args:
@@ -74,7 +74,7 @@ def updateDict(dic_target: dict, faces: list | set | tuple, float_value: float) 
     return dic
 
 
-def order_faces(faces: list | set | tuple) -> set:
+def sort_vertex(faces: list | set | tuple) -> set:
     """
     Sorts the faces in lexicographic order.
     Args:

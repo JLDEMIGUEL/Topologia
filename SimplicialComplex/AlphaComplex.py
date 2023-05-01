@@ -11,7 +11,7 @@ from scipy.spatial import Delaunay, Voronoi, voronoi_plot_2d
 from SimplicialComplex.SimplicialComplex import SimplicialComplex
 from SimplicialComplex.utils.alpha_complex_utils import compute_circumference_radius, compute_edge_value, \
     plot_triangles, plot_edges, filter_faces, gif_plot_edges, gif_plot_triangles
-from SimplicialComplex.utils.simplicial_complex_utils import filter_by_float
+from SimplicialComplex.utils.simplicial_complex_utils import filter_by_float, sort_vertex
 
 
 class AlphaComplex(SimplicialComplex):
@@ -36,7 +36,8 @@ class AlphaComplex(SimplicialComplex):
         """
         self.tri = Delaunay(points)
         # Add all the vertex to the complex
-        aux = SimplicialComplex([tuple([int(num) for num in tup]) for tup in self.tri.simplices])
+        sorted_faces = sort_vertex([tuple([int(num) for num in tup]) for tup in self.tri.simplices])
+        aux = SimplicialComplex(sorted_faces)
         super().__init__(aux.n_faces(0))
         # Add the value of each edge
         for x in aux.n_faces(1):

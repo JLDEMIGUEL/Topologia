@@ -5,8 +5,8 @@ from unittest.mock import patch
 import numpy as np
 
 from SimplicialComplex.AlphaComplex import AlphaComplex
-from SimplicialComplex.utils.simplicial_complex_utils import order, reachable, sub_faces, updateDict, \
-    order_faces, filter_by_float, noise, connected_components, reachable_alg, num_loops, calc_homology, num_triangles, \
+from SimplicialComplex.utils.simplicial_complex_utils import sort_faces, reachable, sub_faces, updateDict, \
+    sort_vertex, filter_by_float, noise, connected_components, reachable_alg, num_loops, calc_homology, num_triangles, \
     check_if_sub_face, boundary_operator
 
 
@@ -14,12 +14,12 @@ class Test(TestCase):
     def test_order_1(self):
         input_list = [(0, 1), (0,), (100, 1000)]
         expected_output = [(0,), (0, 1), (100, 1000)]
-        self.assertEqual(expected_output, order(input_list))
+        self.assertEqual(expected_output, sort_faces(input_list))
 
     def test_order_2(self):
         input_list = [(0, 100), (100,), (0, 99)]
         expected_output = [(0, 99), (0, 100), (100,)]
-        self.assertEqual(expected_output, order(input_list))
+        self.assertEqual(expected_output, sort_faces(input_list))
 
     def test_reachable_1(self):
         edges = [(0, 1), (1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4), (4, 5), (4, 6), (5, 6), (6, 7), (6, 8), (7, 8),
@@ -75,7 +75,7 @@ class Test(TestCase):
     def test_order_faces(self):
         unsorted_faces = {(3, 2, 1), (4, 6, 5), (2, 1), (1,), (8, 9)}
         sorted_faces = {(1, 2, 3), (4, 5, 6), (1, 2), (1,), (8, 9)}
-        self.assertEqual(sorted_faces, order_faces(unsorted_faces))
+        self.assertEqual(sorted_faces, sort_vertex(unsorted_faces))
 
     def test_filter_by_float(self):
         dic = {(2,): 0, (5,): 0, (11,): 0, (8,): 0, (14,): 0, (): 0, (17,): 0, (0,): 0, (3,): 0, (9,): 0, (6,): 0,
