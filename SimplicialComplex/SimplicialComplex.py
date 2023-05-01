@@ -8,7 +8,7 @@ from SimplicialComplex.utils.matrices_utils import smith_normal_form, generalize
     smith_normal_form_z
 from SimplicialComplex.utils.simplicial_complex_utils import order, reachable, sub_faces, updateDict, \
     order_faces, calc_homology, plot_persistence_diagram, plot_barcode_diagram, check_if_sub_face, \
-    check_if_directed_sub_face, build_homology_string
+    boundary_operator, build_homology_string
 
 
 class SimplicialComplex:
@@ -93,7 +93,7 @@ class SimplicialComplex:
         Returns:
              list[tuple]: faces with dimension n
         """
-        return order(set(x for x in self.faces.keys() if len(x) - 1 == n))
+        return order(filter(lambda x: len(x) - 1 == n, self.faces.keys()))
 
     def star(self, face: tuple) -> list[tuple]:
         """
@@ -115,8 +115,7 @@ class SimplicialComplex:
         Returns:
              list[tuple]: closed star of the given face
         """
-        star = self.star(face)
-        return order(SimplicialComplex(star).faces.keys())
+        return order(SimplicialComplex(self.star(face)).faces.keys())
 
     def link(self, face: tuple) -> list[tuple]:
         """
@@ -126,11 +125,7 @@ class SimplicialComplex:
         Returns:
             list[tuple]: link of the given face
         """
-        link = set()
-        for x in self.closed_star(face):
-            if len(set(x).intersection(face)) == 0:
-                link.add(x)
-        return order(link)
+        return order(filter(lambda x: len(set(x).intersection(face)) == 0, self.closed_star(face)))
 
     def skeleton(self, dim: int) -> list[tuple]:
         """
@@ -140,11 +135,7 @@ class SimplicialComplex:
         Returns:
             list[tuple]: skeleton with the given dimension
         """
-        skeleton = set()
-        for x in self.faces.keys():
-            if len(x) <= dim + 1:
-                skeleton.add(x)
-        return order(skeleton)
+        return order(filter(lambda face: len(face) <= dim + 1, self.faces.keys()))
 
     def euler_characteristic(self) -> int:
         """
@@ -154,8 +145,7 @@ class SimplicialComplex:
         """
         euler = 0
         for i in range(self.dimension() + 1):
-            sk = len({x for x in self.faces.keys() if len(x) == i + 1})
-            euler += (-1) ** i * sk
+            euler += (-1) ** i * self.betti_number(i, group=2)
         return euler
 
     def connected_components(self) -> int:
@@ -166,9 +156,7 @@ class SimplicialComplex:
         """
         # Build visited vertex dictionary
         vertex, edges = [x[0] for x in self.n_faces(0)], self.n_faces(1)
-        visited_vertex = dict()
-        for x in vertex:
-            visited_vertex[x] = False
+        visited_vertex = {x: False for x in vertex}
         # Compute connected components
         components = set()
         for vert in vertex:
@@ -177,26 +165,26 @@ class SimplicialComplex:
                 components.add(tuple(reachable_list))
         return len(components)
 
-    def boundary_matrix(self, p: int, group=None) -> np.array:
+    def boundary_matrix(self, p: int, group: int | str = None) -> np.array:
         """
         Returns the boundary matrix of the complex.
         Args:
             p (int): dimension
+            group (int | str): group
         Returns:
             np.array: boundary matrix for the given dimension
         """
         Cp = self.n_faces(p)
         Cp_1 = self.n_faces(p - 1)
-        Md = [[0 for _ in range(len(Cp))] for _ in range(len(Cp_1))]
 
-        Md = [[check_if_directed_sub_face(sub_face, super_face) for super_face in Cp] for sub_face in Cp_1]
+        Md = [[boundary_operator(sub_face, super_face) for super_face in Cp] for sub_face in Cp_1]
         if group == 'Q':
             Md = [[Fraction(elem) for elem in row] for row in Md]
         elif group is not None:
-            Md = [[check_if_directed_sub_face(sub_face, super_face) % group for super_face in Cp] for sub_face in Cp_1]
+            Md = [[boundary_operator(sub_face, super_face) % group for super_face in Cp] for sub_face in Cp_1]
         return np.array(Md)
 
-    def generalized_boundary_matrix(self) -> np.array:
+    def generalized_boundary_matrix(self, group: int | str = None) -> np.array:
         """
         Computes the generalized border matrix of the complex.
         Returns:
@@ -204,14 +192,14 @@ class SimplicialComplex:
         """
         faces = sorted(self.faces.keys(), key=lambda face: (self.faces[face], len(face), face))
         faces.remove(faces[0])
-        M = [[0 for _ in range(len(faces))] for _ in range(len(faces))]
 
-        for i in range(len(faces)):
-            for j in range(len(faces)):
-                # If is sub-face, add to matrix
-                if check_if_sub_face(faces[i], faces[j]):
-                    M[i][j] = 1
-        return np.array(M)
+        Md = [[boundary_operator(sub_face, super_face) for super_face in faces] for sub_face in faces]
+        if group == 'Q':
+            Md = [[Fraction(elem) for elem in row] for row in Md]
+        elif group is not None:
+            Md = [[boundary_operator(sub_face, super_face) % group for super_face in faces] for sub_face in
+                  faces]
+        return np.array(Md)
 
     def betti_number(self, p: int, group=None) -> int:
         """
@@ -379,7 +367,7 @@ class SimplicialComplex:
         else:
             p = [p]
         # Compute generalized border matrix and compute the final matrix and lows
-        M, lows_list = generalized_border_matrix_algorithm(self.generalized_boundary_matrix())
+        M, lows_list = generalized_border_matrix_algorithm(self.generalized_boundary_matrix(group=2))
         faces = sorted(self.faces.keys(), key=lambda _face: (self.faces[_face], len(_face), _face))
         faces.remove(faces[0])
         infinite = 1.5 * max(self.threshold_values())

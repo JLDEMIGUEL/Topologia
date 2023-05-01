@@ -18,24 +18,23 @@ def order(faces: list | set | tuple) -> list:
     return sorted(faces, key=lambda a: (a, len(a)))
 
 
-def reachable(edges: list | set | tuple, vert: int, visitedVertex: dict) -> list:
+def reachable(edges: list | set | tuple, vert: int, visited_vertex: dict) -> list:
     """
     Returns a list with the reachable vertex from the given vertex.
     Args:
         edges (list | set | tuple): list of edges
-        visitedVertex (dict): dict with the visited vertex
+        visited_vertex (dict): dict with the visited vertex
         vert (int): entry vertex to get the list of reachable vertex
     Returns:
         list: list of reachable vertex from the given vertex
     """
     reach = [vert]
-    visitedVertex[vert] = True
+    visited_vertex[vert] = True
     for edge in edges:
         if vert in edge:
-            tup = tuple(x for x in edge if x != vert)
-            endVert = tup[0]
-            if not visitedVertex[endVert]:
-                reach = reach + reachable(edges, endVert, visitedVertex)
+            end_vert = tuple(x for x in edge if x != vert)[0]
+            if not visited_vertex[end_vert]:
+                reach = reach + reachable(edges, end_vert, visited_vertex)
     return reach
 
 
@@ -116,13 +115,10 @@ def check_if_sub_face(sub_face: tuple, super_face: tuple) -> bool:
     """
     if len(sub_face) != len(super_face) - 1 or len(sub_face) == 0:
         return False
-    for vert in sub_face:
-        if vert not in super_face:
-            return False
-    return True
+    return set(sub_face).issubset(set(super_face))
 
 
-def check_if_directed_sub_face(sub_face: tuple, super_face: tuple) -> bool:
+def boundary_operator(sub_face: tuple, super_face: tuple) -> bool:
     """
     Checks if the given sub-face is a directed sub-face of the given super-face, and returns the sign of the
     corresponding face map if so.

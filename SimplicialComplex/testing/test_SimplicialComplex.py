@@ -8,7 +8,7 @@ import numpy as np
 
 from SimplicialComplex.AlphaComplex import AlphaComplex
 from SimplicialComplex.SimplicialComplex import SimplicialComplex
-from SimplicialComplex.utils.constants import tetraedro, toro, plano_proyectivo, botella_klein
+from SimplicialComplex.utils.constants import tetraedro, toro, plano_proyectivo, botella_klein, tetraedro_borde
 
 CLOUD_PATH = os.path.join(os.path.abspath(Path(__file__).parent.parent.parent), "docs", "clouds.json")
 
@@ -233,7 +233,7 @@ class TestSimplicialComplex(TestCase):
 
     def test_generalized_border_matrix(self):
         simple_alpha = AlphaComplex([[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]])
-        matrix = simple_alpha.generalized_boundary_matrix()
+        matrix = simple_alpha.generalized_boundary_matrix(group=2)
 
         expected_matrix = [[0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
                            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0],
@@ -254,7 +254,7 @@ class TestSimplicialComplex(TestCase):
                            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-        self.assertTrue((np.array(expected_matrix) == matrix).all())
+        self.assertEqual(np.array(expected_matrix).tolist(), matrix.tolist())
 
     def test_boundary_matrix_1(self):
         expected = [[-1, -1, -1, 0, 0, 0],
