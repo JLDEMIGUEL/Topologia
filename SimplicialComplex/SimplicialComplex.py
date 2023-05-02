@@ -6,7 +6,7 @@ import numpy as np
 
 from SimplicialComplex.utils.matrices_utils import smith_normal_form, generalized_border_matrix_algorithm, \
     smith_normal_form_z
-from SimplicialComplex.utils.simplicial_complex_utils import sort_faces, reachable, sub_faces, updateDict, \
+from SimplicialComplex.utils.simplicial_complex_utils import sort_faces, reachable, sub_faces, update_faces_dict, \
     sort_vertex, calc_homology, plot_persistence_diagram, plot_barcode_diagram, boundary_operator, build_homology_string
 
 
@@ -33,7 +33,7 @@ class SimplicialComplex:
         for face in faces:
             faces = faces.union(sub_faces(face))
         # Build the faces dictionary
-        self.faces = updateDict({}, faces, 0)
+        self.faces = update_faces_dict({}, faces, 0)
 
     def add(self, faces: list | set | tuple, float_value: float) -> None:
         """
@@ -46,7 +46,7 @@ class SimplicialComplex:
         """
         faces = SimplicialComplex(faces).faces_list()
         # Updates the faces dictionary with the new faces
-        self.faces = updateDict(self.faces, faces, float_value)
+        self.faces = update_faces_dict(self.faces, faces, float_value)
 
     def filtration_order(self) -> list[tuple]:
         """
@@ -218,13 +218,13 @@ class SimplicialComplex:
         dim_bp = len([_ for x in mp_1 if sum(x) != 0])
         return dim_zp - dim_bp
 
-    def all_betti_numbers(self, group=None) -> int:
+    def all_betti_numbers(self, group=None) -> list[int]:
         """
         Gets the betti numbers of the simplicial complex for the given dimension p.
         Args:
             group: group
         Returns:
-            int: betti_number
+            list[int]: betti_number
         """
         return [self.betti_number(dim, group) for dim in range(self.dimension())]
 

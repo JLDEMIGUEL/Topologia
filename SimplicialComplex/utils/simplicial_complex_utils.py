@@ -20,7 +20,7 @@ def sort_faces(faces: list | set | tuple) -> list:
 
 def reachable(edges: list | set | tuple, vert: int, visited_vertex: dict) -> list:
     """
-    Returns a list with the reachable vertex from the given vertex.
+    Returns a list with the reachable vertex from the given vertex in a graph.
     Args:
         edges (list | set | tuple): list of edges
         visited_vertex (dict): dict with the visited vertex
@@ -46,15 +46,15 @@ def sub_faces(face: list | set | tuple) -> set:
     Returns:
         set: set with all sub faces
     """
-    auxSet = set()
+    sub_faces_set = set()
     for vert in face:
-        face2 = tuple(x for x in face if x != vert)
-        auxSet.add(face2)
-        auxSet = auxSet.union(sub_faces(face2))
-    return auxSet
+        sub_face = tuple(x for x in face if x != vert)
+        sub_faces_set.add(sub_face)
+        sub_faces_set = sub_faces_set.union(sub_faces(sub_face))
+    return sub_faces_set
 
 
-def updateDict(dic_target: dict, faces: list | set | tuple, float_value: float) -> dict:
+def update_faces_dict(dic_target: dict, faces: list | set | tuple, float_value: float) -> dict:
     """
     Update the dictionary of faces with the new given faces.
     Args:
@@ -67,9 +67,7 @@ def updateDict(dic_target: dict, faces: list | set | tuple, float_value: float) 
     """
     dic = dic_target.copy()
     for face in faces:
-        if face not in dic:
-            dic[face] = float_value
-        elif dic[face] > float_value:
+        if face not in dic or dic[face] > float_value:
             dic[face] = float_value
     return dic
 
@@ -85,8 +83,7 @@ def sort_vertex(faces: list | set | tuple) -> set:
     sorted_faces = set()
     for x in faces:
         sorted_faces.add(tuple(sorted(list(x), key=lambda a: a)))
-    faces = sorted_faces
-    return faces
+    return sorted_faces
 
 
 def filter_by_float(dic: dict, value: float) -> set:
@@ -98,9 +95,7 @@ def filter_by_float(dic: dict, value: float) -> set:
     Returns:
         set: faces which float value is less than the given value
     """
-    keys = dic.keys()
-    res = {x for x in keys if dic[x] <= value}
-    return res
+    return {x for x in dic.keys() if dic[x] <= value}
 
 
 def check_if_sub_face(sub_face: tuple, super_face: tuple) -> bool:
@@ -170,29 +165,29 @@ def connected_components(complex_faces: set) -> int:
     components = set()
     for vert in vertex:
         if not visited_vertex[vert]:
-            reachableList = sorted(reachable_alg(edges, vert, visited_vertex), key=lambda a: a)
-            components.add(tuple(reachableList))
+            reachable_list = sorted(reachable_alg(edges, vert, visited_vertex), key=lambda a: a)
+            components.add(tuple(reachable_list))
     return len(components)
 
 
-def reachable_alg(edges: list | set | tuple, vert: int, visitedVertex: dict) -> list:
+def reachable_alg(edges: list | set | tuple, vert: int, visited_vertex: dict) -> list:
     """
     Returns a list with the reachable vertex from the given vertex.
     Args:
         edges (list | set | tuple): list of edges
-        visitedVertex (dict): dict with the visited vertex
+        visited_vertex (dict): dict with the visited vertex
         vert (int): entry vertex to get the list of reachable vertex
     Returns:
         list: list of reachable vertex from the given vertex
     """
     reach = [vert]
-    visitedVertex[vert] = True
+    visited_vertex[vert] = True
     for edge in edges:
         if vert in edge:
             tup = tuple(x for x in edge if x != vert)
-            endVert = tup[0]
-            if not visitedVertex[endVert]:
-                reach = reach + reachable(edges, endVert, visitedVertex)
+            end_vertex = tup[0]
+            if not visited_vertex[end_vertex]:
+                reach = reach + reachable(edges, end_vertex, visited_vertex)
     return reach
 
 

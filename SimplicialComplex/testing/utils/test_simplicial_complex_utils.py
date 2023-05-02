@@ -5,7 +5,7 @@ from unittest.mock import patch
 import numpy as np
 
 from SimplicialComplex.AlphaComplex import AlphaComplex
-from SimplicialComplex.utils.simplicial_complex_utils import sort_faces, reachable, sub_faces, updateDict, \
+from SimplicialComplex.utils.simplicial_complex_utils import sort_faces, reachable, sub_faces, update_faces_dict, \
     sort_vertex, filter_by_float, noise, connected_components, reachable_alg, num_loops, calc_homology, num_triangles, \
     check_if_sub_face, boundary_operator
 
@@ -70,7 +70,7 @@ class Test(TestCase):
                         (0, 1): 0.2146289409772831, (0, 1, 2): 0.27011640994552, (0, 1, 5): 0.2146289409772831,
                         (0, 2, 7): 0.24143718415372575, (2, 7): 0.24143718415372575, (0, 3, 5): 0.129720050879878,
                         (0, 3, 7): 0.12926191918239155, (3, 7): 0.12926191918239155}
-        self.assertEqual(expected_dic, updateDict(dic, faces, float_value))
+        self.assertEqual(expected_dic, update_faces_dict(dic, faces, float_value))
 
     def test_order_faces(self):
         unsorted_faces = {(3, 2, 1), (4, 6, 5), (2, 1), (1,), (8, 9)}

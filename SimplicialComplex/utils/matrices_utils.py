@@ -103,11 +103,34 @@ def smith_normal_form_z(matrix: np.array, rows_opp_matrix=None, columns_opp_matr
     return matrix, rows_opp_matrix, columns_opp_matrix, steps
 
 
-def adjust_desc(desc):
+def adjust_desc(desc: str) -> str:
+    """
+    Adjust the column and row of the step description
+
+    Args:
+        desc: the step description
+
+    Returns:
+        str: the adjusted step description
+
+    """
     return re.sub(r"([cr])(\d+)", lambda match: f"{match.group(1)}{int(match.group(2)) + 1}", desc)
 
 
-def add_step(steps, mat, row, col, desc):
+def add_step(steps: list, mat: np.matrix, row: np.matrix, col: np.matrix, desc: str) -> None:
+    """
+    Adds a step to the step list.
+
+    Args:
+        steps (list): list with previous steps
+        mat (np.matrix): matrix to add
+        row (np.matrix): rows matrix to add
+        col (np.matrix): columns matrix to add
+        desc (str): step description to add
+
+    Returns:
+        None:
+    """
     if len(steps) == 0:
         steps.extend([(mat.copy(), row.copy(), col.copy(), desc)])
         return
@@ -197,7 +220,21 @@ def swap_and_sign(matrix: np.array, rows_opp_matrix: np.array, columns_opp_matri
     return matrix, rows_opp_matrix, columns_opp_matrix
 
 
-def swap_all(matrix, rows_opp_matrix, columns_opp_matrix, source, obj, steps):
+def swap_all(matrix: np.matrix, rows_opp_matrix: np.matrix, columns_opp_matrix: np.matrix, source: tuple[int], obj: tuple[int], steps: list) -> tuple:
+    """
+    Swaps the columns and rows specified in the 3 matrix's
+    Args:
+        matrix (np.matrix): main matrix
+        rows_opp_matrix (np.matrix): rows matrix
+        columns_opp_matrix (np.matrix): column matrix
+        source (tuple[int]): source coordinates
+        obj (tuple[int]): destiny coordinates
+        steps (list): steps list
+
+    Returns:
+        tuple: the 3 matrix with the applied swap
+
+    """
     if source[0] != obj[0]:
         matrix = swap(matrix, [source[0], 0], [obj[0], 0])
         rows_opp_matrix, columns_opp_matrix = swap_opp_matrix(rows_opp_matrix, columns_opp_matrix, [source[0], 0],
@@ -356,7 +393,7 @@ def reconstruct(matrix: np.array, aux: np.array) -> np.array:
     return matrix_res
 
 
-def inverse(number: int | Fraction, group: int = None) -> int:
+def inverse(number: int | Fraction, group: int = None) -> int | Fraction:
     """
     Computes the modular inverse of a number in a given group.
     The modular inverse of a is the number x such that a*x = 1 (mod group)
@@ -367,7 +404,7 @@ def inverse(number: int | Fraction, group: int = None) -> int:
         group (int): The group to find the modular inverse in
 
     Returns:
-        int: The modular inverse of number in group, or None if no inverse exists
+        int | Fraction: The modular inverse of number in group, or None if no inverse exists
     """
     if group is None:
         return number
@@ -399,7 +436,7 @@ def _build_eye_matrix(rows: int, cols: int, group: object = None) -> tuple[np.ar
     return columns_opp_matrix, rows_opp_matrix
 
 
-def gcd_euclides(a: int, b: int) -> int:
+def gcd(a: int, b: int) -> int:
     """
     Compute the greatest common divisor (gcd) of two integers using the Euclidean algorithm.
     Parameters:
@@ -429,7 +466,7 @@ def matrix_gcd(matrix: np.array) -> int:
         for element in row:
             if element == 0:
                 continue
-            gcd_result = gcd_euclides(gcd_result % element, element)
+            gcd_result = gcd(gcd_result % element, element)
     return gcd_result
 
 
@@ -464,16 +501,16 @@ def _find_non_divisible_number(matrix: np.array) -> tuple[int, int]:
     first = matrix[0, 0]
     # Find in first column
     for i in range(1, rows):
-        if gcd_euclides(first, matrix[i][0]) < first:
+        if gcd(first, matrix[i][0]) < first:
             return i, 0
     # Find in first row
     for j in range(1, cols):
-        if gcd_euclides(first, matrix[0][j]) < first:
+        if gcd(first, matrix[0][j]) < first:
             return 0, j
     # Find in the rest of the matrix
     for i in range(1, rows):
         for j in range(1, cols):
-            if gcd_euclides(first, matrix[i][j]) < first:
+            if gcd(first, matrix[i][j]) < first:
                 return i, j
 
 
@@ -521,7 +558,7 @@ def _process_reduction(matrix: np.array, coord: tuple[int, int], rows_opp_matrix
         rows_opp_matrix[0, :] += rows_opp_matrix[coord[0], :]
         add_step(steps, matrix.copy(), rows_opp_matrix.copy(), columns_opp_matrix.copy(),
                  "Sumar a c1, c{}".format(coord[0] + 1))
-        matrix, rows_opp_matrix, columns_opp_matrix = _process_reduction(matrix, [0, coord[1]], rows_opp_matrix,
+        matrix, rows_opp_matrix, columns_opp_matrix = _process_reduction(matrix, (0, coord[1]), rows_opp_matrix,
                                                                          columns_opp_matrix)
     return matrix, rows_opp_matrix, columns_opp_matrix
 

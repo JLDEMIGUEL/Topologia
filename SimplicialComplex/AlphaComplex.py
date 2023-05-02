@@ -77,9 +77,12 @@ class AlphaComplex(SimplicialComplex):
             plt.show()
             time.sleep(sleep_time)
 
-    def gif_alpha(self):
+    def gif_alpha(self) -> str:
         """
         Plots the AlphaComplex iterating the dict values in order.
+
+        Returns:
+            str: the file name of the gif
         """
         images = []
         vor = Voronoi(self.tri.points)

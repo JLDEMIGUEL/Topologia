@@ -9,7 +9,7 @@ from fractions import Fraction
 
 from SimplicialComplex.AlphaComplex import AlphaComplex
 from SimplicialComplex.utils.matrices_utils import search_non_zero_elem, swap, reconstruct, smith_normal_form, \
-    gcd_euclides, matrix_gcd, min_abs_position, smith_normal_form_z, generalized_border_matrix_algorithm, extended_gcd
+    gcd, matrix_gcd, min_abs_position, smith_normal_form_z, generalized_border_matrix_algorithm, extended_gcd
 
 
 class Test(TestCase):
@@ -292,12 +292,12 @@ class Test(TestCase):
 
     def test_gcd_euclides_1(self):
         expected = 2
-        returned = gcd_euclides(2, 4)
+        returned = gcd(2, 4)
         self.assertEqual(expected, returned)
 
     def test_gcd_euclides_2(self):
         expected = 36
-        returned = gcd_euclides(180, 324)
+        returned = gcd(180, 324)
         self.assertEqual(expected, returned)
 
     def test_matrix_gcd_1(self):
