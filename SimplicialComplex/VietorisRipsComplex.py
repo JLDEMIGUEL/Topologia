@@ -34,8 +34,8 @@ class Vietoris_RipsComplex(SimplicialComplex):
         if efficient:
             self.faces = self._compute()
         else:
-            pointPositions = tuple(i for i in range(len(points)))
-            faces = all_faces({tuple(x for x in range(len(points)))}, pointPositions)
+            point_positions = tuple(i for i in range(len(points)))
+            faces = all_faces({tuple(x for x in range(len(points)))}, point_positions)
             self.faces = get_all_radios(faces, self.points)
 
     def _compute_rips_complex_for_subset(self, subset: list) -> tuple[int, int]:
@@ -78,12 +78,11 @@ class Vietoris_RipsComplex(SimplicialComplex):
 
         return max(left_max, right_max)
 
-    def _compute(self) -> tuple[set, dict]:
+    def _compute(self) -> dict:
         """
         Compute the Vietoris Rips Complex for the set of points passed to the class.
         Returns:
-            tuple[set, dict]: A tuple containing the set of faces of the Rips complex and a dictionary where the keys
-            are the faces and the values are the corresponding radii
+            dict: A dictionary where the keys are the faces and the values are the corresponding radius
         """
         with Pool() as pool:
             if self.max_size is None:

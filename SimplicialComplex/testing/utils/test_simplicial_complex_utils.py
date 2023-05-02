@@ -5,21 +5,21 @@ from unittest.mock import patch
 import numpy as np
 
 from SimplicialComplex.AlphaComplex import AlphaComplex
-from SimplicialComplex.utils.simplicial_complex_utils import order, reachable, sub_faces, updateDict, \
-    order_faces, filter_by_float, noise, connected_components, reachable_alg, num_loops, calc_homology, num_triangles, \
-    check_if_sub_face, check_if_directed_sub_face
+from SimplicialComplex.utils.simplicial_complex_utils import sort_faces, reachable, sub_faces, update_faces_dict, \
+    sort_vertex, filter_by_float, noise, connected_components, reachable_alg, num_loops, calc_homology, num_triangles, \
+    check_if_sub_face, boundary_operator
 
 
 class Test(TestCase):
     def test_order_1(self):
         input_list = [(0, 1), (0,), (100, 1000)]
         expected_output = [(0,), (0, 1), (100, 1000)]
-        self.assertEqual(expected_output, order(input_list))
+        self.assertEqual(expected_output, sort_faces(input_list))
 
     def test_order_2(self):
         input_list = [(0, 100), (100,), (0, 99)]
         expected_output = [(0, 99), (0, 100), (100,)]
-        self.assertEqual(expected_output, order(input_list))
+        self.assertEqual(expected_output, sort_faces(input_list))
 
     def test_reachable_1(self):
         edges = [(0, 1), (1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4), (4, 5), (4, 6), (5, 6), (6, 7), (6, 8), (7, 8),
@@ -70,12 +70,12 @@ class Test(TestCase):
                         (0, 1): 0.2146289409772831, (0, 1, 2): 0.27011640994552, (0, 1, 5): 0.2146289409772831,
                         (0, 2, 7): 0.24143718415372575, (2, 7): 0.24143718415372575, (0, 3, 5): 0.129720050879878,
                         (0, 3, 7): 0.12926191918239155, (3, 7): 0.12926191918239155}
-        self.assertEqual(expected_dic, updateDict(dic, faces, float_value))
+        self.assertEqual(expected_dic, update_faces_dict(dic, faces, float_value))
 
     def test_order_faces(self):
         unsorted_faces = {(3, 2, 1), (4, 6, 5), (2, 1), (1,), (8, 9)}
         sorted_faces = {(1, 2, 3), (4, 5, 6), (1, 2), (1,), (8, 9)}
-        self.assertEqual(sorted_faces, order_faces(unsorted_faces))
+        self.assertEqual(sorted_faces, sort_vertex(unsorted_faces))
 
     def test_filter_by_float(self):
         dic = {(2,): 0, (5,): 0, (11,): 0, (8,): 0, (14,): 0, (): 0, (17,): 0, (0,): 0, (3,): 0, (9,): 0, (6,): 0,
@@ -118,11 +118,11 @@ class Test(TestCase):
         self.assertFalse(check_if_sub_face((1, 2), (3, 4)))
 
     def test_check_if_directed_sub_face(self):
-        self.assertEqual(0, check_if_directed_sub_face((1, 2), (2, 3)))
-        self.assertEqual(1, check_if_directed_sub_face((1, 2), (1, 2, 3)))
-        self.assertEqual(-1, check_if_directed_sub_face((1, 3), (1, 2, 3)))
-        self.assertEqual(-1, check_if_directed_sub_face((1, 2), (1, 3, 2)))
-        self.assertEqual(1, check_if_directed_sub_face((1, 3), (1, 3, 2)))
+        self.assertEqual(0, boundary_operator((1, 2), (2, 3)))
+        self.assertEqual(1, boundary_operator((1, 2), (1, 2, 3)))
+        self.assertEqual(-1, boundary_operator((1, 3), (1, 2, 3)))
+        self.assertEqual(-1, boundary_operator((1, 2), (1, 3, 2)))
+        self.assertEqual(1, boundary_operator((1, 3), (1, 3, 2)))
 
     def test_noise(self):
         points = np.array([[1, 2], [3, 4], [5, 6]])

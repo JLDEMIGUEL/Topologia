@@ -37,9 +37,9 @@ def all_faces(combinations: set, points: tuple) -> set:
     """
     for i in range(len(points)):
         face2 = tuple(j for j in points if i != j)
-        sizePrev = len(combinations)
+        previous_size = len(combinations)
         combinations.add(face2)
-        if len(combinations) == sizePrev:
+        if len(combinations) == previous_size:
             return combinations
         all_faces(combinations, face2)
     return combinations

@@ -73,14 +73,15 @@ def plot_edges(edges_list: list, tri: Delaunay) -> None:
         plt.plot(x, y, 'k')
 
 
-def gif_plot_triangles(triangles: list, tri: Delaunay, ax) -> None:
+def gif_plot_triangles(triangles: list, tri: Delaunay, ax) -> list:
     """
     Plots the given triangles.
     Args:
         tri (Delaunay): Delaunay triangulation
         triangles (list): list of triangles
+        ax:
     Returns:
-        None:
+        list: list of plots
     """
     plots = []
     if len(triangles) > 0:
