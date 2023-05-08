@@ -7,7 +7,8 @@ import numpy as np
 from SimplicialComplex.utils.matrices_utils import smith_normal_form, generalized_border_matrix_algorithm, \
     smith_normal_form_z
 from SimplicialComplex.utils.simplicial_complex_utils import sort_faces, reachable, sub_faces, update_faces_dict, \
-    sort_vertex, calc_homology, plot_persistence_diagram, plot_barcode_diagram, boundary_operator, build_homology_string
+    calc_homology, plot_persistence_diagram, plot_barcode_diagram, boundary_operator, build_homology_string, \
+    validate_subfaces
 
 
 class SimplicialComplex:
@@ -31,7 +32,9 @@ class SimplicialComplex:
         faces = set(faces)
         # Compute all the faces of the complex
         for face in faces:
-            faces = faces.union(sub_faces(face))
+            sub_faces_set = sub_faces(face)
+            validate_subfaces(sub_faces_set, faces)
+            faces = faces.union(sub_faces_set)
         # Build the faces dictionary
         self.faces = update_faces_dict({}, faces, 0)
 
@@ -144,11 +147,11 @@ class SimplicialComplex:
             euler += (-1) ** i * self.betti_number(i, group=2)
         return euler
 
-    def connected_components(self) -> int:
+    def connected_components(self) -> set:
         """
-        Returns number of connected components of the SimplicialComplex.
+        Returns connected components of the SimplicialComplex.
         Returns:
-            int: number of connected components
+            set: connected components
         """
         # Build visited vertex dictionary
         vertex, edges = [x[0] for x in self.n_faces(0)], self.n_faces(1)
@@ -159,7 +162,7 @@ class SimplicialComplex:
             if not visited_vertex[vert]:
                 reachable_list = sorted(reachable(edges, vert, visited_vertex), key=lambda a: a)
                 components.add(tuple(reachable_list))
-        return len(components)
+        return components
 
     def boundary_matrix(self, p: int, group: int | str = None) -> np.array:
         """
@@ -177,7 +180,7 @@ class SimplicialComplex:
         if group == 'Q':
             Md = [[Fraction(elem) for elem in row] for row in Md]
         elif group is not None:
-            Md = [[boundary_operator(sub_face, super_face) % group for super_face in Cp] for sub_face in Cp_1]
+            Md = [[elem % group for elem in row] for row in Md]
         return np.array(Md)
 
     def generalized_boundary_matrix(self, group: int | str = None) -> np.array:

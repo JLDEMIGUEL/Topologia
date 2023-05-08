@@ -6,6 +6,19 @@ from matplotlib import pyplot as plt
 from SimplicialComplex.utils.matrices_utils import elementary_divisors
 
 
+class InvalidSimplicialComplexException(Exception):
+    def __init__(self, message, ):
+        super().__init__(message)
+
+
+def validate_subfaces(sub_faces_set, faces):
+    for sub_face in sub_faces_set:
+        for face in faces:
+            if set(face) == set(sub_face) and face != sub_face:
+                raise InvalidSimplicialComplexException(
+                    f"La cara {sub_face} no tiene la misma orientación que la cara {face}.")
+
+
 def sort_faces(faces: list | set | tuple) -> list:
     """
     Sorts the list of faces following lexicographic and faces length.
@@ -115,7 +128,7 @@ def check_if_sub_face(sub_face: tuple, super_face: tuple) -> bool:
 
 def boundary_operator(sub_face: tuple, super_face: tuple) -> bool:
     """
-    Checks if the given sub-face is a directed sub-face of the given super-face, and returns the sign of the
+    Checks if the given sub-face is a sub-face of the given super-face, and returns the sign of the
     corresponding face map if so.
 
     Args:
@@ -123,7 +136,7 @@ def boundary_operator(sub_face: tuple, super_face: tuple) -> bool:
         super_face (tuple[int]): A tuple representing the vertices of the super-face.
 
     Returns:
-        int: If the sub-face is a directed sub-face of the super-face, returns either -1 or 1 depending on the relative
+        int: If the sub-face is a sub-face of the super-face, returns either -1 or 1 depending on the relative
              orientation of the sub-face with respect to the super-face. If the sub-face is not a directed sub-face of the
              super-face, returns 0.
     """
@@ -295,16 +308,16 @@ def build_homology_string(betti: int, group: int | str, mp_1: np.matrix) -> str:
     elif group == 'Q':
         group = '\\mathbb{Q}'
     else:
-        group = '\\mathbb{Z}_{'+f'{group}'+"}"
+        group = '\\mathbb{Z}_{' + f'{group}' + "}"
     homology = ""
     if betti == 1:
         homology += f"{group}"
     elif betti != 0:
-        homology += f"{group}^"+"{"+f"{betti}"+"}"
+        homology += f"{group}^" + "{" + f"{betti}" + "}"
     for num in elementary_divisors(mp_1):
         if homology != "":
             homology += "\\oplus"
-        homology += "\\mathbb{Z}_{"+f"{num}"+"}"
+        homology += "\\mathbb{Z}_{" + f"{num}" + "}"
     if homology == "":
         homology = "0"
     return homology

@@ -9,6 +9,7 @@ import numpy as np
 from SimplicialComplex.AlphaComplex import AlphaComplex
 from SimplicialComplex.SimplicialComplex import SimplicialComplex
 from SimplicialComplex.utils.constants import tetraedro, toro, plano_proyectivo, botella_klein, tetraedro_borde
+from SimplicialComplex.utils.simplicial_complex_utils import InvalidSimplicialComplexException
 
 CLOUD_PATH = os.path.join(os.path.abspath(Path(__file__).parent.parent.parent), "docs", "clouds.json")
 
@@ -31,6 +32,10 @@ class TestSimplicialComplex(TestCase):
 
     # Simple AlphaComplex
     simple_alpha = AlphaComplex([[-3, 0], [0, 1], [3, 0], [-1.7, -1.8], [1.7, -1.8], [0, -4]])
+
+    def test_invalid_sc(self):
+        with self.assertRaises(InvalidSimplicialComplexException):
+            SimplicialComplex([(1, 2, 3), (1, 3, 2)])
 
     def test_add_1(self):
         sc = SimplicialComplex(tetraedro.faces_list())
@@ -161,16 +166,16 @@ class TestSimplicialComplex(TestCase):
         self.assertEqual(1, self.ac4.euler_characteristic())
 
     def test_connected_components_1(self):
-        self.assertEqual(1, tetraedro.connected_components())
+        self.assertEqual({(0, 1, 2, 3)}, tetraedro.connected_components())
 
     def test_connected_components_2(self):
-        self.assertEqual(1, self.sc2.connected_components())
+        self.assertEqual({(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)}, self.sc2.connected_components())
 
     def test_connected_components_3(self):
-        self.assertEqual(4, self.sc3.connected_components())
+        self.assertEqual({(0,), (1,), (2, 3), (4, 5, 6, 7, 8, 9)}, self.sc3.connected_components())
 
     def test_connected_components_4(self):
-        self.assertEqual(1, self.ac4.connected_components())
+        self.assertEqual({(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)}, self.ac4.connected_components())
 
     def test_boundarymatrix_1(self):
         expected_bm_0 = [[0, 0, 0, 0]]

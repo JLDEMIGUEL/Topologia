@@ -22,7 +22,7 @@ class TestVietoris_RipsComplex(TestCase):
         self.assertEqual(3, self.ac1.dimension())
 
     def test_connected_components(self):
-        self.assertEqual(1, self.ac1.connected_components())
+        self.assertEqual({(0, 1, 2, 3)}, self.ac1.connected_components())
 
     def test_euler_characteristic(self):
         self.assertEqual(1, self.ac1.euler_characteristic())

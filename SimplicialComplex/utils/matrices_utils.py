@@ -29,7 +29,7 @@ def smith_normal_form(matrix: np.array, rows_opp_matrix: np.array = None, column
     [x, y] = search_non_zero_elem(matrix)
     if matrix[x, y] == 0:
         return matrix, rows_opp_matrix, columns_opp_matrix, steps
-    # Swap and reduce first row and column
+    # Swap and reduce first element
     if [x, y] != [0, 0]:
         matrix, rows_opp_matrix, columns_opp_matrix = swap_all(matrix, rows_opp_matrix, columns_opp_matrix,
                                                                [x, y], [0, 0], steps)
@@ -220,7 +220,8 @@ def swap_and_sign(matrix: np.array, rows_opp_matrix: np.array, columns_opp_matri
     return matrix, rows_opp_matrix, columns_opp_matrix
 
 
-def swap_all(matrix: np.matrix, rows_opp_matrix: np.matrix, columns_opp_matrix: np.matrix, source: tuple[int], obj: tuple[int], steps: list) -> tuple:
+def swap_all(matrix: np.matrix, rows_opp_matrix: np.matrix, columns_opp_matrix: np.matrix, source: tuple[int],
+             obj: tuple[int], steps: list) -> tuple:
     """
     Swaps the columns and rows specified in the 3 matrix's
     Args:
@@ -273,14 +274,14 @@ def swap_opp_matrix(rows_opp_matrix: np.array, columns_opp_matrix: np.array, sou
 
 
 def simplify_rows_and_columns(matrix_target: np.array, rows_opp_matrix: np.array, columns_opp_matrix: np.array,
-                              group: object, steps) -> tuple[np.array, np.array, np.array]:
+                              group: int | str, steps: list) -> tuple[np.array, np.array, np.array]:
     """
     Simplifies the columns of the given matrix.
     Args:
         rows_opp_matrix:
         matrix_target (np.array): target matrix
         columns_opp_matrix (np.array): columns opp matrix
-        group (object): group
+        group (int | str): group
         steps (list): steps list
     Returns:
         tuple[np.array, np.array, np.array]: simplified matrix
@@ -323,7 +324,7 @@ def simplify_rows_and_columns(matrix_target: np.array, rows_opp_matrix: np.array
     return matrix, rows_opp_matrix, columns_opp_matrix
 
 
-def reduce_rows_columns(matrix: np.array, rows_opp_matrix, columns_opp_matrix, steps: list) -> np.array:
+def reduce_rows_columns(matrix: np.array, rows_opp_matrix, columns_opp_matrix, steps: list) -> tuple[np.array, np.array, np.array]:
     """
     Reduces the first column and first row assuming that the element [0, 0] divides
     every element in both, the first column and first row.
@@ -333,7 +334,7 @@ def reduce_rows_columns(matrix: np.array, rows_opp_matrix, columns_opp_matrix, s
         matrix (np.array): target matrix to reduce
         steps (list): steps list
     Returns:
-        np.array: matrix with the applied reduction
+        tuple[np.array,np.array,np.array]: matrix with the applied reduction
     """
     matrix = matrix.copy()
     first_row, first_col = matrix[0, :], matrix[:, 0]
@@ -474,7 +475,7 @@ def min_abs_position(matrix: np.array) -> list[int, int]:
     """
     Find the position of the minimum absolute value in a matrix.
     Parameters:
-        matrix (np.array): A 2D list of integers
+        matrix (np.array): A matrix of integers
     Returns:
         list[int, int]: A tuple of integers representing the row and column indices
                          of the minimum absolute value in the matrix.
@@ -514,15 +515,18 @@ def _find_non_divisible_number(matrix: np.array) -> tuple[int, int]:
                 return i, j
 
 
-def _process_reduction(matrix: np.array, coord: tuple[int, int], rows_opp_matrix, columns_opp_matrix,
-                       steps=None) -> np.array:
+def _process_reduction(matrix: np.array, coord: tuple[int, int], rows_opp_matrix: np.array, columns_opp_matrix: np.array,
+                       steps: list = None) -> tuple[np.array, np.array, np.array]:
     """
     Returns the matrix with the reduction applied.
     Args:
         matrix (np.array): matrix to find elements
         coord (tuple[int, int]): coordinates where the element is in the matrix
+        columns_opp_matrix (np.array): columns operations matrix
+        rows_opp_matrix (np.array): rows operations matrix
+        steps (list): algorithm steps
     Returns:
-        np.array: reduced matrix
+        tuple[np.array, np.array, np.array]: reduced matrix
     """
     if steps is None:
         steps = []
