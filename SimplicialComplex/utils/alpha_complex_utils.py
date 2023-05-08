@@ -1,4 +1,5 @@
 import math
+import os
 import statistics
 
 import matplotlib.colors
@@ -122,3 +123,11 @@ def filter_faces(dic: dict) -> dict:
         ordered_faces.remove(last)
         dic.pop(last)
     return dic
+
+
+def delete_file(func):
+    def wrapper(*args, **kwargs):
+        file_content, gifname = func(*args, **kwargs)
+        os.remove(gifname)
+        return file_content
+    return wrapper

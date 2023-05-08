@@ -305,16 +305,10 @@ def barcode_diagram(points_request):
 def gif_alpha(points_request):
     points = points_request['points']
     ac = AlphaComplex(points)
-    filename = None
     try:
-        filename = ac.gif_alpha()
-        with open(filename, 'rb') as f:
-            file_content = f.read()
+        file_content = ac.gif_alpha()
         response = Response(file_content, content_type="image/gif")
         return response
-    except Exception:
+    except Exception as e:
         # Handle exceptions here
         abort(500, "An error occurred when generating the gif")
-    finally:
-        if os.path.exists(filename):
-            os.remove(filename)

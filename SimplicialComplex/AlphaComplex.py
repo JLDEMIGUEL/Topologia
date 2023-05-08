@@ -10,7 +10,7 @@ from scipy.spatial import Delaunay, Voronoi, voronoi_plot_2d
 
 from SimplicialComplex.SimplicialComplex import SimplicialComplex
 from SimplicialComplex.utils.alpha_complex_utils import compute_circumference_radius, compute_edge_value, \
-    plot_triangles, plot_edges, filter_faces, gif_plot_edges, gif_plot_triangles
+    plot_triangles, plot_edges, filter_faces, gif_plot_edges, gif_plot_triangles, delete_file
 from SimplicialComplex.utils.simplicial_complex_utils import filter_by_float, sort_vertex
 
 
@@ -77,6 +77,7 @@ class AlphaComplex(SimplicialComplex):
             plt.show()
             time.sleep(sleep_time)
 
+    @delete_file
     def gif_alpha(self) -> str:
         """
         Plots the AlphaComplex iterating the dict values in order.
@@ -102,15 +103,18 @@ class AlphaComplex(SimplicialComplex):
             plt.close()
 
         unique_id = str(uuid.uuid4())
-        gifname = "app/routes/media/plots-{}.gif".format(unique_id)
+        gifname = "plots-{}.gif".format(unique_id)
         with imageio.get_writer(gifname, mode='I', fps=3) as writer:
             for plot in images:
                 fig = plot
-                filename = 'app/routes/media/plot-{}.png'.format(unique_id)
+                filename = 'plot-{}.png'.format(unique_id)
                 fig.savefig(filename)
-                image = imageio.imread(filename)
+                image = imageio.imread_v2(filename)
                 writer.append_data(image)
                 plt.close(plot)
                 os.remove(filename)
-        return gifname
+        with open(gifname, 'rb') as f:
+            file_content = f.read()
+            return file_content, gifname
+
 
