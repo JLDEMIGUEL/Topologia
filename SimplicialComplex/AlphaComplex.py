@@ -100,7 +100,7 @@ class AlphaComplex(SimplicialComplex):
             plt.close()
 
         with io.BytesIO() as buffer:
-            with imageio.get_writer(buffer, mode='I', duration=1000 / 3, format="gif", loop=0) as writer:
+            with imageio.get_writer(buffer, mode='I', duration=.5, format="gif", loop=0) as writer:
                 for fig in images:
                     with io.BytesIO() as img_buffer:
                         fig.savefig(img_buffer, format='png')
