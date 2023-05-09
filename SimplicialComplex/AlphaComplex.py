@@ -1,6 +1,5 @@
-import os
+import io
 import time
-import uuid
 
 import imageio
 import matplotlib.pyplot as plt
@@ -10,7 +9,7 @@ from scipy.spatial import Delaunay, Voronoi, voronoi_plot_2d
 
 from SimplicialComplex.SimplicialComplex import SimplicialComplex
 from SimplicialComplex.utils.alpha_complex_utils import compute_circumference_radius, compute_edge_value, \
-    plot_triangles, plot_edges, filter_faces, gif_plot_edges, gif_plot_triangles, delete_file
+    plot_triangles, plot_edges, filter_faces, gif_plot_edges, gif_plot_triangles
 from SimplicialComplex.utils.simplicial_complex_utils import filter_by_float, sort_vertex
 
 
@@ -77,13 +76,12 @@ class AlphaComplex(SimplicialComplex):
             plt.show()
             time.sleep(sleep_time)
 
-    @delete_file
-    def gif_alpha(self) -> str:
+    def gif_alpha(self) -> bytes:
         """
         Plots the AlphaComplex iterating the dict values in order.
 
         Returns:
-            str: the file name of the gif
+            bytes: the bytes of the gif
         """
         images = []
         vor = Voronoi(self.tri.points)
@@ -94,27 +92,21 @@ class AlphaComplex(SimplicialComplex):
             edges_list = [list(edge) for edge in faces if len(edge) == 2]
             triangles = [list(triangle) for triangle in faces if len(triangle) == 3]
             # Plot voronoi, points, compute_edge_value and triangles
-            voronoi_plot_2d(vor, ax=ax,
-                            show_vertices=False, line_width=2, line_colors='blue')
+            voronoi_plot_2d(vor, ax=ax, show_vertices=False, line_width=2, line_colors='blue')
             ax.plot(self.tri.points[:, 0], self.tri.points[:, 1], 'ko')
             gif_plot_edges(edges_list, self.tri, ax)
             gif_plot_triangles(triangles, self.tri, ax)
             images.append(fig)
             plt.close()
 
-        unique_id = str(uuid.uuid4())
-        gifname = "plots-{}.gif".format(unique_id)
-        with imageio.get_writer(gifname, mode='I', fps=3) as writer:
-            for plot in images:
-                fig = plot
-                filename = 'plot-{}.png'.format(unique_id)
-                fig.savefig(filename)
-                image = imageio.imread_v2(filename)
-                writer.append_data(image)
-                plt.close(plot)
-                os.remove(filename)
-        with open(gifname, 'rb') as f:
-            file_content = f.read()
-            return file_content, gifname
-
-
+        with io.BytesIO() as buffer:
+            with imageio.get_writer(buffer, mode='I', duration=1000 / 3, format="gif", loop=0) as writer:
+                for fig in images:
+                    with io.BytesIO() as img_buffer:
+                        fig.savefig(img_buffer, format='png')
+                        img_buffer.seek(0)
+                        image = imageio.imread_v2(img_buffer)
+                        writer.append_data(image)
+                    plt.close(fig)
+            file_content = buffer.getvalue()
+        return file_content
